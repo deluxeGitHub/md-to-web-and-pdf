@@ -96,32 +96,28 @@ jobs:
             number_sections=""
             template_name=""
             template_dir=""
-
             template_name=$(python3 - "docs/${name}.md" <<'PY'
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
-lines = text.splitlines()
-if not lines or lines[0].strip() != "---":
-    sys.exit(0)
-try:
-    fm_end = lines.index("---", 1)
-except ValueError:
-    sys.exit(0)
-for line in lines[1:fm_end]:
-    if line.lower().startswith("template:"):
-        value = line.split(":", 1)[1].strip().strip("'\"")
-        print(value.lower())
-        break
-PY
-)
-
+            import sys
+            from pathlib import Path
+            path = Path(sys.argv[1])
+            text = path.read_text(encoding="utf-8")
+            lines = text.splitlines()
+            if not lines or lines[0].strip() != "---":
+                sys.exit(0)
+            try:
+                fm_end = lines.index("---", 1)
+            except ValueError:
+                sys.exit(0)
+            for line in lines[1:fm_end]:
+                if line.lower().startswith("template:"):
+                    value = line.split(":", 1)[1].strip().strip("'\"")
+                    print(value.lower())
+                    break
+            PY
+            )
             if [ -z "$template_name" ]; then
               template_name="default"
             fi
-
             if [ -d "templates/$template_name" ]; then
               template_dir="templates/$template_name"
             else
