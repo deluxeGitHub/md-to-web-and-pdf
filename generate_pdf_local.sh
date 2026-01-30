@@ -6,6 +6,7 @@ mkdir -p temp
 
 # Get the current date
 CURRENT_DATE=$(date +%Y-%m-%d)
+CURRENT_DATE_DE=$(date +%d.%m.%Y)
 
 # Loop through all Markdown files in the docs directory
 for file in docs/*.md; do
@@ -14,6 +15,39 @@ for file in docs/*.md; do
     cp "$file" "temp/${name}_temp.md"
     header_file="temp/${name}_header.tex"
     number_sections=""
+    template_name=""
+    template_dir=""
+
+    template_name=$(python3 - "$file" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+lines = text.splitlines()
+if not lines or lines[0].strip() != "---":
+    sys.exit(0)
+try:
+    fm_end = lines.index("---", 1)
+except ValueError:
+    sys.exit(0)
+for line in lines[1:fm_end]:
+    if line.lower().startswith("template:"):
+        value = line.split(":", 1)[1].strip().strip("'\"")
+        print(value.lower())
+        break
+PY
+)
+
+    if [ -z "$template_name" ]; then
+        template_name="default"
+    fi
+
+    if [ -d "templates/$template_name" ]; then
+        template_dir="templates/$template_name"
+    else
+        template_name="default"
+    fi
 
     # Enable section prefixing for documents that request it
     if grep -q '^section_prefix:' "$file"; then
@@ -31,15 +65,39 @@ EOF
     else
         echo "\\usepackage{enumitem}" > "$header_file"
     fi
+
+    if [ -n "$template_dir" ] && [ -f "$template_dir/pdf-header.tex" ]; then
+        cat "$template_dir/pdf-header.tex" >> "$header_file"
+    fi
     
+    # Map title2 to subtitle for PDF rendering
+    sed -i "s/^title2:/subtitle:/" "temp/${name}_temp.md"
+
     # Replace date placeholder in Markdown content
-    sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE/g" "temp/${name}_temp.md"
-    
-    # Replace date in the metadata block
-    sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE/g" "temp/${name}_temp.md"
+    if [ "$template_name" = "dtfb" ]; then
+        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+        sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+        sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+        sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
+    else
+        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE/g" "temp/${name}_temp.md"
+        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE/g" "temp/${name}_temp.md"
+    fi
 
     # Replace TOC syntax for LaTeX
-    sed -i '/^\* TOC$/{N;s|.*\n.*$|\\clearpage\\renewcommand{\\contentsname}{Inhaltsverzeichnis}\n\\tableofcontents\n\\clearpage|}' "temp/${name}_temp.md"
+    awk '
+      { sub(/\r$/, ""); }
+      $0 == "* TOC" || $0 == "TOC {:toc}" || $0 == "* TOC {:toc}" {
+        print "\\clearpage\\renewcommand{\\contentsname}{Inhaltsverzeichnis}";
+        print "\\tableofcontents";
+        print "\\clearpage";
+        skip = 1;
+        next;
+      }
+      skip && $0 == "{:toc}" { skip = 0; next; }
+      { print; }
+    ' "temp/${name}_temp.md" > "temp/${name}_temp.md.tmp" && mv "temp/${name}_temp.md.tmp" "temp/${name}_temp.md"
     
     # Remove HTML-only blocks for PDF generation
     sed -i '/<div class="html-only"/,/^<\/div>$/d' "temp/${name}_temp.md"
@@ -59,7 +117,7 @@ EOF
       --pdf-engine=xelatex \
       -V geometry:margin=1in \
       --include-in-header="$header_file" \
-      --resource-path=./docs
+      --resource-path=.:./docs:./templates:./templates/$template_name
 done
 
 echo "PDFs successfully generated in assets/pdf/"

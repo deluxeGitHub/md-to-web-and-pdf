@@ -4,9 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+    {% assign template_name = page.template | default: "default" | downcase %}
+    {% if template_name == "dtfb" %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/png" href="{{ "/templates/dtfb/images/DTFB-favicon.png" | relative_url }}">
+        <link rel="stylesheet" href="{{ "/templates/dtfb/web.css" | relative_url }}">
+    {% else %}
+        <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+    {% endif %}
 </head>
-<body class="{% if page.section_prefix %}section-prefix{% endif %}">
+<body class="{% if page.section_prefix %}section-prefix{% endif %} template-{{ template_name }}">
+    {% if template_name == "dtfb" %}
+        {% include templates/dtfb/header.html %}
+    {% endif %}
+    {% if template_name == "dtfb" %}
+        <div class="dtfb-doc-heading">
+            <div class="dtfb-doc-heading__top">
+                <div class="dtfb-doc-heading__brand">
+                    <img class="dtfb-doc-logo" src="{{ "/templates/dtfb/images/DTFB-logo.png" | relative_url }}" alt="DTFB Logo">
+                    <div class="dtfb-doc-titles">
+                        <div class="dtfb-doc-title">{{ page.title }}</div>
+                        {% if page.subtitle %}
+                            <div class="dtfb-doc-subtitle">{{ page.subtitle }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="dtfb-doc-actions">
+                    <div class="dtfb-hero__links">
+                        {% if page.show_home != false %}
+                            <a class="dtfb-home-button" href="{{ "/" | relative_url }}">Home</a>
+                        {% endif %}
+                        {% if page.pdf %}
+                            <a href="{{ page.pdf | relative_url }}" target="_blank" rel="noopener">PDF</a>
+                        {% endif %}
+                        {% if page.source %}
+                            <a href="{{ page.source }}" target="_blank" rel="noopener">Quelle</a>
+                        {% endif %}
+                        <button class="dtfb-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                            <span class="dtfb-theme-toggle__icon" data-theme-icon>
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                        <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                        <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                        <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                        <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                        <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                        <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                        <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                        <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                                    </g>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                    {% assign template_date_raw = page.date | default: "" %}
+                    {% assign template_date_str = template_date_raw | jsonify %}
+                    {% if template_date_str contains "site.time" or template_date_str contains "=>" %}
+                        {% assign template_date = site.time | date: "%d.%m.%Y" %}
+                    {% else %}
+                        {% assign template_date = template_date_raw %}
+                    {% endif %}
+                    {% if template_date != "" %}
+                        <div class="dtfb-doc-date">Stand: {{ template_date }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
     <div class="wrapper">
         {{ content }}
     </div>
@@ -25,6 +92,71 @@
                 backToTopButton.style.display = "none"; // Versteckt den Button, wenn man oben ist
             }
         };
+    </script>
+
+    <script>
+        const dtfbSlugify = (text) => text.toLowerCase()
+            .replace(/[^\w\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-");
+
+        const dtfbCopyText = async (text) => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            }
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            temp.setAttribute("readonly", "");
+            temp.style.position = "absolute";
+            temp.style.left = "-9999px";
+            document.body.appendChild(temp);
+            temp.select();
+            const success = document.execCommand("copy");
+            document.body.removeChild(temp);
+            return success;
+        };
+
+        const initHeadingLinks = () => {
+            const wrapper = document.querySelector(".wrapper");
+            if (!wrapper) return;
+            const headings = wrapper.querySelectorAll("h1, h2, h3, h4");
+
+            headings.forEach((heading) => {
+                if (heading.querySelector(".dtfb-heading-link")) return;
+                let id = heading.getAttribute("id");
+                if (!id) {
+                    id = dtfbSlugify(heading.textContent || "section");
+                    let unique = id;
+                    let counter = 2;
+                    while (document.getElementById(unique)) {
+                        unique = `${id}-${counter++}`;
+                    }
+                    heading.setAttribute("id", unique);
+                }
+
+                const link = document.createElement("a");
+                link.className = "dtfb-heading-link";
+                link.href = `#${id}`;
+                link.setAttribute("aria-label", "Link kopieren");
+                link.innerHTML = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M10.5 13.5l3-3\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M7 17a4 4 0 0 1 0-5.66l2.34-2.34a4 4 0 0 1 5.66 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M17 7a4 4 0 0 1 0 5.66l-2.34 2.34a4 4 0 0 1-5.66 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>";
+
+                link.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    const url = `${window.location.origin}${window.location.pathname}#${id}`;
+                    await dtfbCopyText(url);
+                    history.replaceState(null, "", `#${id}`);
+                });
+
+                heading.appendChild(link);
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initHeadingLinks);
+        } else {
+            initHeadingLinks();
+        }
     </script>
 </body>
 </html>

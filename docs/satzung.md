@@ -1,28 +1,16 @@
 ---
-title: "Satzung des BTFV e.V."
-author: "![BTFV Logo](images/btfv-logo.png)"
+title: "Satzung"
+title2: "des BTFV e.V."
 date: 23.11.2025
 layout: default
 section_prefix: "§"
+template: DTFB
+pdf: /assets/pdf/satzung.pdf
+source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md
 ---
-<div class="html-only" style="text-align: center;">
-    <div class="title" style="text-align: center;">
-        <img src="images/btfv-logo.png" alt="BTFV Logo" style="display: block; margin: 0 auto;" />
-        Satzung des BTFV e.V.
-    </div>
-
-    <p style="text-align: center;">
-        Zuletzt geändert am: 23.11.2025
-    </p>
-    <p>
-        <a href="./../assets/pdf/satzung.pdf" target="_blank">Download als PDF</a><br />
-        <a href="https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md" target="_blank">GitHub Repository</a>
-    </p>
-</div>
 
 * TOC
 {:toc}
-
 
 # Name, Rechtsform und Sitz des Vereins
 1. Der Verein führt den Namen: Bayerischer Tischfußballverband e.V. Die Abkürzung lautet: BTFV.

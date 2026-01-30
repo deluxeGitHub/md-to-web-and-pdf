@@ -7,6 +7,7 @@ Dieses Repository enthält die offiziellen Dokumente des Bayerischen Tischfußba
 - **docs/**: Enthält die Markdown-Quellen der Verbandsdokumente (`satzung.md`, `spielordnung.md`, `gebuehrenordnung.md` usw.).
 - **assets/pdf/**: Hier werden die automatisch generierten PDF-Versionen der Dokumente abgelegt.
 - **assets/css/**: Enthält das Stylesheet für die HTML-Darstellung.
+- **templates/**: Enth?lt modulare Templates (Web + PDF) f?r verschiedene Verb?nde.
 - **generate_pdf_local.sh**: Skript zur lokalen PDF-Erzeugung aus den Markdown-Dateien.
 - **.github/workflows/generate-pdf.yml**: GitHub Actions Workflow zur automatischen PDF-Erstellung bei jedem Push auf den `main`-Branch.
 - **_layouts/** und **_config.yml**: Dateien für das Jekyll-Setup zur HTML-Darstellung auf GitHub Pages.
@@ -31,6 +32,8 @@ Die Dokumente werden im [Markdown-Format](https://www.markdownguide.org/basic-sy
   erzeugt beim Export ein automatisches Inhaltsverzeichnis an dieser Stelle.
 - **HTML-Blöcke:**  
   Blöcke wie `<div class="html-only">...</div>` werden beim PDF-Export entfernt und erscheinen nur in der HTML-Version.
+- **Templates:**  
+  Mit `template: DTFB` im Front-Matter werden Web- und PDF-Styles aus `templates/dtfb` aktiviert.
 - **Alphabetische Listen:**  
   Für Listen mit Buchstaben (a, b, c, ...) wird in HTML folgendes verwendet:
   ```html

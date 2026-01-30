@@ -1,23 +1,11 @@
 ---
 title: "Example"
-author: "![BTFV Logo](images/btfv-logo.png)"
-date: {{ site.time | date: "%d-%m-%Y" }}
+date: "{{ site.time | date: '%d.%m.%Y' }}"
+layout: default
+template: DTFB
+pdf: /assets/pdf/example.pdf
+source: https://github.com/deluxeGitHub/btfv-docs/blob/main/docs/example.md
 ---
-
-<div class="html-only" style="text-align: center;">
-    <div class="title" style="text-align: center;">
-        <img src="images/btfv-logo.png" alt="BTFV Logo" style="display: block; margin: 0 auto;" />
-        Example
-    </div>
-
-    <p style="text-align: center;">
-        Zuletzt geändert am:  {{ site.time | date: "%d-%m-%Y" }}
-    </p>
-    <p>
-        <a href="./../assets/pdf/example.pdf" target="_blank">Download als PDF</a><br />
-        <a href="https://github.com/deluxeGitHub/btfv-docs/blob/main/docs/example.md" target="_blank">GitHub Repository</a>
-    </p>
-</div>
 
 * TOC
 {:toc}
@@ -41,7 +29,6 @@ You will like those projects!
 ##### h5 Heading
 ###### h6 Heading
 
-
 ## Horizontal Rules
 
 ___
@@ -49,7 +36,6 @@ ___
 ---
 
 ***
-
 
 ## Typographic replacements
 
@@ -63,7 +49,6 @@ test.. test... test..... test?..... test!....
 
 "Smartypants, double quotes" and 'single quotes'
 
-
 ## Emphasis
 
 **This is bold text**
@@ -76,14 +61,11 @@ _This is italic text_
 
 ~~Strikethrough~~
 
-
 ## Blockquotes
-
 
 > Blockquotes can also be nested...
 >> ...by using additional greater-than signs right next to each other...
 > > > ...or with spaces between arrows.
-
 
 ## Lists
 
@@ -103,7 +85,6 @@ Ordered
 2. Consectetur adipiscing elit
 3. Integer molestie lorem at massa
 
-
 1. You can use sequential numbers...
 1. ...or keep all the numbers as `1.`
 
@@ -111,7 +92,6 @@ Start numbering with offset:
 
 57. foo
 1. bar
-
 
 ## Code
 
@@ -123,7 +103,6 @@ Indented code
     line 1 of code
     line 2 of code
     line 3 of code
-
 
 Block code "fences"
 
@@ -157,7 +136,6 @@ Right aligned columns
 | engine | engine to be used for processing templates. Handlebars is the default. |
 | ext    | extension to be used for dest files. |
 
-
 ## Links
 
 [link text](http://dev.nodeca.com)
@@ -165,7 +143,6 @@ Right aligned columns
 [link with title](http://nodeca.github.io/pica/demo/ "title text!")
 
 Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
-
 
 ## Images
 
@@ -180,12 +157,10 @@ With a reference later in the document defining the URL location:
 
 [id]: https://octodex.github.com/images/dojocat.jpg  "The Dojocat"
 
-
 ## Plugins
 
 The killer feature of `markdown-it` is very effective support of
 [syntax plugins](https://www.npmjs.org/browse/keyword/markdown-it-plugin).
-
 
 ### [Emojies](https://github.com/markdown-it/markdown-it-emoji)
 
@@ -195,22 +170,18 @@ The killer feature of `markdown-it` is very effective support of
 
 see [how to change output](https://github.com/markdown-it/markdown-it-emoji#change-output) with twemoji.
 
-
 ### [Subscript](https://github.com/markdown-it/markdown-it-sub) / [Superscript](https://github.com/markdown-it/markdown-it-sup)
 
 - 19^th^
 - H~2~O
 
-
 ### [\<ins>](https://github.com/markdown-it/markdown-it-ins)
 
 ++Inserted text++
 
-
 ### [\<mark>](https://github.com/markdown-it/markdown-it-mark)
 
 ==Marked text==
-
 
 ### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
 
@@ -227,7 +198,6 @@ Duplicated footnote reference[^second].
     and multiple paragraphs.
 
 [^second]: Footnote text.
-
 
 ### [Definition lists](https://github.com/markdown-it/markdown-it-deflist)
 
@@ -252,7 +222,6 @@ Term 1
 Term 2
   ~ Definition 2a
   ~ Definition 2b
-
 
 ### [Abbreviations](https://github.com/markdown-it/markdown-it-abbr)
 
