@@ -70,17 +70,17 @@ EOF
         cat "$template_dir/pdf-header.tex" >> "$header_file"
     fi
     
-    # Replace date placeholder in Markdown content
-    if [ "$template_name" = "base" ]; then
-        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
-    else
-        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE/g" "temp/${name}_temp.md"
-    fi
+    # Replace date placeholder in Markdown content (all templates)
+    sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: ‘%d.%m.%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: '%d-%m-%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: \"%d.%m.%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
 
     # Replace TOC syntax for LaTeX
     awk '

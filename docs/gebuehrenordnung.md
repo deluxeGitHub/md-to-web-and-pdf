@@ -1,5 +1,5 @@
 ---
-title: "Gebührenordnung des BTFV e.V."
+title: "Gebührenordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: base

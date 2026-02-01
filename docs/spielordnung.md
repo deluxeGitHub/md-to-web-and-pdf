@@ -1,5 +1,5 @@
 ---
-title: "Spielordnung des BTFV e.V."
+title: "Spielordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
