@@ -8,8 +8,8 @@ mkdir -p temp
 CURRENT_DATE=$(date +%Y-%m-%d)
 CURRENT_DATE_DE=$(date +%d.%m.%Y)
 
-# Loop through all Markdown files in the docs directory
-for file in docs/*.md; do
+ # Loop through all Markdown files in the docs directory (including subfolders)
+while IFS= read -r -d '' file; do
     filename=$(basename -- "$file")
     name="${filename%.*}" # Extract file name without extension
     cp "$file" "temp/${name}_temp.md"
@@ -114,6 +114,6 @@ EOF
       -V geometry:margin=1in \
       --include-in-header="$header_file" \
       --resource-path=.:./docs:./templates:./templates/$template_name
-done
+done < <(find docs -name "*.md" -print0)
 
 echo "PDFs successfully generated in assets/pdf/"
