@@ -14,7 +14,7 @@ for file in docs/*.md; do
     name="${filename%.*}" # Extract file name without extension
     cp "$file" "temp/${name}_temp.md"
     header_file="temp/${name}_header.tex"
-    number_sections=""
+    number_sections="--number-sections"
     template_name=""
     template_dir=""
 
@@ -51,7 +51,6 @@ PY
 
     # Enable section prefixing for documents that request it
     if grep -q '^section_prefix:' "$file"; then
-        number_sections="--number-sections"
         cat > "$header_file" <<'EOF'
 \usepackage{enumitem}
 \renewcommand{\thesection}{\S\arabic{section}}
