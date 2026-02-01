@@ -1,6 +1,6 @@
 ---
 title: "Satzung"
-title2: "des BTFV e.V."
+subtitle: "des BTFV e.V."
 date: 23.11.2025
 layout: default
 section_prefix: "§"

@@ -5,6 +5,7 @@ layout: default
 template: dtfb
 pdf: /assets/pdf/spielordnung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/spielordnung.md
+subtitle: "des BTFV e.V."
 ---
 
 * TOC

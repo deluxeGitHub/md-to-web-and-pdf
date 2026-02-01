@@ -5,6 +5,7 @@ layout: default
 template: base
 pdf: /assets/pdf/gebuehrenordnung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/gebuehrenordnung.md
+subtitle: "des BTFV e.V."
 ---
 
 * TOC

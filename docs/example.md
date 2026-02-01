@@ -5,6 +5,7 @@ layout: default
 template: btfv
 pdf: /assets/pdf/example.pdf
 source: https://github.com/deluxeGitHub/btfv-docs/blob/main/docs/example.md
+subtitle: "des BTFV e.V."
 ---
 
 * TOC

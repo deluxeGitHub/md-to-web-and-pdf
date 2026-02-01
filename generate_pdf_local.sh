@@ -70,9 +70,6 @@ EOF
         cat "$template_dir/pdf-header.tex" >> "$header_file"
     fi
     
-    # Map title2 to subtitle for PDF rendering
-    sed -i "s/^title2:/subtitle:/" "temp/${name}_temp.md"
-
     # Replace date placeholder in Markdown content
     if [ "$template_name" = "base" ]; then
         sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"

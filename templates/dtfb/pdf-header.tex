@@ -26,7 +26,7 @@
 \fancyhead[L]{}
 \fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/logo.png}}
 \fancyfoot[L]{\hspace*{15pt}\raisebox{-10pt}{\textcolor{DTFBGray}{\small \thedate}}}
-\fancyfoot[C]{\raisebox{0pt}{\includegraphics[width=\textwidth]{templates/dtfb/images/wave.png}}}
+\fancyfoot[C]{\raisebox{0pt}{\IfFileExists{templates/dtfb/images/footer_decoration.png}{\includegraphics[width=\textwidth]{templates/dtfb/images/footer_decoration.png}}{}}}
 \fancyfoot[R]{\raisebox{-10pt}{\textcolor{DTFBGray}{\small Seite \thepage\ von \pageref{LastPage}}}}
 
 \titleformat{\section}{\Large\bfseries\color{DTFBGreen}}{\thesection}{0.6em}{}
