@@ -33,7 +33,7 @@ Die Dokumente werden im [Markdown-Format](https://www.markdownguide.org/basic-sy
 - **HTML-Blöcke:**  
   Blöcke wie `<div class="html-only">...</div>` werden beim PDF-Export entfernt und erscheinen nur in der HTML-Version.
 - **Templates:**  
-  Mit `template: DTFB` im Front-Matter werden Web- und PDF-Styles aus `templates/dtfb` aktiviert.
+  Mit `template: base` im Front-Matter werden Web- und PDF-Styles aus `templates/base` aktiviert.
 - **Alphabetische Listen:**  
   Für Listen mit Buchstaben (a, b, c, ...) wird in HTML folgendes verwendet:
   ```html

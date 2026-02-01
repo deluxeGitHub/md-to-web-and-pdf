@@ -24,9 +24,9 @@
 \setlength{\headheight}{40pt}
 \setlength{\footskip}{34pt}
 \fancyhead[L]{}
-\fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/DTFB-logo.png}}
+\fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/logo.png}}
 \fancyfoot[L]{\hspace*{15pt}\raisebox{-10pt}{\textcolor{DTFBGray}{\small \thedate}}}
-\fancyfoot[C]{\raisebox{0pt}{\includegraphics[width=\textwidth]{templates/dtfb/images/DTFB-wave.png}}}
+\fancyfoot[C]{\raisebox{0pt}{\IfFileExists{templates/dtfb/images/footer_decoration.png}{\includegraphics[width=\textwidth]{templates/dtfb/images/footer_decoration.png}}{}}}
 \fancyfoot[R]{\raisebox{-10pt}{\textcolor{DTFBGray}{\small Seite \thepage\ von \pageref{LastPage}}}}
 
 \titleformat{\section}{\Large\bfseries\color{DTFBGreen}}{\thesection}{0.6em}{}
@@ -59,7 +59,7 @@
     \thispagestyle{fancy}
     \vspace*{1.2cm}
     \begin{center}
-      \includegraphics[height=80pt]{templates/dtfb/images/DTFB-logo.png}\par
+      \includegraphics[height=80pt]{templates/dtfb/images/logo.png}\par
       \vspace{0.9cm}
       {\Huge\dtfbtitlefont\bfseries\color{DTFBGreen}\thetitle\par}
       \ifx\dtfbsubtitle\@empty\else
@@ -72,6 +72,6 @@
     \vfill
   \end{titlepage}
   \setcounter{page}{2}
-  \fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/DTFB-logo.png}}
+  \fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/logo.png}}
 }
 \makeatother

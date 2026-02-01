@@ -8,13 +8,13 @@ mkdir -p temp
 CURRENT_DATE=$(date +%Y-%m-%d)
 CURRENT_DATE_DE=$(date +%d.%m.%Y)
 
-# Loop through all Markdown files in the docs directory
-for file in docs/*.md; do
+ # Loop through all Markdown files in the docs directory (including subfolders)
+while IFS= read -r -d '' file; do
     filename=$(basename -- "$file")
     name="${filename%.*}" # Extract file name without extension
     cp "$file" "temp/${name}_temp.md"
     header_file="temp/${name}_header.tex"
-    number_sections=""
+    number_sections="--number-sections"
     template_name=""
     template_dir=""
 
@@ -51,7 +51,6 @@ PY
 
     # Enable section prefixing for documents that request it
     if grep -q '^section_prefix:' "$file"; then
-        number_sections="--number-sections"
         cat > "$header_file" <<'EOF'
 \usepackage{enumitem}
 \renewcommand{\thesection}{\S\arabic{section}}
@@ -70,20 +69,17 @@ EOF
         cat "$template_dir/pdf-header.tex" >> "$header_file"
     fi
     
-    # Map title2 to subtitle for PDF rendering
-    sed -i "s/^title2:/subtitle:/" "temp/${name}_temp.md"
-
-    # Replace date placeholder in Markdown content
-    if [ "$template_name" = "dtfb" ]; then
-        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
-    else
-        sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE/g" "temp/${name}_temp.md"
-        sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE/g" "temp/${name}_temp.md"
-    fi
+    # Replace date placeholder in Markdown content (all templates)
+    sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/{{ site.time | date: ‘%d.%m.%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: '%d-%m-%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: \"%d.%m.%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
 
     # Replace TOC syntax for LaTeX
     awk '
@@ -118,6 +114,6 @@ EOF
       -V geometry:margin=1in \
       --include-in-header="$header_file" \
       --resource-path=.:./docs:./templates:./templates/$template_name
-done
+done < <(find docs -name "*.md" -print0)
 
 echo "PDFs successfully generated in assets/pdf/"
