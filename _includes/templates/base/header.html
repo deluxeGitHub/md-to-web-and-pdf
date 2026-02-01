@@ -1,5 +1,5 @@
 {% assign template_date = page.date | default: "" %}
-<header class="dtfb-hero"></header>
+<header class="base-hero"></header>
 <script>
 (() => {
     const initThemeToggle = () => {
@@ -22,7 +22,7 @@
             renderIcon(mode);
         };
 
-        const stored = localStorage.getItem('dtfb-theme');
+        const stored = localStorage.getItem('base-theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (stored === 'light' || stored === 'dark') {
             applyTheme(stored);
@@ -35,7 +35,7 @@
         toggle.addEventListener('click', () => {
             const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
             applyTheme(next);
-            localStorage.setItem('dtfb-theme', next);
+            localStorage.setItem('base-theme', next);
         });
     };
 

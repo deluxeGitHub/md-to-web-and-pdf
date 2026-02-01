@@ -1,0 +1,77 @@
+% Base PDF header styling
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{fontspec}
+
+\definecolor{BaseOrange}{HTML}{F28C28}
+\definecolor{BaseDark}{HTML}{2B2B2B}
+\definecolor{BaseGray}{HTML}{4A4A49}
+
+\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
+\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\basetitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\basetitlefont{TeX Gyre Heros}[Weight=500]}
+
+\geometry{bottom=1.8in}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt}
+\setlength{\footskip}{34pt}
+\fancyhead[L]{}
+\fancyhead[R]{\includegraphics[height=50pt]{templates/base/images/logo.png}}
+\fancyfoot[L]{\hspace*{15pt}\raisebox{-10pt}{\textcolor{BaseGray}{\small \thedate}}}
+\fancyfoot[C]{\raisebox{0pt}{\includegraphics[width=\textwidth]{templates/base/images/wave.png}}}
+\fancyfoot[R]{\raisebox{-10pt}{\textcolor{BaseGray}{\small Seite \thepage\ von \pageref{LastPage}}}}
+
+\titleformat{\section}{\Large\bfseries\color{BaseOrange}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{BaseOrange}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{BaseOrange}}{\thesubsubsection}{0.6em}{}
+
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BaseOrange,
+  urlcolor=BaseOrange
+}
+
+\makeatletter
+\newcommand{\basesubtitle}{}
+\@ifundefined{subtitle}{
+  \newcommand{\subtitle}[1]{\gdef\basesubtitle{#1}}
+}{
+  \let\baseorigsubtitle\subtitle
+  \renewcommand{\subtitle}[1]{\gdef\basesubtitle{#1}\baseorigsubtitle{#1}}
+}
+\makeatother
+
+\makeatletter
+\renewcommand{\maketitle}{
+  \fancyhead[R]{}
+  \begin{titlepage}
+    \thispagestyle{fancy}
+    \vspace*{1.2cm}
+    \begin{center}
+      \includegraphics[height=80pt]{templates/base/images/logo.png}\par
+      \vspace{0.9cm}
+      {\Huge\basetitlefont\bfseries\color{BaseOrange}\thetitle\par}
+      \ifx\basesubtitle\@empty\else
+        \vspace{0.35cm}
+        {\Large\color{BaseGray}\basesubtitle\par}
+      \fi
+      \vspace{0.8cm}
+      {\large\color{BaseGray}Stand: \thedate\par}
+    \end{center}
+    \vfill
+  \end{titlepage}
+  \setcounter{page}{2}
+  \fancyhead[R]{\includegraphics[height=50pt]{templates/base/images/logo.png}}
+}
+\makeatother

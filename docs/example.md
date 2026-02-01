@@ -2,7 +2,7 @@
 title: "Example"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
-template: DTFB
+template: base
 pdf: /assets/pdf/example.pdf
 source: https://github.com/deluxeGitHub/btfv-docs/blob/main/docs/example.md
 ---

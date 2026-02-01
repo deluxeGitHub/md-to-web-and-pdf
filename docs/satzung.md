@@ -4,7 +4,7 @@ title2: "des BTFV e.V."
 date: 23.11.2025
 layout: default
 section_prefix: "§"
-template: DTFB
+template: base
 pdf: /assets/pdf/satzung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md
 ---
@@ -29,8 +29,7 @@ source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md
 1. Der BTFV verfolgt keine politischen Ziele und vertritt den Grundsatz
     religiöser und weltanschaulicher Toleranz.
 
-1. Der BTFV ist Mitglied des Deutschen Tischfußballbundes e.V. (DTFB)
-    mit Sitz in 65510 Hünstetten.
+1. Der BTFV ist Mitglied eines nationalen Tischfußball-Dachverbandes.
 
 # Aufgaben
 
@@ -43,7 +42,7 @@ source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md
 1. Zu den Aufgaben des Landesverbandes gehören insbesondere:
     <ol type="a">
       <li>Landesmeisterschaften, sowie ein geregelter Ligabetrieb</li>
-      <li>Zusammenarbeit mit dem DTFB</li>
+      <li>Zusammenarbeit mit dem nationalen Dachverband</li>
       <li>Unterrichtung der Öffentlichkeit und Förderung der Öffentlichkeitsarbeit</li>
       <li>Mitwirkung bei der Gewährung von Zuschüssen für sportliche Zwecke</li>
     </ol>

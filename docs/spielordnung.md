@@ -2,7 +2,7 @@
 title: "Spielordnung des BTFV e.V."
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
-template: DTFB
+template: base
 pdf: /assets/pdf/spielordnung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/spielordnung.md
 ---
@@ -93,7 +93,7 @@ Der BTFV-Vorstand behält sich das Recht vor neu gegründeten Mannschaften eine 
 | --- | --- | --- |
 | Bonzini B90 ITSF | Player with standard screw | Official ITSF-B ball |
 | Leonhart leo_pro Tournament | Leo_player, ausgewichtet KL  <br>ttB_player, BANG | 1st_ITSF-Ball „official“ |
-| Ullrich-Sport Tournament | Ullrich Soccer mit Gewicht | Ullrich Sport Kickerball - für P4P und DTFB Turniere, Ball "SoccerPro 1st"|
+| Ullrich-Sport Tournament | Ullrich Soccer mit Gewicht | Ullrich Sport Kickerball - für P4P und Bundesverbandsturniere, Ball "SoccerPro 1st"|
 
 ## Trikots
 
@@ -105,7 +105,7 @@ Neu gemeldete Spieler erhalten eine Kulanz von 30 Tagen ab offizieller Anmeldung
 
 ## Hin- und Rückrunde
 
-Eine Saison besteht aus einer Hin- und Rückrunde. Aufgrund der gewünschten Spieltage/ Uhrzeiten der jeweiligen Heimmannschaft wird der Spielplan erstellt. Berücksichtigt werden dabei auch offizielle Termine des BTFV, ITSF und des DTFB.
+Eine Saison besteht aus einer Hin- und Rückrunde. Aufgrund der gewünschten Spieltage/ Uhrzeiten der jeweiligen Heimmannschaft wird der Spielplan erstellt. Berücksichtigt werden dabei auch offizielle Termine des BTFV, der ITSF und des Bundesverbands.
 
 ## Verlegen eines Spieltages
 
@@ -271,7 +271,7 @@ Das Spielergebnis muss bis zum **Sonntag 24:00 Uhr** **des Spieltags** auf der B
 
 ## Teilnahme Bundesliga
 
-Die Bestplatzierte Mannschaft der Landesliga, welche noch nicht in der Bundesliga spielberechtigt ist, hat die Berechtigung an der Aufstiegsrunde des DTFB teilzunehmen. Sollte diese Mannschaft dieses Privileg nicht wahrnehmen so geht es an die nächst Bestplatzierte weiter.
+Die Bestplatzierte Mannschaft der Landesliga, welche noch nicht in der Bundesliga spielberechtigt ist, hat die Berechtigung an der Aufstiegsrunde des Bundesverbands teilzunehmen. Sollte diese Mannschaft dieses Privileg nicht wahrnehmen so geht es an die nächst Bestplatzierte weiter.
 
 Falls alle Teams der Landesliga bereits ein Bundesliga Team stellen, kann auch in den unteren Ligen nach einem Anwärter gesucht werden. Sollten zwei Mannschaften, die teilnehmen möchten, dieselbe Platzierung belegen, so wird ein Entscheidungsspiel ausgetragen.
 

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Verbandsdokumente"
-template: DTFB
+template: base
 show_home: false
 ---
 

@@ -74,7 +74,7 @@ EOF
     sed -i "s/^title2:/subtitle:/" "temp/${name}_temp.md"
 
     # Replace date placeholder in Markdown content
-    if [ "$template_name" = "dtfb" ]; then
+    if [ "$template_name" = "base" ]; then
         sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
         sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
         sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
