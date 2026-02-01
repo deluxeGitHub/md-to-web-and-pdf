@@ -5,25 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }}</title>
     {% assign template_name = page.template | default: "default" | downcase %}
-    {% if template_name == "base" %}
+    {% assign supported_templates = "base,dtfb,btfv" | split: "," %}
+    {% if supported_templates contains template_name %}
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
-        <link rel="icon" type="image/png" href="{{ "/templates/base/images/favicon.png" | relative_url }}">
-        <link rel="stylesheet" href="{{ "/templates/base/web.css" | relative_url }}">
+        <link rel="icon" type="image/png" href="{{ "/templates/" | append: template_name | append: "/images/favicon.png" | relative_url }}">
+        <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
     {% else %}
         <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
     {% endif %}
 </head>
 <body class="{% if page.section_prefix %}section-prefix{% endif %} template-{{ template_name }}">
-    {% if template_name == "base" %}
+    {% if supported_templates contains template_name %}
         {% include templates/base/header.html %}
     {% endif %}
-    {% if template_name == "base" %}
+    {% if supported_templates contains template_name %}
         <div class="base-doc-heading">
             <div class="base-doc-heading__top">
                 <div class="base-doc-heading__brand">
-                    <img class="base-doc-logo" src="{{ "/templates/base/images/logo.png" | relative_url }}" alt="Logo">
+                    <img class="base-doc-logo" src="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}" alt="Logo">
                     <div class="base-doc-titles">
                         <div class="base-doc-title">{{ page.title }}</div>
                         {% if page.subtitle %}

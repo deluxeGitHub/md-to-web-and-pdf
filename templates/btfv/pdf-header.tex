@@ -1,0 +1,77 @@
+% BTFV PDF header styling
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{fontspec}
+
+\definecolor{BTFVBlue}{HTML}{2563EB}
+\definecolor{BTFVDark}{HTML}{0F172A}
+\definecolor{BTFVGray}{HTML}{6B7280}
+
+\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
+\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\btfvtitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\btfvtitlefont{TeX Gyre Heros}[Weight=500]}
+
+\geometry{bottom=1.8in}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt}
+\setlength{\footskip}{34pt}
+\fancyhead[L]{}
+\fancyhead[R]{\includegraphics[height=50pt]{templates/btfv/images/logo.png}}
+\fancyfoot[L]{\hspace*{15pt}\raisebox{-10pt}{\textcolor{BTFVGray}{\small \thedate}}}
+\fancyfoot[C]{\raisebox{0pt}{\includegraphics[width=\textwidth]{templates/btfv/images/wave.png}}}
+\fancyfoot[R]{\raisebox{-10pt}{\textcolor{BTFVGray}{\small Seite \thepage\ von \pageref{LastPage}}}}
+
+\titleformat{\section}{\Large\bfseries\color{BTFVBlue}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{BTFVBlue}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{BTFVBlue}}{\thesubsubsection}{0.6em}{}
+
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BTFVBlue,
+  urlcolor=BTFVBlue
+}
+
+\makeatletter
+\newcommand{\btfvsubtitle}{}
+\@ifundefined{subtitle}{
+  \newcommand{\subtitle}[1]{\gdef\btfvsubtitle{#1}}
+}{
+  \let\btfvorigsubtitle\subtitle
+  \renewcommand{\subtitle}[1]{\gdef\btfvsubtitle{#1}\btfvorigsubtitle{#1}}
+}
+\makeatother
+
+\makeatletter
+\renewcommand{\maketitle}{
+  \fancyhead[R]{}
+  \begin{titlepage}
+    \thispagestyle{fancy}
+    \vspace*{1.2cm}
+    \begin{center}
+      \includegraphics[height=80pt]{templates/btfv/images/logo.png}\par
+      \vspace{0.9cm}
+      {\Huge\btfvtitlefont\bfseries\color{BTFVBlue}\thetitle\par}
+      \ifx\btfvsubtitle\@empty\else
+        \vspace{0.35cm}
+        {\Large\color{BTFVGray}\btfvsubtitle\par}
+      \fi
+      \vspace{0.8cm}
+      {\large\color{BTFVGray}Stand: \thedate\par}
+    \end{center}
+    \vfill
+  \end{titlepage}
+  \setcounter{page}{2}
+  \fancyhead[R]{\includegraphics[height=50pt]{templates/btfv/images/logo.png}}
+}
+\makeatother

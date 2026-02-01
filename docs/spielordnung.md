@@ -2,7 +2,7 @@
 title: "Spielordnung des BTFV e.V."
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
-template: base
+template: dtfb
 pdf: /assets/pdf/spielordnung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/spielordnung.md
 ---
