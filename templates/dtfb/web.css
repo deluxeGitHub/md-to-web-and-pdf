@@ -305,6 +305,10 @@ body.template-dtfb #markdown-toc {
     margin-bottom: 40px;
 }
 
+body.template-dtfb #markdown-toc ul {
+    counter-reset: item;
+}
+
 body.template-dtfb #markdown-toc li {
     counter-increment: item;
     margin: 8px 0;

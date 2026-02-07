@@ -305,6 +305,10 @@ body.template-base #markdown-toc {
     margin-bottom: 40px;
 }
 
+body.template-base #markdown-toc ul {
+    counter-reset: item;
+}
+
 body.template-base #markdown-toc li {
     counter-increment: item;
     margin: 8px 0;

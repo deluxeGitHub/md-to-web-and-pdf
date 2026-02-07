@@ -305,6 +305,10 @@ body.template-btfv #markdown-toc {
     margin-bottom: 40px;
 }
 
+body.template-btfv #markdown-toc ul {
+    counter-reset: item;
+}
+
 body.template-btfv #markdown-toc li {
     counter-increment: item;
     margin: 8px 0;
