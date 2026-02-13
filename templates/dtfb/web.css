@@ -47,6 +47,7 @@ body.template-dtfb {
     color: var(--base-ink);
     background: radial-gradient(circle at top left, var(--base-card) 0%, var(--base-paper) 55%, var(--base-paper) 100%);
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 :root[data-theme='dark'] body.template-dtfb {
@@ -281,6 +282,8 @@ body.template-dtfb td {
     padding: 10px 12px;
     border: 1px solid var(--base-border);
     text-align: left;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 body.template-dtfb th {
@@ -313,6 +316,7 @@ body.template-dtfb #markdown-toc li {
     counter-increment: item;
     margin: 8px 0;
     font-size: 16px;
+    list-style: none;
 }
 
 body.template-dtfb #markdown-toc li a::before {
@@ -471,6 +475,11 @@ body.template-dtfb .base-heading-link svg {
 }
 
 @media (max-width: 540px) {
+    body.template-dtfb .wrapper {
+        margin: 0 8px 36px;
+        padding: 16px 12px 28px;
+    }
+
     body.template-dtfb .base-doc-heading__top {
         flex-direction: column;
         align-items: flex-start;
@@ -492,5 +501,62 @@ body.template-dtfb .base-heading-link svg {
 
     body.template-dtfb .base-hero__links {
         justify-content: flex-start;
+    }
+
+    body.template-dtfb p,
+    body.template-dtfb li {
+        font-size: 16px;
+        line-height: 1.42;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    body.template-dtfb h1,
+    body.template-dtfb h2,
+    body.template-dtfb h3,
+    body.template-dtfb h4 {
+        margin-top: 22px;
+        margin-bottom: 8px;
+    }
+
+    body.template-dtfb h1 {
+        font-size: 23px;
+    }
+
+    body.template-dtfb h2 {
+        font-size: 20px;
+    }
+
+    body.template-dtfb h3 {
+        font-size: 18px;
+    }
+
+    body.template-dtfb h4 {
+        font-size: 16px;
+    }
+
+    body.template-dtfb ul,
+    body.template-dtfb ol {
+        margin: 0 0 12px;
+        padding-left: 1.05rem;
+    }
+
+    body.template-dtfb ul ul,
+    body.template-dtfb ol ol,
+    body.template-dtfb ul ol,
+    body.template-dtfb ol ul {
+        margin: 4px 0 8px;
+        padding-left: 0.75rem;
+    }
+
+    body.template-dtfb li {
+        margin-bottom: 4px;
+    }
+
+    body.template-dtfb #back-to-top {
+        right: 10px;
+        bottom: 10px;
+        padding: 8px 10px;
+        font-size: 11px;
     }
 }
