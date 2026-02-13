@@ -438,6 +438,10 @@ body[class*="template-"] .base-heading-link svg {
 
 /* Responsive Anpassungen */
 @media (max-width: 860px) {
+    body[class*="template-"] .base-doc-heading {
+        margin: 0 16px 20px;
+    }
+
     body[class*="template-"] .base-hero__content {
         flex-direction: column;
         align-items: flex-start;
@@ -455,6 +459,28 @@ body[class*="template-"] .base-heading-link svg {
 }
 
 @media (max-width: 540px) {
+    body[class*="template-"] .base-hero {
+        padding: 0 0 16px;
+        margin-bottom: 8px;
+    }
+
+    body[class*="template-"] .base-hero__band {
+        height: 46px;
+    }
+
+    body[class*="template-"] .base-hero__toolbar {
+        padding: 8px 8px 0;
+    }
+
+    body[class*="template-"] .base-hero__content {
+        margin: -10px auto 0;
+        padding: 0 8px;
+    }
+
+    body[class*="template-"] .base-doc-heading {
+        margin: 0 8px 16px;
+    }
+
     body[class*="template-"] .wrapper {
         margin: 0 8px 36px;
         padding: 16px 12px 28px;
