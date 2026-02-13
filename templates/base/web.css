@@ -1,39 +1,61 @@
 :root {
-    --base-ink: #2b2b2b;
-    --base-ink-rgb: 43, 43, 43;
-    --base-muted: #6a6a6a;
-    --base-paper: #f4f4f2;
-    --base-card: #ffffff;
-    --base-border: #e0e0e0;
-    --base-shadow: rgba(0, 0, 0, 0.08);
-    --base-black: #111111;
-    --base-red: #f05a28;
-    --base-green: #f28c28;
-    --base-green-dark: #cc6d1f;
-    --base-green-rgb: 242, 140, 40;
-    --base-accent: #4a4a49;
-    --base-accent-rgb: 74, 74, 73;
-    --base-band: #4a4a49;
-    --base-band-text: #ffffff;
-    --base-link-underline: rgba(var(--base-green-rgb), 0.35);
+    /* Text und Flaechen */
+    --color-text-primary: #2b2b2b;
+    --color-text-primary-rgb: 43, 43, 43;
+    --color-text-muted: #6a6a6a;
+    --color-surface-page: #f4f4f2;
+    --color-surface-card: #ffffff;
+    --color-border-default: #e0e0e0;
+    --color-shadow-card: rgba(0, 0, 0, 0.08);
+
+    /* Akzent- und Funktionsfarben */
+    --color-ink-strong: #111111;
+    --color-danger: #f05a28;
+    --color-brand-primary: #f28c28; /* h1-h4, Links, Buttons, Tabellenkopf */
+    --color-brand-primary-hover: #cc6d1f;
+    --color-brand-rgb: 242, 140, 40;
+    --color-brand-contrast: #4a4a49; /* Hover fuer CTA/Back-to-top */
+    --color-brand-contrast-rgb: 74, 74, 73;
+    --color-header-band-bg: #4a4a49;
+    --color-header-band-text: #ffffff;
+    --color-link-underline: rgba(var(--color-brand-rgb), 0.35);
+
+    /* Legacy-Variablen fuer bestehende Styles */
+    --base-ink: var(--color-text-primary);
+    --base-ink-rgb: var(--color-text-primary-rgb);
+    --base-muted: var(--color-text-muted);
+    --base-paper: var(--color-surface-page);
+    --base-card: var(--color-surface-card);
+    --base-border: var(--color-border-default);
+    --base-shadow: var(--color-shadow-card);
+    --base-black: var(--color-ink-strong);
+    --base-red: var(--color-danger);
+    --base-green: var(--color-brand-primary);
+    --base-green-dark: var(--color-brand-primary-hover);
+    --base-green-rgb: var(--color-brand-rgb);
+    --base-accent: var(--color-brand-contrast);
+    --base-accent-rgb: var(--color-brand-contrast-rgb);
+    --base-band: var(--color-header-band-bg);
+    --base-band-text: var(--color-header-band-text);
+    --base-link-underline: var(--color-link-underline);
 }
 
 :root[data-theme='dark'] {
-    --base-ink: #f3f3f3;
-    --base-ink-rgb: 243, 243, 243;
-    --base-muted: #b0b0b0;
-    --base-paper: #1f1f1f;
-    --base-card: #2b2b2b;
-    --base-border: #3a3a3a;
-    --base-shadow: rgba(0, 0, 0, 0.5);
-    --base-red: #ff7a3c;
-    --base-green: #ff9a3c;
-    --base-green-dark: #e37f2b;
-    --base-green-rgb: 255, 154, 60;
-    --base-accent: #8d8d8d;
-    --base-accent-rgb: 141, 141, 141;
-    --base-band: #111111;
-    --base-band-text: #ffffff;
-    --base-link-underline: rgba(var(--base-green-rgb), 0.45);
+    --color-text-primary: #f3f3f3;
+    --color-text-primary-rgb: 243, 243, 243;
+    --color-text-muted: #b0b0b0;
+    --color-surface-page: #1f1f1f;
+    --color-surface-card: #2b2b2b;
+    --color-border-default: #3a3a3a;
+    --color-shadow-card: rgba(0, 0, 0, 0.5);
+    --color-danger: #ff7a3c;
+    --color-brand-primary: #ff9a3c;
+    --color-brand-primary-hover: #e37f2b;
+    --color-brand-rgb: 255, 154, 60;
+    --color-brand-contrast: #8d8d8d;
+    --color-brand-contrast-rgb: 141, 141, 141;
+    --color-header-band-bg: #111111;
+    --color-header-band-text: #ffffff;
+    --color-link-underline: rgba(var(--color-brand-rgb), 0.45);
 }
 

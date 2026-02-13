@@ -2,26 +2,27 @@
     box-sizing: border-box;
 }
 
+/* Seitenlayout und Grundfarben */
 body[class*="template-"] {
     margin: 0;
     font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
-    color: var(--base-ink);
-    background: radial-gradient(circle at top left, var(--base-card) 0%, var(--base-paper) 55%, var(--base-paper) 100%);
+    color: var(--color-text-primary);
+    background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
     line-height: 1.6;
     overflow-x: hidden;
 }
 
 :root[data-theme='dark'] body[class*="template-"] {
-    background: radial-gradient(circle at top left, var(--base-card) 0%, var(--base-paper) 55%, var(--base-paper) 100%);
+    background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
 }
 
 body[class*="template-"] .wrapper {
     max-width: 900px;
     margin: 0 auto 80px;
-    background: var(--base-card);
+    background: var(--color-surface-card);
     padding: 36px 42px 64px;
-    border: 1px solid var(--base-border);
-    box-shadow: 0 18px 40px var(--base-shadow);
+    border: 1px solid var(--color-border-default);
+    box-shadow: 0 18px 40px var(--color-shadow-card);
     border-radius: 8px;
 }
 
@@ -36,7 +37,7 @@ body[class*="template-"] .base-hero {
 }
 
 body[class*="template-"] .base-hero__band {
-    background: var(--base-band);
+    background: var(--color-header-band-bg);
     height: 64px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -51,9 +52,9 @@ body[class*="template-"] .base-hero__toolbar {
 }
 
 body[class*="template-"] .base-theme-toggle {
-    background: var(--base-card);
-    color: var(--base-ink);
-    border: 1px solid var(--base-border);
+    background: var(--color-surface-card);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-default);
     padding: 0;
     width: 34px;
     height: 34px;
@@ -67,8 +68,8 @@ body[class*="template-"] .base-theme-toggle {
 }
 
 body[class*="template-"] .base-theme-toggle:hover {
-    border-color: var(--base-green);
-    background-color: var(--base-paper);
+    border-color: var(--color-brand-primary);
+    background-color: var(--color-surface-page);
     box-shadow: 0 10px 18px rgba(0, 0, 0, 0.16);
 }
 
@@ -118,7 +119,7 @@ body[class*="template-"] .base-doc-logo {
 
 body[class*="template-"] .base-doc-date {
     font-size: 13px;
-    color: var(--base-muted);
+    color: var(--color-text-muted);
     white-space: nowrap;
 }
 
@@ -138,6 +139,7 @@ body[class*="template-"] .base-hero__links {
     align-items: center;
 }
 
+/* Header-Buttons (Home/PDF/Quelle) */
 body[class*="template-"] .base-hero__links a {
     font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
     font-size: 12px;
@@ -145,15 +147,15 @@ body[class*="template-"] .base-hero__links a {
     text-transform: uppercase;
     text-decoration: none;
     padding: 6px 12px;
-    border: 1px solid var(--base-green);
+    border: 1px solid var(--color-brand-primary);
     color: #ffffff;
-    background: var(--base-green);
+    background: var(--color-brand-primary);
     transition: all 0.2s ease;
 }
 
 body[class*="template-"] .base-hero__links a:hover {
-    background: var(--base-accent);
-    border-color: var(--base-accent);
+    background: var(--color-brand-contrast);
+    border-color: var(--color-brand-contrast);
     color: #ffffff;
 }
 
@@ -161,12 +163,13 @@ body[class*="template-"] .base-home-button {
     margin-bottom: 0;
 }
 
+/* Ueberschriften: Farbe wird ueber --color-brand-primary gesteuert */
 body[class*="template-"] h1,
 body[class*="template-"] h2,
 body[class*="template-"] h3,
 body[class*="template-"] h4 {
     font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     margin-top: 30px;
     margin-bottom: 12px;
     line-height: 1.2;
@@ -175,17 +178,17 @@ body[class*="template-"] h4 {
 
 body[class*="template-"] h1 {
     font-size: 26px;
-    border-bottom: 2px solid var(--base-green);
+    border-bottom: 2px solid var(--color-brand-primary);
     padding-bottom: 8px;
 }
 
 body[class*="template-"] .base-doc-heading {
-    border: 1px solid var(--base-border);
-    border-left: 6px solid var(--base-green);
+    border: 1px solid var(--color-border-default);
+    border-left: 6px solid var(--color-brand-primary);
     border-radius: 8px;
     padding: 16px 20px;
     margin: 0 auto 20px;
-    background: var(--base-card);
+    background: var(--color-surface-card);
     box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
 }
 
@@ -193,7 +196,7 @@ body[class*="template-"] .base-doc-title {
     font-family: "Oswald", "Lato", "Helvetica Neue", Arial, sans-serif;
     font-size: 30px;
     letter-spacing: 0.01em;
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     text-transform: none;
     font-weight: 500;
 }
@@ -201,7 +204,7 @@ body[class*="template-"] .base-doc-title {
 body[class*="template-"] .base-doc-subtitle {
     margin-top: 6px;
     font-size: 15px;
-    color: var(--base-muted);
+    color: var(--color-text-muted);
 }
 
 body[class*="template-"] h2 {
@@ -221,17 +224,19 @@ body[class*="template-"] li {
     font-size: 17px;
 }
 
+/* Fliesstext-Links */
 body[class*="template-"] a {
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     text-decoration: none;
-    border-bottom: 1px solid var(--base-link-underline);
+    border-bottom: 1px solid var(--color-link-underline);
 }
 
 body[class*="template-"] a:hover {
-    color: var(--base-green-dark);
-    border-bottom-color: var(--base-green-dark);
+    color: var(--color-brand-primary-hover);
+    border-bottom-color: var(--color-brand-primary-hover);
 }
 
+/* Tabellen: Header nutzt die Markenfarbe */
 body[class*="template-"] table {
     width: 100%;
     border-collapse: collapse;
@@ -241,27 +246,28 @@ body[class*="template-"] table {
 body[class*="template-"] th,
 body[class*="template-"] td {
     padding: 10px 12px;
-    border: 1px solid var(--base-border);
+    border: 1px solid var(--color-border-default);
     text-align: left;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
 body[class*="template-"] th {
-    background: var(--base-green);
+    background: var(--color-brand-primary);
     color: #ffffff;
     font-family: "acumin-pro-extra-condensed", "Work Sans", "Lato", "Helvetica Neue", Arial, sans-serif;
     letter-spacing: 0.04em;
 }
 
 body[class*="template-"] tr:nth-child(even) {
-    background: rgba(var(--base-green-rgb), 0.06);
+    background: rgba(var(--color-brand-rgb), 0.06);
 }
 
 :root[data-theme='dark'] body[class*="template-"] tr:nth-child(even) {
-    background: rgba(var(--base-green-rgb), 0.08);
+    background: rgba(var(--color-brand-rgb), 0.08);
 }
 
+/* Inhaltsverzeichnis (TOC) */
 body[class*="template-"] #markdown-toc {
     counter-reset: item;
     list-style-type: none;
@@ -284,7 +290,7 @@ body[class*="template-"] #markdown-toc li {
 
 body[class*="template-"] #markdown-toc li a::before {
     content: counters(item, ".") ". ";
-    color: var(--base-green);
+    color: var(--color-brand-primary);
 }
 
 body.section-prefix[class*="template-"] #markdown-toc > li > a::before {
@@ -293,11 +299,11 @@ body.section-prefix[class*="template-"] #markdown-toc > li > a::before {
 
 body[class*="template-"] #markdown-toc a {
     text-decoration: none;
-    color: var(--base-green);
+    color: var(--color-brand-primary);
 }
 
 body[class*="template-"] #markdown-toc a:hover {
-    color: var(--base-green-dark);
+    color: var(--color-brand-primary-hover);
 }
 
 body[class*="template-"] ul,
@@ -327,7 +333,7 @@ body[class*="template-"] #back-to-top {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: var(--base-green);
+    background-color: var(--color-brand-primary);
     color: white;
     padding: 10px 15px;
     border-radius: 5px;
@@ -342,9 +348,10 @@ body[class*="template-"] #back-to-top {
 }
 
 body[class*="template-"] #back-to-top:hover {
-    background-color: var(--base-accent);
+    background-color: var(--color-brand-contrast);
 }
 
+/* Automatische Nummerierung fuer h1-h4 */
 body[class*="template-"] {
     counter-reset: section;
 }
@@ -364,7 +371,7 @@ body[class*="template-"] h3 {
 body[class*="template-"] h1::before {
     counter-increment: section;
     content: counter(section) ". ";
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
@@ -375,21 +382,21 @@ body[class*="template-"].section-prefix h1::before {
 body[class*="template-"] h2::before {
     counter-increment: subsection;
     content: counter(section) "." counter(subsection) " ";
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
 body[class*="template-"] h3::before {
     counter-increment: subsubsection;
     content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
 body[class*="template-"] h4::before {
     counter-increment: subsubsubsection;
     content: counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
-    color: var(--base-green);
+    color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
@@ -402,7 +409,7 @@ body[class*="template-"] .base-heading-link {
     margin-left: 8px;
     border-radius: 999px;
     border: 1px solid transparent;
-    color: var(--base-muted);
+    color: var(--color-text-muted);
     text-decoration: none;
     opacity: 0;
     transform: translateY(-1px);
@@ -418,9 +425,9 @@ body[class*="template-"] .base-heading-link:focus {
 }
 
 body[class*="template-"] .base-heading-link:hover {
-    color: var(--base-green);
-    border-color: var(--base-green);
-    background-color: rgba(var(--base-green-rgb), 0.08);
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+    background-color: rgba(var(--color-brand-rgb), 0.08);
 }
 
 body[class*="template-"] .base-heading-link svg {
@@ -429,6 +436,7 @@ body[class*="template-"] .base-heading-link svg {
     display: block;
 }
 
+/* Responsive Anpassungen */
 @media (max-width: 860px) {
     body[class*="template-"] .base-hero__content {
         flex-direction: column;
@@ -532,5 +540,3 @@ body[class*="template-"] .base-heading-link svg {
         font-size: 11px;
     }
 }
-
-
