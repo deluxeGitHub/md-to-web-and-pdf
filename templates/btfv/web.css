@@ -310,6 +310,8 @@ body.template-btfv #markdown-toc {
 
 body.template-btfv #markdown-toc ul {
     counter-reset: item;
+    margin: 0;
+    padding-left: 0.95rem;
 }
 
 body.template-btfv #markdown-toc li {
@@ -339,7 +341,16 @@ body.template-btfv #markdown-toc a:hover {
 
 body.template-btfv ul,
 body.template-btfv ol {
-    margin: 0 0 18px 18px;
+    margin: 0 0 16px;
+    padding-left: 1.2rem;
+}
+
+body.template-btfv ul ul,
+body.template-btfv ol ol,
+body.template-btfv ul ol,
+body.template-btfv ol ul {
+    margin: 4px 0 10px;
+    padding-left: 0.95rem;
 }
 
 body.template-btfv li {

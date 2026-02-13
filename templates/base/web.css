@@ -310,6 +310,8 @@ body.template-base #markdown-toc {
 
 body.template-base #markdown-toc ul {
     counter-reset: item;
+    margin: 0;
+    padding-left: 0.95rem;
 }
 
 body.template-base #markdown-toc li {
@@ -339,7 +341,16 @@ body.template-base #markdown-toc a:hover {
 
 body.template-base ul,
 body.template-base ol {
-    margin: 0 0 18px 18px;
+    margin: 0 0 16px;
+    padding-left: 1.2rem;
+}
+
+body.template-base ul ul,
+body.template-base ol ol,
+body.template-base ul ol,
+body.template-base ol ul {
+    margin: 4px 0 10px;
+    padding-left: 0.95rem;
 }
 
 body.template-base li {

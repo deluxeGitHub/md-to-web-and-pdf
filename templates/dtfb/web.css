@@ -310,6 +310,8 @@ body.template-dtfb #markdown-toc {
 
 body.template-dtfb #markdown-toc ul {
     counter-reset: item;
+    margin: 0;
+    padding-left: 0.95rem;
 }
 
 body.template-dtfb #markdown-toc li {
@@ -339,7 +341,16 @@ body.template-dtfb #markdown-toc a:hover {
 
 body.template-dtfb ul,
 body.template-dtfb ol {
-    margin: 0 0 18px 18px;
+    margin: 0 0 16px;
+    padding-left: 1.2rem;
+}
+
+body.template-dtfb ul ul,
+body.template-dtfb ol ol,
+body.template-dtfb ul ol,
+body.template-dtfb ol ul {
+    margin: 4px 0 10px;
+    padding-left: 0.95rem;
 }
 
 body.template-dtfb li {
