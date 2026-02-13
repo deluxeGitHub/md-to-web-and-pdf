@@ -20,27 +20,10 @@
     --color-header-band-text: #ffffff;
     --color-link-underline: rgba(var(--color-brand-rgb), 0.35);
 
-    /* Legacy-Variablen fuer bestehende Styles */
-    --base-ink: var(--color-text-primary);
-    --base-ink-rgb: var(--color-text-primary-rgb);
-    --base-muted: var(--color-text-muted);
-    --base-paper: var(--color-surface-page);
-    --base-card: var(--color-surface-card);
-    --base-border: var(--color-border-default);
-    --base-shadow: var(--color-shadow-card);
-    --base-black: var(--color-ink-strong);
-    --base-red: var(--color-danger);
-    --base-green: var(--color-brand-primary);
-    --base-green-dark: var(--color-brand-primary-hover);
-    --base-green-rgb: var(--color-brand-rgb);
-    --base-accent: var(--color-brand-contrast);
-    --base-accent-rgb: var(--color-brand-contrast-rgb);
-    --base-band: var(--color-header-band-bg);
-    --base-band-text: var(--color-header-band-text);
-    --base-link-underline: var(--color-link-underline);
 }
 
 :root[data-theme='dark'] {
+    /* Text und Flaechen */
     --color-text-primary: #f1f5f9;
     --color-text-primary-rgb: 241, 245, 249;
     --color-text-muted: #94a3b8;
@@ -48,6 +31,8 @@
     --color-surface-card: #111827;
     --color-border-default: #1f2937;
     --color-shadow-card: rgba(0, 0, 0, 0.55);
+
+    /* Akzent- und Funktionsfarben */
     --color-danger: #f87171;
     --color-brand-primary: #60a5fa;
     --color-brand-primary-hover: #3b82f6;
