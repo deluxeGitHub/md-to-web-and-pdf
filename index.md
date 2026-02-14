@@ -9,7 +9,9 @@ subtitle: "des DTFB e.V."
 
 
 - [Satzung](docs/satzung.md)
-- [Spielordnung](docs/spielordnung.md)
+- [Spielordnung DTFB](docs/spielordnung.md)
+- [Spielordnung BTFV](docs/spielordnung_btfv.md)
+- [Spielordnung Base-Design](docs/spielordnung_base.md)
 - [Gebührenordnung](docs/gebuehrenordnung.md)
 - [Ausschreibung 1.+2.Herren Bundesliga-Hauptrunde](docs/dtfb/ausschreibung-1-2-herren-bundesliga-hauptrunde.md)
 - [Ausschreibung_1.Senioren_2026_Hauptrunde](docs/dtfb/ausschreibung-1-senioren-2026-hauptrunde.md)
