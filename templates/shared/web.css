@@ -1,0 +1,568 @@
+* {
+    box-sizing: border-box;
+}
+
+/* Seitenlayout und Grundfarben */
+body[class*="template-"] {
+    margin: 0;
+    font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+    color: var(--color-text-primary);
+    background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+:root[data-theme='dark'] body[class*="template-"] {
+    background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
+}
+
+body[class*="template-"] .wrapper {
+    max-width: 900px;
+    margin: 0 auto 80px;
+    background: var(--color-surface-card);
+    padding: 36px 42px 64px;
+    border: 1px solid var(--color-border-default);
+    box-shadow: 0 18px 40px var(--color-shadow-card);
+    border-radius: 8px;
+}
+
+body[class*="template-"] .base-doc-heading + .wrapper {
+    margin-top: 0;
+}
+
+body[class*="template-"] .base-hero {
+    position: relative;
+    padding: 0 0 26px;
+    margin-bottom: 12px;
+}
+
+body[class*="template-"] .base-hero__band {
+    background: var(--color-header-band-bg);
+    height: 64px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[class*="template-"] .base-hero__toolbar {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px 42px 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+body[class*="template-"] .base-theme-toggle {
+    background: var(--color-surface-card);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-default);
+    padding: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body[class*="template-"] .base-theme-toggle:hover {
+    border-color: var(--color-brand-primary);
+    background-color: var(--color-surface-page);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.16);
+}
+
+body[class*="template-"] .base-theme-toggle__icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+body[class*="template-"] .base-hero__content {
+    max-width: 900px;
+    margin: -18px auto 0;
+    padding: 0 42px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+body[class*="template-"] .base-doc-heading {
+    max-width: 900px;
+    margin: 0 auto 18px;
+}
+
+body[class*="template-"] .base-doc-heading__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+body[class*="template-"] .base-doc-titles {
+    min-width: 0;
+}
+
+body[class*="template-"] .base-doc-heading__brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+body[class*="template-"] .base-doc-logo {
+    width: 70px;
+    height: auto;
+}
+
+body[class*="template-"] .base-doc-date {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+body[class*="template-"] .base-doc-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+body[class*="template-"] .base-hero__links {
+    margin-top: 0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Header-Buttons (Home/PDF/Quelle) */
+body[class*="template-"] .base-hero__links a {
+    font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--color-brand-primary);
+    color: #ffffff;
+    background: var(--color-brand-primary);
+    transition: all 0.2s ease;
+}
+
+body[class*="template-"] .base-hero__links a:hover {
+    background: var(--color-brand-contrast);
+    border-color: var(--color-brand-contrast);
+    color: #ffffff;
+}
+
+body[class*="template-"] .base-home-button {
+    margin-bottom: 0;
+}
+
+/* Ueberschriften: Farbe wird ueber --color-brand-primary gesteuert */
+body[class*="template-"] h1,
+body[class*="template-"] h2,
+body[class*="template-"] h3,
+body[class*="template-"] h4 {
+    font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+    color: var(--color-brand-primary);
+    margin-top: 30px;
+    margin-bottom: 12px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+body[class*="template-"] h1 {
+    font-size: 26px;
+    border-bottom: 2px solid var(--color-brand-primary);
+    padding-bottom: 8px;
+}
+
+body[class*="template-"] .base-doc-heading {
+    border: 1px solid var(--color-border-default);
+    border-left: 6px solid var(--color-brand-primary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 0 auto 20px;
+    background: var(--color-surface-card);
+    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+body[class*="template-"] .base-doc-title {
+    font-family: "Oswald", "Lato", "Helvetica Neue", Arial, sans-serif;
+    font-size: 30px;
+    letter-spacing: 0.01em;
+    color: var(--color-brand-primary);
+    text-transform: none;
+    font-weight: 500;
+}
+
+body[class*="template-"] .base-doc-subtitle {
+    margin-top: 6px;
+    font-size: 15px;
+    color: var(--color-text-muted);
+}
+
+body[class*="template-"] h2 {
+    font-size: 22px;
+}
+
+body[class*="template-"] h3 {
+    font-size: 19px;
+}
+
+body[class*="template-"] h4 {
+    font-size: 17px;
+}
+
+body[class*="template-"] p,
+body[class*="template-"] li {
+    font-size: 17px;
+}
+
+/* Fliesstext-Links */
+body[class*="template-"] a {
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-link-underline);
+}
+
+body[class*="template-"] a:hover {
+    color: var(--color-brand-primary-hover);
+    border-bottom-color: var(--color-brand-primary-hover);
+}
+
+/* Tabellen: Header nutzt die Markenfarbe */
+body[class*="template-"] table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+body[class*="template-"] th,
+body[class*="template-"] td {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-default);
+    text-align: left;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+body[class*="template-"] th {
+    background: var(--color-brand-primary);
+    color: #ffffff;
+    font-family: "acumin-pro-extra-condensed", "Work Sans", "Lato", "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0.04em;
+}
+
+body[class*="template-"] tr:nth-child(even) {
+    background: rgba(var(--color-brand-rgb), 0.06);
+}
+
+:root[data-theme='dark'] body[class*="template-"] tr:nth-child(even) {
+    background: rgba(var(--color-brand-rgb), 0.08);
+}
+
+/* Inhaltsverzeichnis (TOC) */
+body[class*="template-"] #markdown-toc {
+    counter-reset: item;
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 40px;
+}
+
+body[class*="template-"] #markdown-toc ul {
+    counter-reset: item;
+    margin: 0;
+    padding-left: 0.95rem;
+}
+
+body[class*="template-"] #markdown-toc li {
+    counter-increment: item;
+    margin: 8px 0;
+    font-size: 16px;
+    list-style: none;
+}
+
+body[class*="template-"] #markdown-toc li a::before {
+    content: counters(item, ".") ". ";
+    color: var(--color-brand-primary);
+}
+
+body.section-prefix[class*="template-"] #markdown-toc > li > a::before {
+    content: "\00A7 " counters(item, ".") " ";
+}
+
+body[class*="template-"] #markdown-toc a {
+    text-decoration: none;
+    color: var(--color-brand-primary);
+}
+
+body[class*="template-"] #markdown-toc a:hover {
+    color: var(--color-brand-primary-hover);
+}
+
+body[class*="template-"] ul,
+body[class*="template-"] ol {
+    margin: 0 0 16px;
+    padding-left: 1.2rem;
+}
+
+body[class*="template-"] ul ul,
+body[class*="template-"] ol ol,
+body[class*="template-"] ul ol,
+body[class*="template-"] ol ul {
+    margin: 4px 0 10px;
+    padding-left: 0.95rem;
+}
+
+body[class*="template-"] li {
+    margin-bottom: 8px;
+}
+
+body[class*="template-"] img {
+    max-width: 100%;
+    height: auto;
+}
+
+body[class*="template-"] #back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--color-brand-primary);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: none;
+    transition: background-color 0.3s ease;
+    font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+}
+
+body[class*="template-"] #back-to-top:hover {
+    background-color: var(--color-brand-contrast);
+}
+
+/* Automatische Nummerierung fuer h1-h4 */
+body[class*="template-"] {
+    counter-reset: section;
+}
+
+body[class*="template-"] h1 {
+    counter-reset: subsection;
+}
+
+body[class*="template-"] h2 {
+    counter-reset: subsubsection;
+}
+
+body[class*="template-"] h3 {
+    counter-reset: subsubsubsection;
+}
+
+body[class*="template-"] h1::before {
+    counter-increment: section;
+    content: counter(section) ". ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
+}
+
+body[class*="template-"].section-prefix h1::before {
+    content: "\00A7 " counter(section) " ";
+}
+
+body[class*="template-"] h2::before {
+    counter-increment: subsection;
+    content: counter(section) "." counter(subsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
+}
+
+body[class*="template-"] h3::before {
+    counter-increment: subsubsection;
+    content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
+}
+
+body[class*="template-"] h4::before {
+    counter-increment: subsubsubsection;
+    content: counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
+}
+
+body[class*="template-"] .base-heading-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin-left: 8px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(-1px);
+    transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+body[class*="template-"] h1:hover .base-heading-link,
+body[class*="template-"] h2:hover .base-heading-link,
+body[class*="template-"] h3:hover .base-heading-link,
+body[class*="template-"] h4:hover .base-heading-link,
+body[class*="template-"] .base-heading-link:focus {
+    opacity: 1;
+}
+
+body[class*="template-"] .base-heading-link:hover {
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+    background-color: rgba(var(--color-brand-rgb), 0.08);
+}
+
+body[class*="template-"] .base-heading-link svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 860px) {
+    body[class*="template-"] .base-doc-heading {
+        margin: 0 16px 20px;
+    }
+
+    body[class*="template-"] .base-hero__content {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 24px;
+    }
+
+    body[class*="template-"] .wrapper {
+        margin: 0 16px 60px;
+        padding: 28px 24px 48px;
+    }
+
+    body[class*="template-"] .base-hero__toolbar {
+        padding: 12px 24px 0;
+    }
+}
+
+@media (max-width: 540px) {
+    body[class*="template-"] .base-hero {
+        padding: 0 0 16px;
+        margin-bottom: 8px;
+    }
+
+    body[class*="template-"] .base-hero__band {
+        height: 46px;
+    }
+
+    body[class*="template-"] .base-hero__toolbar {
+        padding: 8px 8px 0;
+    }
+
+    body[class*="template-"] .base-hero__content {
+        margin: -10px auto 0;
+        padding: 0 8px;
+    }
+
+    body[class*="template-"] .base-doc-heading {
+        margin: 0 8px 16px;
+    }
+
+    body[class*="template-"] .wrapper {
+        margin: 0 8px 36px;
+        padding: 16px 12px 28px;
+    }
+
+    body[class*="template-"] .base-doc-heading__top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body[class*="template-"] .base-doc-heading__brand {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body[class*="template-"] .base-doc-title {
+        font-size: 24px;
+    }
+
+    body[class*="template-"] .base-doc-actions {
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    body[class*="template-"] .base-hero__links {
+        justify-content: flex-start;
+    }
+
+    body[class*="template-"] p,
+    body[class*="template-"] li {
+        font-size: 16px;
+        line-height: 1.42;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    body[class*="template-"] h1,
+    body[class*="template-"] h2,
+    body[class*="template-"] h3,
+    body[class*="template-"] h4 {
+        margin-top: 22px;
+        margin-bottom: 8px;
+    }
+
+    body[class*="template-"] h1 {
+        font-size: 23px;
+    }
+
+    body[class*="template-"] h2 {
+        font-size: 20px;
+    }
+
+    body[class*="template-"] h3 {
+        font-size: 18px;
+    }
+
+    body[class*="template-"] h4 {
+        font-size: 16px;
+    }
+
+    body[class*="template-"] ul,
+    body[class*="template-"] ol {
+        margin: 0 0 12px;
+        padding-left: 1.05rem;
+    }
+
+    body[class*="template-"] ul ul,
+    body[class*="template-"] ol ol,
+    body[class*="template-"] ul ol,
+    body[class*="template-"] ol ul {
+        margin: 4px 0 8px;
+        padding-left: 0.75rem;
+    }
+
+    body[class*="template-"] li {
+        margin-bottom: 4px;
+    }
+
+    body[class*="template-"] #back-to-top {
+        right: 10px;
+        bottom: 10px;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+}

@@ -59,6 +59,7 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    overflow-x: hidden;
 }
 
 /* Wrapper für den Inhalt */
@@ -163,12 +164,15 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    table-layout: fixed;
 }
 
 th, td {
     padding: 10px;
     border: 1px solid #ddd;
     text-align: left;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 th {
@@ -208,3 +212,67 @@ li {
 #back-to-top:hover {
             background-color: #2980b9;
         }
+
+@media (max-width: 768px) {
+    .wrapper {
+        width: auto;
+        margin: 8px;
+        padding: 12px;
+    }
+
+    p {
+        margin: 0 0 14px;
+        font-size: 17px;
+    }
+
+    h1 {
+        margin-top: 24px;
+        margin-bottom: 14px;
+        font-size: 24px;
+    }
+
+    h2 {
+        margin-top: 22px;
+        margin-bottom: 12px;
+        font-size: 22px;
+    }
+
+    h3 {
+        margin-top: 18px;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    h4 {
+        margin-top: 14px;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    ul,
+    ol {
+        margin: 0 0 14px;
+        padding-left: 1rem;
+    }
+
+    li {
+        margin-bottom: 6px;
+    }
+
+    ul ul,
+    ol ol,
+    ul ol,
+    ol ul {
+        margin-bottom: 10px;
+        padding-left: 0.8rem;
+    }
+
+    #markdown-toc li {
+        margin: 6px 0;
+        font-size: 17px;
+    }
+
+    #markdown-toc ul {
+        margin-left: 12px;
+    }
+}

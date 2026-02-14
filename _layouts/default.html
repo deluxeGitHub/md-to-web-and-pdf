@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }}</title>
-    {% assign template_name = page.template | default: "default" | downcase %}
+    {% assign template_name = page.template | default: "base" | downcase %}
     {% assign supported_templates = "base,dtfb,btfv" | split: "," %}
+    {% unless supported_templates contains template_name %}
+        {% assign template_name = "base" %}
+    {% endunless %}
     {% if supported_templates contains template_name %}
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="icon" type="image/png" href="{{ "/templates/" | append: template_name | append: "/images/favicon.png" | relative_url }}">
+        <link rel="stylesheet" href="{{ "/templates/shared/web.css" | relative_url }}">
         <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
     {% endif %}
 </head>
 <body class="{% if page.section_prefix %}section-prefix{% endif %} template-{{ template_name }}">
@@ -161,3 +163,4 @@
     </script>
 </body>
 </html>
+
