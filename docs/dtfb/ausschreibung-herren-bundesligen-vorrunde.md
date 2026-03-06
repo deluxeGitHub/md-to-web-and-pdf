@@ -3,6 +3,7 @@ title: "Ausschreibung Herren Bundesligen-Vorrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-herren-bundesligen-vorrunde.pdf
 subtitle: "des DTFB e.V."
 ---

@@ -3,6 +3,7 @@ title: "Infos Modus und Ablauf - 1.+2. Damen_Bundesliga_2026"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/infos-modus-und-ablauf-1-2-damen-bundesliga-2026.pdf
 subtitle: "des DTFB e.V."
 ---

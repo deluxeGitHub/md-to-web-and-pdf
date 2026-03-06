@@ -3,6 +3,7 @@ title: "Vorschlag Mehrfachmeldung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/mehrfachmeldung.pdf
 subtitle: "Samuel Brantner (BTFV)"
 show_home: false

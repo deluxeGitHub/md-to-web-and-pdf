@@ -3,6 +3,7 @@ title: "Example"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: btfv
+section_numbering: arabic
 pdf: /assets/pdf/example.pdf
 source: https://github.com/deluxeGitHub/btfv-docs/blob/main/docs/example.md
 subtitle: "des BTFV e.V."

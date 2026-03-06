@@ -3,6 +3,7 @@ title: "Ausschreibung Regionalliga Süd 2026"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-regionalliga-s-d-2026.pdf
 subtitle: "des DTFB e.V."
 ---

@@ -3,6 +3,7 @@ title: "Ausschreibung 1.+2.Herren Bundesliga-Hauptrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-1-2-herren-bundesliga-hauptrunde.pdf
 subtitle: "des DTFB e.V."
 ---

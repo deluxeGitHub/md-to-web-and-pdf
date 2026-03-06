@@ -3,6 +3,7 @@ title: "Ausschreibung Regionalliga Nord 2026"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-regionalliga-nord-2026.pdf
 subtitle: "des DTFB e.V."
 ---

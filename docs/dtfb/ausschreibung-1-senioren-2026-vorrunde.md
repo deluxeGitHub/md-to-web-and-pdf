@@ -3,6 +3,7 @@ title: "Ausschreibung_1.Senioren_2026_Vorrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-1-senioren-2026-vorrunde.pdf
 subtitle: "des DTFB e.V."
 ---
