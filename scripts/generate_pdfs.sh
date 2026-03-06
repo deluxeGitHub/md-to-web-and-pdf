@@ -172,7 +172,7 @@ EOF
         --pdf-engine=xelatex \
         -V geometry:margin=1in \
         --include-in-header="$header_file" \
-        --resource-path=".:./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
+        --resource-path=".:$(dirname "$file"):./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
         echo "     OK  ${OUTPUT_DIR}/${name}.pdf"
         count=$((count + 1))
     else
