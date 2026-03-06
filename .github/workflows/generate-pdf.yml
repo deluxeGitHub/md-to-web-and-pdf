@@ -27,9 +27,12 @@ jobs:
             pandoc \
             texlive-xetex \
             texlive-latex-extra \
+            texlive-plain-generic \
             texlive-fonts-recommended \
             texlive-fonts-extra \
+            fonts-texgyre \
             lmodern
+          fc-cache -fv
 
       - name: Generate PDFs
         run: bash scripts/generate_pdfs.sh "$BUILD_DATE"

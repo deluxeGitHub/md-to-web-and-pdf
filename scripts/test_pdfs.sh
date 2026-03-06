@@ -183,6 +183,46 @@ PY
     done < <(find docs -name "*.md" -print0)
 }
 
+# -- Umgebungs-Suite ------------------------------------------------------
+
+test_suite_environment() {
+    echo -e "\n${BOLD}Suite: LaTeX-Umgebung${NC}"
+    echo "  Prüft Fonts und LaTeX-Pakete, die für die PDF-Generierung nötig sind."
+    echo ""
+
+    # Benötigte System-Fonts (fontspec sucht via fontconfig)
+    local fonts=("TeX Gyre Heros" "Latin Modern Sans")
+    for font in "${fonts[@]}"; do
+        local found
+        found=$(fc-list 2>/dev/null | grep -i "$font" || true)
+        if [[ -n "$found" ]]; then
+            pass "Font: $font"
+        else
+            fail "Font nicht gefunden: $font  (fc-list kennt ihn nicht)"
+        fi
+    done
+
+    # Benötigte LaTeX-Pakete (.sty via kpsewhich)
+    local packages=(titlesec soul enumitem fancyhdr lastpage geometry hyperref fontspec)
+    for pkg in "${packages[@]}"; do
+        if kpsewhich "${pkg}.sty" &>/dev/null; then
+            pass "LaTeX-Paket: ${pkg}.sty"
+        else
+            fail "LaTeX-Paket fehlt: ${pkg}.sty"
+        fi
+    done
+
+    # Benötigte Tools
+    local tools=(pandoc xelatex python3)
+    for tool in "${tools[@]}"; do
+        if command -v "$tool" &>/dev/null; then
+            pass "Tool: $tool  ($($tool --version 2>&1 | head -1))"
+        else
+            fail "Tool fehlt: $tool"
+        fi
+    done
+}
+
 # -- Zusammenfassung ------------------------------------------------------
 
 run_all() {
@@ -190,6 +230,7 @@ run_all() {
     echo -e "${BOLD}  PDF Test Suite${NC}"
     echo -e "${BOLD}========================================${NC}"
 
+    test_suite_environment
     test_suite_pdfs
     test_suite_templates
     test_suite_frontmatter
