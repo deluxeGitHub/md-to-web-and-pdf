@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
     {% endif %}
 </head>
-<body class="{% if page.section_prefix %}section-prefix{% endif %} template-{{ template_name }}">
+<body class="{% if page.section_numbering == 'paragraph' %}section-prefix{% endif %} template-{{ template_name }}">
     {% if supported_templates contains template_name %}
         {% include templates/base/header.html %}
     {% endif %}
