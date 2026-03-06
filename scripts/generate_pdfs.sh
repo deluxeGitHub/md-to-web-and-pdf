@@ -80,11 +80,31 @@ PY
     fi
 
     # LaTeX-Header erstellen
-    # section_prefix: "§"  → §-Nummerierung (z.B. BTFV-Satzung)
-    # numbered_sections: * → arabische Nummerierung ohne § (z.B. DTFB-Ausschreibungen)
-    if grep -q '^section_prefix:' "$file"; then
-        number_sections="--number-sections"
-        cat > "$header_file" <<'EOF'
+    # section_numbering: paragraph → §1, §2 … (z.B. BTFV-Satzung)
+    # section_numbering: arabic   → 1, 1.1 … (z.B. DTFB-Ausschreibungen)
+    # (nicht gesetzt)             → keine Nummerierung
+    section_numbering=$(python3 - "$file" <<'PY'
+import sys
+from pathlib import Path
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+lines = text.splitlines()
+if not lines or lines[0].strip() != "---":
+    sys.exit(0)
+try:
+    fm_end = lines.index("---", 1)
+except ValueError:
+    sys.exit(0)
+for line in lines[1:fm_end]:
+    if line.lower().startswith("section_numbering:"):
+        print(line.split(":", 1)[1].strip().strip("'\"").lower())
+        break
+PY
+    )
+
+    case "$section_numbering" in
+        paragraph)
+            number_sections="--number-sections"
+            cat > "$header_file" <<'EOF'
 \usepackage{enumitem}
 \renewcommand{\thesection}{\S\arabic{section}}
 \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
@@ -94,12 +114,15 @@ PY
 \renewcommand{\numberline}[1]{#1\hspace{0.6em}}
 \makeatother
 EOF
-    elif grep -q '^numbered_sections:' "$file"; then
-        number_sections="--number-sections"
-        echo "\\usepackage{enumitem}" > "$header_file"
-    else
-        echo "\\usepackage{enumitem}" > "$header_file"
-    fi
+            ;;
+        arabic)
+            number_sections="--number-sections"
+            echo "\\usepackage{enumitem}" > "$header_file"
+            ;;
+        *)
+            echo "\\usepackage{enumitem}" > "$header_file"
+            ;;
+    esac
 
     if [[ -f "$template_dir/pdf-header.tex" ]]; then
         cat "$template_dir/pdf-header.tex" >> "$header_file"

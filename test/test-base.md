@@ -4,7 +4,7 @@ subtitle: "Design-Referenz für das Base-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: base
-section_prefix: "§"
+section_numbering: paragraph
 pdf: /assets/pdf/test-base.pdf
 ---
 

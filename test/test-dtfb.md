@@ -4,7 +4,7 @@ subtitle: "Design-Referenz für das DTFB-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
-numbered_sections: true
+section_numbering: arabic
 pdf: /assets/pdf/test-dtfb.pdf
 ---
 

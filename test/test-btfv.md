@@ -4,7 +4,7 @@ subtitle: "Design-Referenz für das BTFV-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: btfv
-section_prefix: "§"
+section_numbering: paragraph
 pdf: /assets/pdf/test-btfv.pdf
 ---
 

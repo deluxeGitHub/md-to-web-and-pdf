@@ -323,32 +323,48 @@ test_suite_section_numbering() {
         local has_section_symbol
         has_section_symbol=$(echo "$text" | grep -cE '^§[0-9]' || true)
 
-        if grep -q '^section_prefix:' "$md"; then
-            # Erwartet: §1, §2 … am Zeilenanfang
-            if [[ "$has_section_symbol" -gt 0 ]]; then
-                pass "${name}: §-Nummerierung vorhanden (${has_section_symbol} Abschnitte)"
-            else
-                fail "${name}: section_prefix gesetzt, aber kein §N am Zeilenanfang im PDF"
-            fi
-        elif grep -q '^numbered_sections:' "$md"; then
-            # Erwartet: "1 ", "1.1 " am Zeilenanfang, KEIN §N
-            local has_arabic
-            has_arabic=$(echo "$text" | grep -cE '^[0-9]+(\.[0-9]+)? ' || true)
-            if [[ "$has_arabic" -gt 0 && "$has_section_symbol" -eq 0 ]]; then
-                pass "${name}: arabische Nummerierung vorhanden, kein § als Abschnittsnummer"
-            elif [[ "$has_section_symbol" -gt 0 ]]; then
-                fail "${name}: numbered_sections gesetzt, aber §N-Nummern im PDF gefunden"
-            else
-                fail "${name}: numbered_sections gesetzt, aber keine 1/1.1-Nummerierung im PDF"
-            fi
-        else
-            # Erwartet: kein §N am Zeilenanfang
-            if [[ "$has_section_symbol" -gt 0 ]]; then
-                fail "${name}: kein section_prefix gesetzt, aber §N-Nummern im PDF gefunden"
-            else
-                pass "${name}: keine §-Abschnittsnummerierung (korrekt)"
-            fi
-        fi
+        local sn
+        sn=$(python3 -c "
+import sys
+from pathlib import Path
+text = Path('${md}').read_text(encoding='utf-8')
+lines = text.splitlines()
+if not lines or lines[0].strip() != '---': sys.exit()
+try: end = lines.index('---', 1)
+except ValueError: sys.exit()
+for l in lines[1:end]:
+    if l.lower().startswith('section_numbering:'):
+        print(l.split(':',1)[1].strip().strip(chr(39)+chr(34)).lower())
+        break
+" 2>/dev/null || true)
+
+        case "$sn" in
+            paragraph)
+                if [[ "$has_section_symbol" -gt 0 ]]; then
+                    pass "${name}: §-Nummerierung vorhanden (${has_section_symbol} Abschnitte)"
+                else
+                    fail "${name}: section_numbering:paragraph gesetzt, aber kein §N im PDF"
+                fi
+                ;;
+            arabic)
+                local has_arabic
+                has_arabic=$(echo "$text" | grep -cE '^[0-9]+(\.[0-9]+)? ' || true)
+                if [[ "$has_arabic" -gt 0 && "$has_section_symbol" -eq 0 ]]; then
+                    pass "${name}: arabische Nummerierung vorhanden, kein §"
+                elif [[ "$has_section_symbol" -gt 0 ]]; then
+                    fail "${name}: section_numbering:arabic gesetzt, aber §N im PDF gefunden"
+                else
+                    fail "${name}: section_numbering:arabic gesetzt, aber keine Nummerierung im PDF"
+                fi
+                ;;
+            *)
+                if [[ "$has_section_symbol" -gt 0 ]]; then
+                    fail "${name}: section_numbering nicht gesetzt, aber §N im PDF gefunden"
+                else
+                    pass "${name}: keine Abschnittsnummerierung (korrekt)"
+                fi
+                ;;
+        esac
 
     done < <(find test -maxdepth 1 -name "*.md" -print0)
 
