@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - development
   workflow_dispatch:
 
 jobs:
@@ -42,4 +43,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add assets/pdf/
           git diff --cached --quiet || git commit -m "Update PDF versions"
-          git push origin main
+          git push origin HEAD
