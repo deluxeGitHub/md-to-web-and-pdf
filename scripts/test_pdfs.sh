@@ -418,6 +418,42 @@ test_suite_html() {
             fail "${name}.html  → keine Überschriften gefunden"
         fi
 
+        # T4: section_numbering → korrekte body-Klasse
+        # section_numbering:paragraph → body muss "section-prefix" enthalten
+        # section_numbering:arabic    → body darf "section-prefix" NICHT enthalten
+        local sn_html
+        sn_html=$(python3 -c "
+import sys
+from pathlib import Path
+text = Path('${md}').read_text(encoding='utf-8')
+lines = text.splitlines()
+if not lines or lines[0].strip() != '---': sys.exit()
+try: end = lines.index('---', 1)
+except ValueError: sys.exit()
+for l in lines[1:end]:
+    if l.lower().startswith('section_numbering:'):
+        print(l.split(':',1)[1].strip().strip(chr(39)+chr(34)).lower())
+        break
+" 2>/dev/null || true)
+        local body_class
+        body_class=$(grep -o '<body[^>]*>' "$html_file" 2>/dev/null | head -1)
+        case "$sn_html" in
+            paragraph)
+                if echo "$body_class" | grep -q "section-prefix"; then
+                    pass "${name}.html  → body hat Klasse 'section-prefix' (paragraph)"
+                else
+                    fail "${name}.html  → section_numbering:paragraph, aber body fehlt Klasse 'section-prefix'"
+                fi
+                ;;
+            arabic)
+                if echo "$body_class" | grep -q "section-prefix"; then
+                    fail "${name}.html  → section_numbering:arabic, aber body hat Klasse 'section-prefix'"
+                else
+                    pass "${name}.html  → body hat kein 'section-prefix' (arabic, korrekt)"
+                fi
+                ;;
+        esac
+
     done < <(find docs -name "*.md" -print0)
 }
 
