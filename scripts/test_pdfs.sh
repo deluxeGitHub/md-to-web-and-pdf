@@ -258,11 +258,18 @@ test_suite_fixtures() {
             continue
         fi
 
-        if diff -q "$fixture" "$tex" &>/dev/null; then
+        # Nur den Dokumenten-Body vergleichen (ab \begin{document}), damit
+        # Unterschiede in der auto-generierten Pandoc-Präambel (Paket-Reihenfolge
+        # etc.) nicht zu falsch-negativen Ergebnissen bei verschiedenen
+        # Pandoc-Versionen führen.
+        body_fixture=$(sed -n '/\\begin{document}/,$p' "$fixture")
+        body_tex=$(sed -n '/\\begin{document}/,$p' "$tex")
+
+        if [[ "$body_fixture" == "$body_tex" ]]; then
             pass "${name}.tex  → identisch mit Fixture"
         else
             fail "${name}.tex  → Abweichung vom Fixture"
-            diff "$fixture" "$tex" | head -20 | sed 's/^/    /' >&2
+            diff <(echo "$body_fixture") <(echo "$body_tex") | head -20 | sed 's/^/    /' >&2
         fi
 
     done < <(find test -maxdepth 1 -name "*.md" -print0)
