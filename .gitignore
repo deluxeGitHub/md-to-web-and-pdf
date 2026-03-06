@@ -7,3 +7,4 @@ _site/
 # sollen aber nicht aus Versehen auf development committet werden.
 # Bereits auf main getrackten PDFs sind davon nicht betroffen.
 /assets/pdf/*.pdf
+.claude/
