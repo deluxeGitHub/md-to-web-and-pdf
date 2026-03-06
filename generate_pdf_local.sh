@@ -4,6 +4,14 @@
 mkdir -p assets/pdf
 mkdir -p temp
 
+# macOS (BSD sed) requires an explicit backup suffix for -i, even if empty.
+# GNU sed (Linux) does not accept the empty-string argument in the same way.
+if [[ "$(uname)" == "Darwin" ]]; then
+    SED_I=(sed -i '')
+else
+    SED_I=(sed -i)
+fi
+
 # Get the current date
 CURRENT_DATE=$(date +%Y-%m-%d)
 CURRENT_DATE_DE=$(date +%d.%m.%Y)
@@ -70,16 +78,16 @@ EOF
     fi
     
     # Replace date placeholder in Markdown content (all templates)
-    sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/{{ site.time | date: ‘%d.%m.%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/date: {{ site.time | date: '%d-%m-%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/date: {{ site.time | date: \"%d.%m.%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-    sed -i "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/{{ site.time | date: ‘%d-%m-%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/{{ site.time | date: ‘%d.%m.%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/{{ site.time | date: ‘%d.%m.%Y’ }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/date: {{ site.time | date: ‘%d-%m-%Y’ }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/date: {{ site.time | date: \"%d.%m.%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/date: {{ site.time | date: ‘%d.%m.%Y’ }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
 
     # Replace TOC syntax for LaTeX
     awk '
@@ -96,10 +104,10 @@ EOF
     ' "temp/${name}_temp.md" > "temp/${name}_temp.md.tmp" && mv "temp/${name}_temp.md.tmp" "temp/${name}_temp.md"
     
     # Remove HTML-only blocks for PDF generation
-    sed -i '/<div class="html-only"/,/^<\/div>$/d' "temp/${name}_temp.md"
+    "${SED_I[@]}" '/<div class="html-only"/,/^<\/div>$/d' "temp/${name}_temp.md"
 
     # Convert HTML ordered lists (type="a") to LaTeX enumerate with alphabetic labels
-    sed -i '
+    "${SED_I[@]}" '
     s|<ol type="a">|\\begin{enumerate}[label=\\alph*.]|g;
     s|</ol>|\\end{enumerate}|g;
     s|<li>|\\item |g;
