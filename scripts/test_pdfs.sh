@@ -289,6 +289,72 @@ test_suite_fixtures() {
     rm -rf "$run_dir"
 }
 
+# -- Section-Numbering-Suite -----------------------------------------------
+
+test_suite_section_numbering() {
+    echo -e "\n${BOLD}Suite: Abschnittsnummerierung${NC}"
+    echo "  Prüft, dass section_prefix:\"§\" → §-Zeichen und numbered_sections → 1/1.1 erzeugt."
+    echo ""
+
+    local has_pdftotext=false
+    command -v pdftotext &>/dev/null && has_pdftotext=true
+
+    if [[ "$has_pdftotext" == false ]]; then
+        skip "pdftotext nicht verfügbar (brew install poppler) – Suite übersprungen"
+        return
+    fi
+
+    local run_dir="temp/test-numbering"
+    mkdir -p "$run_dir"
+
+    bash scripts/generate_pdfs.sh "$(date +%d.%m.%Y)" test "$run_dir" &>/dev/null
+
+    while IFS= read -r -d '' md; do
+        filename=$(basename -- "$md")
+        name="${filename%.*}"
+        pdf="$run_dir/${name}.pdf"
+
+        [[ ! -f "$pdf" ]] && fail "${name}: PDF nicht generiert" && continue
+
+        local text
+        text=$(pdftotext "$pdf" - 2>/dev/null)
+
+        # § als Abschnittsnummer steht am Zeilenanfang direkt vor einer Ziffer: "§1", "§2"
+        local has_section_symbol
+        has_section_symbol=$(echo "$text" | grep -cE '^§[0-9]' || true)
+
+        if grep -q '^section_prefix:' "$md"; then
+            # Erwartet: §1, §2 … am Zeilenanfang
+            if [[ "$has_section_symbol" -gt 0 ]]; then
+                pass "${name}: §-Nummerierung vorhanden (${has_section_symbol} Abschnitte)"
+            else
+                fail "${name}: section_prefix gesetzt, aber kein §N am Zeilenanfang im PDF"
+            fi
+        elif grep -q '^numbered_sections:' "$md"; then
+            # Erwartet: "1 ", "1.1 " am Zeilenanfang, KEIN §N
+            local has_arabic
+            has_arabic=$(echo "$text" | grep -cE '^[0-9]+(\.[0-9]+)? ' || true)
+            if [[ "$has_arabic" -gt 0 && "$has_section_symbol" -eq 0 ]]; then
+                pass "${name}: arabische Nummerierung vorhanden, kein § als Abschnittsnummer"
+            elif [[ "$has_section_symbol" -gt 0 ]]; then
+                fail "${name}: numbered_sections gesetzt, aber §N-Nummern im PDF gefunden"
+            else
+                fail "${name}: numbered_sections gesetzt, aber keine 1/1.1-Nummerierung im PDF"
+            fi
+        else
+            # Erwartet: kein §N am Zeilenanfang
+            if [[ "$has_section_symbol" -gt 0 ]]; then
+                fail "${name}: kein section_prefix gesetzt, aber §N-Nummern im PDF gefunden"
+            else
+                pass "${name}: keine §-Abschnittsnummerierung (korrekt)"
+            fi
+        fi
+
+    done < <(find test -maxdepth 1 -name "*.md" -print0)
+
+    rm -rf "$run_dir"
+}
+
 # -- HTML-Suite -----------------------------------------------------------
 
 test_suite_html() {
@@ -351,6 +417,7 @@ run_all() {
     test_suite_templates
     test_suite_frontmatter
     test_suite_fixtures
+    test_suite_section_numbering
     test_suite_html
 
     echo -e "\n${BOLD}========================================${NC}"

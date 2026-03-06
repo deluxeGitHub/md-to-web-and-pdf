@@ -80,7 +80,8 @@ PY
     fi
 
     # LaTeX-Header erstellen
-    # --number-sections NUR bei Dokumenten mit section_prefix (§-Nummern)
+    # section_prefix: "§"  → §-Nummerierung (z.B. BTFV-Satzung)
+    # numbered_sections: * → arabische Nummerierung ohne § (z.B. DTFB-Ausschreibungen)
     if grep -q '^section_prefix:' "$file"; then
         number_sections="--number-sections"
         cat > "$header_file" <<'EOF'
@@ -93,6 +94,9 @@ PY
 \renewcommand{\numberline}[1]{#1\hspace{0.6em}}
 \makeatother
 EOF
+    elif grep -q '^numbered_sections:' "$file"; then
+        number_sections="--number-sections"
+        echo "\\usepackage{enumitem}" > "$header_file"
     else
         echo "\\usepackage{enumitem}" > "$header_file"
     fi
