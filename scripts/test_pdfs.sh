@@ -266,7 +266,9 @@ test_suite_fixtures() {
         #        \section{...}\label{foo}\n
         normalize_tex() {
             sed -n '/\\begin{document}/,$p' "$1" \
-            | sed '/^\\hypertarget{/d; s/\\label{\([^}]*\)}}$/\\label{\1}/' \
+            | sed '/^\\hypertarget{/d' \
+            | sed 's/\\label{\([^}]*\)}}$/\\label{\1}/' \
+            | sed 's/\\pandocbounded{\\includegraphics\[.*\]{\([^}]*\)}}/\\includegraphics{\1}/g' \
             | awk '
                 # Zeilenumbrüche innerhalb von LaTeX-Befehlen zusammenführen:
                 # Zeilen die nicht mit \ beginnen und nicht leer sind,
