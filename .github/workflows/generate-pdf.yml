@@ -31,7 +31,8 @@ jobs:
             texlive-fonts-recommended \
             texlive-fonts-extra \
             fonts-texgyre \
-            lmodern
+            lmodern \
+            poppler-utils
           fc-cache -fv
 
       - name: Generate PDFs

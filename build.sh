@@ -204,6 +204,12 @@ run_tests() {
     bash scripts/test_pdfs.sh
 }
 
+generate_fixtures() {
+    info "Generiere Test-Fixtures …"
+    echo ""
+    bash scripts/generate_test_fixtures.sh
+}
+
 # -- Jekyll-Website --------------------------------------------------------
 build_web() {
     info "Baue Jekyll-Website …"
@@ -242,6 +248,7 @@ show_help() {
     bash build.sh web          Nur Jekyll-Website bauen (nach _site/)
     bash build.sh serve        Jekyll-Entwicklungsserver starten (Live-Reload)
     bash build.sh test         PDF-Tests ausführen
+    bash build.sh fixtures     Test-Fixtures (goldene Referenz-PDFs) aktualisieren
     bash build.sh install      Nur Abhängigkeiten prüfen/installieren
     bash build.sh clean        Temporäre Dateien aufräumen
     bash build.sh help         Diese Hilfe anzeigen
@@ -272,8 +279,9 @@ show_menu() {
     echo -e "  ${GREEN}3)${NC}  Nur Website bauen    (→ _site/)"
     echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
     echo -e "  ${GREEN}5)${NC}  Tests ausführen"
-    echo -e "  ${GREEN}6)${NC}  Abhängigkeiten prüfen / installieren"
-    echo -e "  ${GREEN}7)${NC}  Temporäre Dateien aufräumen"
+    echo -e "  ${GREEN}6)${NC}  Test-Fixtures aktualisieren"
+    echo -e "  ${GREEN}7)${NC}  Abhängigkeiten prüfen / installieren"
+    echo -e "  ${GREEN}8)${NC}  Temporäre Dateien aufräumen"
     echo -e "  ${GREEN}q)${NC}  Beenden"
     echo ""
     printf "  Auswahl: "
@@ -285,8 +293,9 @@ show_menu() {
         3) install_deps; echo ""; build_web ;;
         4) install_deps; echo ""; serve_web ;;
         5) run_tests ;;
-        6) install_deps ;;
-        7) clean ;;
+        6) install_deps; echo ""; generate_fixtures ;;
+        7) install_deps ;;
+        8) clean ;;
         q|Q) echo "  Tschüss!"; exit 0 ;;
         *) error "Ungültige Auswahl: $choice"; show_menu ;;
     esac
@@ -318,6 +327,11 @@ main() {
             ;;
         test)
             run_tests
+            ;;
+        fixtures)
+            install_deps
+            echo ""
+            generate_fixtures
             ;;
         install)
             install_deps

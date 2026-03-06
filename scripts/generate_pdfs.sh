@@ -6,10 +6,11 @@
 # Sowohl build.sh (lokal) als auch der GitHub Actions Workflow rufen es auf.
 #
 # Verwendung:
-#   bash scripts/generate_pdfs.sh [DATUM_DE]
+#   bash scripts/generate_pdfs.sh [DATUM_DE] [SOURCE_DIR] [OUTPUT_DIR]
 #
-#   DATUM_DE  Optionales Datum im Format DD.MM.YYYY.
-#             Standard: aktuelles Datum.
+#   DATUM_DE    Optionales Datum im Format DD.MM.YYYY. Standard: heute.
+#   SOURCE_DIR  Quell-Verzeichnis mit *.md-Dateien.  Standard: docs
+#   OUTPUT_DIR  Ausgabe-Verzeichnis für PDFs.         Standard: assets/pdf
 # =============================================================================
 set -euo pipefail
 
@@ -17,27 +18,25 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-# -- Datum ----------------------------------------------------------------
-if [[ $# -ge 1 && -n "${1:-}" ]]; then
-    CURRENT_DATE_DE="$1"
-else
-    CURRENT_DATE_DE=$(date +%d.%m.%Y)
-fi
+# -- Argumente ----------------------------------------------------------------
+CURRENT_DATE_DE="${1:-$(date +%d.%m.%Y)}"
+SOURCE_DIR="${2:-docs}"
+OUTPUT_DIR="${3:-assets/pdf}"
 
-# -- Plattform-kompatibles sed --------------------------------------------
+# -- Plattform-kompatibles sed ------------------------------------------------
 if [[ "$(uname)" == "Darwin" ]]; then
     SED_I=(sed -i '')
 else
     SED_I=(sed -i)
 fi
 
-# -- Ausgabe-Verzeichnisse -------------------------------------------------
-mkdir -p assets/pdf temp
+# -- Ausgabe-Verzeichnisse ----------------------------------------------------
+mkdir -p "$OUTPUT_DIR" temp
 
 count=0
 errors=0
 
-# -- Alle Markdown-Dateien in docs/ (rekursiv) ----------------------------
+# -- Alle Markdown-Dateien im Source-Verzeichnis (rekursiv) ------------------
 while IFS= read -r -d '' file; do
     filename=$(basename -- "$file")
     name="${filename%.*}"
@@ -140,21 +139,21 @@ EOF
     # Markdown → PDF
     # shellcheck disable=SC2086
     if pandoc "temp/${name}_temp.md" \
-        -o "assets/pdf/${name}.pdf" \
+        -o "${OUTPUT_DIR}/${name}.pdf" \
         $number_sections \
         --toc-depth=2 \
         --pdf-engine=xelatex \
         -V geometry:margin=1in \
         --include-in-header="$header_file" \
-        --resource-path=".:./docs:./templates:./templates/$template_name"; then
-        echo "     OK  assets/pdf/${name}.pdf"
+        --resource-path=".:./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
+        echo "     OK  ${OUTPUT_DIR}/${name}.pdf"
         count=$((count + 1))
     else
         echo "     ERR ${name}.pdf" >&2
         errors=$((errors + 1))
     fi
 
-done < <(find docs -name "*.md" -print0)
+done < <(find "$SOURCE_DIR" -name "*.md" -print0)
 
 echo ""
 echo "${count} PDF(s) generiert, ${errors} Fehler"

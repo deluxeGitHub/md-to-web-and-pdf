@@ -223,6 +223,122 @@ test_suite_environment() {
     done
 }
 
+# -- Fixture-Suite --------------------------------------------------------
+
+test_suite_fixtures() {
+    echo -e "\n${BOLD}Suite: Test-Fixtures (Regression)${NC}"
+    echo "  Generiert Test-PDFs aus test/*.md und vergleicht Seitenzahlen mit Referenz."
+    echo ""
+
+    local fixture_dir="test/fixtures/pdf"
+    local run_dir="temp/test-run"
+    mkdir -p "$run_dir"
+
+    # Frische Test-PDFs generieren
+    if ! bash scripts/generate_pdfs.sh "$(date +%d.%m.%Y)" test "$run_dir" &>/dev/null; then
+        fail "PDF-Generierung für test/*.md fehlgeschlagen"
+        return
+    fi
+
+    # Seitenzahl-Vergleich (nur wenn pdfinfo verfügbar)
+    local has_pdfinfo=false
+    command -v pdfinfo &>/dev/null && has_pdfinfo=true
+
+    while IFS= read -r -d '' md; do
+        filename=$(basename -- "$md")
+        name="${filename%.*}"
+        pdf="$run_dir/${name}.pdf"
+        fixture_pdf="${fixture_dir}/${name}.pdf"
+        pages_file="${fixture_dir}/${name}.pages"
+
+        # T1: PDF wurde generiert
+        if [[ ! -f "$pdf" ]]; then
+            fail "Kein Test-PDF erzeugt: ${name}.pdf"
+            continue
+        fi
+
+        # T2: Fixture existiert
+        if [[ ! -f "$fixture_pdf" ]]; then
+            skip "${name}.pdf  → kein Fixture (führe generate_test_fixtures.sh aus)"
+            continue
+        fi
+
+        # T3: Seitenzahl-Vergleich
+        if [[ "$has_pdfinfo" == true && -f "$pages_file" ]]; then
+            local expected actual
+            expected=$(cat "$pages_file")
+            actual=$(pdfinfo "$pdf" 2>/dev/null | awk '/^Pages:/{print $2}')
+            if [[ "$actual" == "$expected" ]]; then
+                pass "${name}.pdf  →  ${actual} Seite(n) (wie Fixture)"
+            else
+                fail "${name}.pdf  →  ${actual} Seiten, erwartet ${expected} (Fixture)"
+            fi
+        else
+            # Nur Existenz + Magic prüfen
+            magic=$(head -c 4 "$pdf" 2>/dev/null || true)
+            if [[ "$magic" == "%PDF" ]]; then
+                pass "${name}.pdf  →  gültiges PDF (kein pdfinfo für Seitenvergleich)"
+            else
+                fail "${name}.pdf  →  kein gültiger PDF-Header"
+            fi
+        fi
+
+    done < <(find test -maxdepth 1 -name "*.md" -print0)
+
+    # Aufräumen
+    rm -rf "$run_dir"
+}
+
+# -- HTML-Suite -----------------------------------------------------------
+
+test_suite_html() {
+    echo -e "\n${BOLD}Suite: HTML-Ausgabe (_site/)${NC}"
+    echo "  Prüft generierte HTML-Seiten auf Existenz, Titel und Struktur."
+    echo ""
+
+    if [[ ! -d "_site" ]]; then
+        skip "HTML  → _site/ nicht vorhanden (bash build.sh web ausführen)"
+        return
+    fi
+
+    while IFS= read -r -d '' md; do
+        filename=$(basename -- "$md")
+        name="${filename%.*}"
+
+        # Jekyll spiegelt die Quellstruktur: docs/subdir/file.md → _site/docs/subdir/file.html
+        # Wir suchen rekursiv in _site/ nach dem passenden Dateinamen.
+        local html_file
+        html_file=$(find "_site" -name "${name}.html" -o -path "*/${name}/index.html" 2>/dev/null | head -1)
+
+        if [[ -z "$html_file" ]]; then
+            fail "${name}.md  → keine HTML-Ausgabe in _site/ gefunden"
+            continue
+        fi
+
+        # T1: title-Tag vorhanden
+        if grep -q "<title>" "$html_file" 2>/dev/null; then
+            pass "${name}.html  → title-Tag vorhanden  ($html_file)"
+        else
+            fail "${name}.html  → kein title-Tag  ($html_file)"
+        fi
+
+        # T2: CSS-Link vorhanden
+        if grep -q "\.css" "$html_file" 2>/dev/null; then
+            pass "${name}.html  → CSS-Link vorhanden"
+        else
+            fail "${name}.html  → kein CSS-Link"
+        fi
+
+        # T3: Mindestens eine Überschrift
+        if grep -q "<h[1-3]" "$html_file" 2>/dev/null; then
+            pass "${name}.html  → Überschriften vorhanden"
+        else
+            fail "${name}.html  → keine Überschriften gefunden"
+        fi
+
+    done < <(find docs -name "*.md" -print0)
+}
+
 # -- Zusammenfassung ------------------------------------------------------
 
 run_all() {
@@ -234,6 +350,8 @@ run_all() {
     test_suite_pdfs
     test_suite_templates
     test_suite_frontmatter
+    test_suite_fixtures
+    test_suite_html
 
     echo -e "\n${BOLD}========================================${NC}"
     echo -e "  Ergebnis: ${GREEN}${PASS} bestanden${NC}  |  ${RED}${FAIL} fehlgeschlagen${NC}  |  ${YELLOW}${SKIP} übersprungen${NC}"
