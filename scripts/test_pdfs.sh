@@ -266,7 +266,24 @@ test_suite_fixtures() {
         #        \section{...}\label{foo}\n
         normalize_tex() {
             sed -n '/\\begin{document}/,$p' "$1" \
-            | sed '/^\\hypertarget{/d; s/\\label{\([^}]*\)}}$/\\label{\1}/'
+            | sed '/^\\hypertarget{/d; s/\\label{\([^}]*\)}}$/\\label{\1}/' \
+            | awk '
+                # Zeilenumbrüche innerhalb von LaTeX-Befehlen zusammenführen:
+                # Zeilen die nicht mit \ beginnen und nicht leer sind,
+                # werden an die vorherige Zeile angehängt.
+                {
+                    if ($0 == "") {
+                        if (buf != "") { print buf; buf = "" }
+                        print ""
+                    } else if ($0 ~ /^\\/) {
+                        if (buf != "") print buf
+                        buf = $0
+                    } else {
+                        buf = buf " " $0
+                    }
+                }
+                END { if (buf != "") print buf }
+            '
         }
 
         body_fixture=$(normalize_tex "$fixture")
