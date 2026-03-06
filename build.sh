@@ -373,10 +373,44 @@ show_help() {
 HELP
 }
 
+# -- Interaktives Menü -----------------------------------------------------
+show_menu() {
+    echo ""
+    echo -e "  ${BLUE}╔══════════════════════════════════════╗${NC}"
+    echo -e "  ${BLUE}║${NC}   md-to-web-and-pdf  Build-Tool      ${BLUE}║${NC}"
+    echo -e "  ${BLUE}╚══════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  ${GREEN}1)${NC}  Alles bauen          (PDFs + Website)"
+    echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
+    echo -e "  ${GREEN}3)${NC}  Nur Website bauen    (→ _site/)"
+    echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
+    echo -e "  ${GREEN}5)${NC}  Abhängigkeiten prüfen / installieren"
+    echo -e "  ${GREEN}6)${NC}  Temporäre Dateien aufräumen"
+    echo -e "  ${GREEN}q)${NC}  Beenden"
+    echo ""
+    printf "  Auswahl: "
+    read -r choice
+    echo ""
+    case "$choice" in
+        1) install_deps; echo ""; generate_pdfs; echo ""; build_web; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
+        2) install_deps; echo ""; generate_pdfs ;;
+        3) install_deps; echo ""; build_web ;;
+        4) install_deps; echo ""; serve_web ;;
+        5) install_deps ;;
+        6) clean ;;
+        q|Q) echo "  Tschüss!"; exit 0 ;;
+        *) error "Ungültige Auswahl: $choice"; show_menu ;;
+    esac
+}
+
 # -- Hauptlogik ------------------------------------------------------------
 main() {
-    local cmd="${1:-all}"
+    if [[ $# -eq 0 ]]; then
+        show_menu
+        return
+    fi
 
+    local cmd="$1"
     case "$cmd" in
         pdf)
             install_deps
