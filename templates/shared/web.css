@@ -436,6 +436,30 @@ body[class*="template-"] .base-heading-link svg {
     display: block;
 }
 
+/* Link-kopiert-Toast */
+#base-toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--color-brand-primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 9999;
+    white-space: nowrap;
+}
+
+#base-toast.base-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 /* Responsive Anpassungen */
 @media (max-width: 860px) {
     body[class*="template-"] .base-doc-heading {
