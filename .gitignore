@@ -8,8 +8,6 @@ _site/
 # Bereits auf main getrackten PDFs sind davon nicht betroffen.
 /assets/pdf/*.pdf
 
-# Test-Fixture PDFs werden lokal generiert und nicht versioniert;
-# nur die .pages-Dateien (Seitenzahl-Referenz) werden getrackt.
-/test/fixtures/pdf/*.pdf
-/temp/test-run/
+# Temporäre Test-Artefakte
+/temp/test-tex/
 .claude/

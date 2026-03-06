@@ -6,11 +6,12 @@
 # Sowohl build.sh (lokal) als auch der GitHub Actions Workflow rufen es auf.
 #
 # Verwendung:
-#   bash scripts/generate_pdfs.sh [DATUM_DE] [SOURCE_DIR] [OUTPUT_DIR]
+#   bash scripts/generate_pdfs.sh [DATUM_DE] [SOURCE_DIR] [OUTPUT_DIR] [FORMAT]
 #
 #   DATUM_DE    Optionales Datum im Format DD.MM.YYYY. Standard: heute.
 #   SOURCE_DIR  Quell-Verzeichnis mit *.md-Dateien.  Standard: docs
 #   OUTPUT_DIR  Ausgabe-Verzeichnis für PDFs.         Standard: assets/pdf
+#   FORMAT      Ausgabeformat: pdf (Standard) oder tex
 # =============================================================================
 set -euo pipefail
 
@@ -22,6 +23,7 @@ cd "$ROOT_DIR"
 CURRENT_DATE_DE="${1:-$(date +%d.%m.%Y)}"
 SOURCE_DIR="${2:-docs}"
 OUTPUT_DIR="${3:-assets/pdf}"
+FORMAT="${4:-pdf}"
 
 # -- Plattform-kompatibles sed ------------------------------------------------
 if [[ "$(uname)" == "Darwin" ]]; then
@@ -163,25 +165,27 @@ EOF
     s|</li>||g;
     ' "temp/${name}_temp.md"
 
-    # Markdown → PDF
+    # Markdown → PDF oder LaTeX
     # shellcheck disable=SC2086
+    out_file="${OUTPUT_DIR}/${name}.${FORMAT}"
+    extra_flags=""
+    [[ "$FORMAT" == "pdf" ]] && extra_flags="--pdf-engine=xelatex -V geometry:margin=1in"
     if pandoc "temp/${name}_temp.md" \
-        -o "${OUTPUT_DIR}/${name}.pdf" \
+        -o "$out_file" \
         $number_sections \
         --toc-depth=2 \
-        --pdf-engine=xelatex \
-        -V geometry:margin=1in \
+        $extra_flags \
         --include-in-header="$header_file" \
         --resource-path=".:$(dirname "$file"):./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
-        echo "     OK  ${OUTPUT_DIR}/${name}.pdf"
+        echo "     OK  $out_file"
         count=$((count + 1))
     else
-        echo "     ERR ${name}.pdf" >&2
+        echo "     ERR ${name}.${FORMAT}" >&2
         errors=$((errors + 1))
     fi
 
 done < <(find "$SOURCE_DIR" -name "*.md" -print0)
 
 echo ""
-echo "${count} PDF(s) generiert, ${errors} Fehler"
+echo "${count} Datei(en) generiert, ${errors} Fehler"
 [[ $errors -eq 0 ]]

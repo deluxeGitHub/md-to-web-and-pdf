@@ -223,69 +223,50 @@ test_suite_environment() {
     done
 }
 
-# -- Fixture-Suite --------------------------------------------------------
+# -- Fixture-Suite (LaTeX-Vergleich) ---------------------------------------
 
 test_suite_fixtures() {
-    echo -e "\n${BOLD}Suite: Test-Fixtures (Regression)${NC}"
-    echo "  Generiert Test-PDFs aus test/*.md und vergleicht Seitenzahlen mit Referenz."
+    echo -e "\n${BOLD}Suite: LaTeX-Fixtures (Regression)${NC}"
+    echo "  Vergleicht frisch generiertes .tex gegen committete Referenz-Fixtures."
     echo ""
 
-    local fixture_dir="test/fixtures/pdf"
-    local run_dir="temp/test-run"
+    local fixture_dir="test/fixtures/tex"
+    local run_dir="temp/test-tex"
     mkdir -p "$run_dir"
 
-    # Frische Test-PDFs generieren
-    if ! bash scripts/generate_pdfs.sh "$(date +%d.%m.%Y)" test "$run_dir" &>/dev/null; then
-        fail "PDF-Generierung für test/*.md fehlgeschlagen"
+    # Frische .tex-Dateien mit fixem Datum generieren (identisch zur Fixture-Erstellung)
+    if ! bash scripts/generate_pdfs.sh "01.01.2000" test "$run_dir" tex &>/dev/null; then
+        fail "LaTeX-Generierung für test/*.md fehlgeschlagen"
+        rm -rf "$run_dir"
         return
     fi
 
-    # Seitenzahl-Vergleich (nur wenn pdfinfo verfügbar)
-    local has_pdfinfo=false
-    command -v pdfinfo &>/dev/null && has_pdfinfo=true
-
     while IFS= read -r -d '' md; do
+        local filename name tex fixture
         filename=$(basename -- "$md")
         name="${filename%.*}"
-        pdf="$run_dir/${name}.pdf"
-        fixture_pdf="${fixture_dir}/${name}.pdf"
-        pages_file="${fixture_dir}/${name}.pages"
+        tex="$run_dir/${name}.tex"
+        fixture="${fixture_dir}/${name}.tex"
 
-        # T1: PDF wurde generiert
-        if [[ ! -f "$pdf" ]]; then
-            fail "Kein Test-PDF erzeugt: ${name}.pdf"
+        if [[ ! -f "$tex" ]]; then
+            fail "${name}: keine .tex-Datei erzeugt"
             continue
         fi
 
-        # T2: Fixture existiert
-        if [[ ! -f "$fixture_pdf" ]]; then
-            skip "${name}.pdf  → kein Fixture (führe generate_test_fixtures.sh aus)"
+        if [[ ! -f "$fixture" ]]; then
+            skip "${name}.tex  → kein Fixture (bash build.sh fixtures ausführen)"
             continue
         fi
 
-        # T3: Seitenzahl-Vergleich
-        if [[ "$has_pdfinfo" == true && -f "$pages_file" ]]; then
-            local expected actual
-            expected=$(cat "$pages_file")
-            actual=$(pdfinfo "$pdf" 2>/dev/null | awk '/^Pages:/{print $2}')
-            if [[ "$actual" == "$expected" ]]; then
-                pass "${name}.pdf  →  ${actual} Seite(n) (wie Fixture)"
-            else
-                fail "${name}.pdf  →  ${actual} Seiten, erwartet ${expected} (Fixture)"
-            fi
+        if diff -q "$fixture" "$tex" &>/dev/null; then
+            pass "${name}.tex  → identisch mit Fixture"
         else
-            # Nur Existenz + Magic prüfen
-            magic=$(head -c 4 "$pdf" 2>/dev/null || true)
-            if [[ "$magic" == "%PDF" ]]; then
-                pass "${name}.pdf  →  gültiges PDF (kein pdfinfo für Seitenvergleich)"
-            else
-                fail "${name}.pdf  →  kein gültiger PDF-Header"
-            fi
+            fail "${name}.tex  → Abweichung vom Fixture"
+            diff "$fixture" "$tex" | head -20 | sed 's/^/    /' >&2
         fi
 
     done < <(find test -maxdepth 1 -name "*.md" -print0)
 
-    # Aufräumen
     rm -rf "$run_dir"
 }
 
