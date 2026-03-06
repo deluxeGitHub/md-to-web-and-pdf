@@ -438,6 +438,57 @@ for l in lines[1:end]:
     done < <(find docs -name "*.md" -print0)
 }
 
+# -- HTML-Fixture-Suite ---------------------------------------------------
+
+test_suite_html_fixtures() {
+    echo -e "\n${BOLD}Suite: HTML-Fixtures (Regression)${NC}"
+    echo "  Vergleicht frisch gebaute HTML-Seiten der Testdokumente gegen Referenz-Fixtures."
+    echo ""
+
+    local fixture_dir="test/fixtures/html"
+
+    if [[ ! -d "$fixture_dir" ]]; then
+        skip "HTML-Fixtures  → kein ${fixture_dir}/ (bash build.sh fixtures ausführen)"
+        return
+    fi
+
+    if [[ ! -d "_site/test" ]]; then
+        skip "HTML-Fixtures  → _site/test/ nicht vorhanden (bash build.sh web ausführen)"
+        return
+    fi
+
+    while IFS= read -r -d '' md; do
+        local name fixture src tmp
+        name="$(basename "${md%.md}")"
+        fixture="${fixture_dir}/${name}.html"
+        src="_site/test/${name}.html"
+
+        if [[ ! -f "$src" ]]; then
+            fail "${name}.html  → keine HTML-Ausgabe in _site/test/ gefunden"
+            continue
+        fi
+
+        if [[ ! -f "$fixture" ]]; then
+            skip "${name}.html  → kein Fixture (bash build.sh fixtures ausführen)"
+            continue
+        fi
+
+        # Datum normalisieren (identisch zur Fixture-Erstellung)
+        tmp="temp/${name}_html_normalized.html"
+        mkdir -p temp
+        sed 's|<div class="base-doc-date">.*</div>||g' "$src" > "$tmp"
+
+        if diff -q "$fixture" "$tmp" &>/dev/null; then
+            pass "${name}.html  → identisch mit Fixture"
+        else
+            fail "${name}.html  → Abweichung vom Fixture"
+            diff "$fixture" "$tmp" | head -20 | sed 's/^/    /' >&2
+        fi
+        rm -f "$tmp"
+
+    done < <(find test -maxdepth 1 -name "*.md" -print0)
+}
+
 # -- Zusammenfassung ------------------------------------------------------
 
 run_all() {
@@ -450,6 +501,7 @@ run_all() {
     test_suite_templates
     test_suite_frontmatter
     test_suite_fixtures
+    test_suite_html_fixtures
     test_suite_section_numbering
     test_suite_html
 

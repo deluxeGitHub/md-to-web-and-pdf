@@ -10,4 +10,6 @@ _site/
 
 # Temporäre Test-Artefakte
 /temp/test-tex/
+# Test-Fixture PDFs: gitignored, aber lokal für manuelle Inspektion vorhanden
+/test/fixtures/tex/*.pdf
 .claude/

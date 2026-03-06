@@ -64,6 +64,10 @@ Dieser Abschnitt enthält deutsche Umlaute: ä, ö, ü, Ä, Ö, Ü, ß.
 
 Text kann **fett**, *kursiv* oder `inline-code` formatiert werden.
 
+## Bild
+
+![Test-Logo](images/test-logo.png)
+
 ## Fußzeile und Datum
 
 <div class="html-only">
