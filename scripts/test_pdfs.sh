@@ -258,12 +258,19 @@ test_suite_fixtures() {
             continue
         fi
 
-        # Nur den Dokumenten-Body vergleichen (ab \begin{document}), damit
-        # Unterschiede in der auto-generierten Pandoc-Präambel (Paket-Reihenfolge
-        # etc.) nicht zu falsch-negativen Ergebnissen bei verschiedenen
-        # Pandoc-Versionen führen.
-        body_fixture=$(sed -n '/\\begin{document}/,$p' "$fixture")
-        body_tex=$(sed -n '/\\begin{document}/,$p' "$tex")
+        # Body-Extraktion + Normalisierung für pandoc-versions-unabhängigen Vergleich:
+        #   1. Nur ab \begin{document} vergleichen (Präambel-Unterschiede ignorieren)
+        #   2. \hypertarget-Wrapping normalisieren: pandoc ≤3.1 schreibt
+        #        \hypertarget{foo}{%\n\section{...}\label{foo}}\n
+        #      pandoc ≥3.6 schreibt direkt:
+        #        \section{...}\label{foo}\n
+        normalize_tex() {
+            sed -n '/\\begin{document}/,$p' "$1" \
+            | sed '/^\\hypertarget{/d; s/\\label{\([^}]*\)}}$/\\label{\1}/'
+        }
+
+        body_fixture=$(normalize_tex "$fixture")
+        body_tex=$(normalize_tex "$tex")
 
         if [[ "$body_fixture" == "$body_tex" ]]; then
             pass "${name}.tex  → identisch mit Fixture"
