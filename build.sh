@@ -3,12 +3,15 @@
 # build.sh – Kombiniertes Build-Script für macOS
 #
 # Erstellt die Jekyll-Website UND generiert PDFs aus den Markdown-Dokumenten.
+# Die eigentliche PDF-Logik liegt in scripts/generate_pdfs.sh – dasselbe
+# Script, das auch der GitHub Actions Workflow aufruft.
 #
 # Verwendung:
-#   bash build.sh              # Website bauen + PDFs generieren
+#   bash build.sh              # Interaktives Menü
 #   bash build.sh pdf          # Nur PDFs generieren
 #   bash build.sh web          # Nur Jekyll-Website bauen (einmalig, nach _site/)
 #   bash build.sh serve        # Jekyll-Entwicklungsserver mit Live-Reload starten
+#   bash build.sh test         # PDF-Tests ausführen
 #   bash build.sh install      # Nur Abhängigkeiten prüfen/installieren
 #   bash build.sh clean        # Temporäre Dateien aufräumen
 # =============================================================================
@@ -185,140 +188,20 @@ install_deps() {
     success "Alle Abhängigkeiten sind vorhanden."
 }
 
-# -- PDF-Generierung -------------------------------------------------------
+# -- PDF-Generierung (via gemeinsames Script) ------------------------------
 generate_pdfs() {
     info "Generiere PDFs …"
-    mkdir -p assets/pdf
-    mkdir -p temp
-
-    # macOS-kompatibles sed
-    SED_I=(sed -i '')
-
-    CURRENT_DATE=$(date +%Y-%m-%d)
-    CURRENT_DATE_DE=$(date +%d.%m.%Y)
-
-    local count=0
-
-    while IFS= read -r -d '' file; do
-        filename=$(basename -- "$file")
-        name="${filename%.*}"
-        cp "$file" "temp/${name}_temp.md"
-        header_file="temp/${name}_header.tex"
-        number_sections="--number-sections"
-        template_name=""
-        template_dir=""
-
-        info "  Verarbeite: $filename"
-
-        # Template-Name aus Front Matter lesen
-        template_name=$(python3 - "$file" <<'PY'
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
-lines = text.splitlines()
-if not lines or lines[0].strip() != "---":
-    sys.exit(0)
-try:
-    fm_end = lines.index("---", 1)
-except ValueError:
-    sys.exit(0)
-for line in lines[1:fm_end]:
-    if line.lower().startswith("template:"):
-        value = line.split(":", 1)[1].strip().strip("'\"")
-        print(value.lower())
-        break
-PY
-        )
-
-        if [[ -z "$template_name" ]]; then
-            template_name="default"
-        fi
-
-        if [[ -d "templates/$template_name" ]]; then
-            template_dir="templates/$template_name"
-        else
-            template_name="default"
-        fi
-
-        # LaTeX-Header erstellen
-        if grep -q '^section_prefix:' "$file"; then
-            cat > "$header_file" <<'EOF'
-\usepackage{enumitem}
-\renewcommand{\thesection}{\S\arabic{section}}
-\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
-\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
-\makeatletter
-\renewcommand{\@seccntformat}[1]{\ifcsname the#1\endcsname\csname the#1\endcsname\hspace{0.4em}\fi}
-\renewcommand{\numberline}[1]{#1\hspace{0.6em}}
-\makeatother
-EOF
-        else
-            echo "\\usepackage{enumitem}" > "$header_file"
-        fi
-
-        if [[ -n "$template_dir" ]] && [[ -f "$template_dir/pdf-header.tex" ]]; then
-            cat "$template_dir/pdf-header.tex" >> "$header_file"
-        fi
-
-        # Datum-Platzhalter ersetzen
-        "${SED_I[@]}" "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/date: {{ site.time | date: '%d-%m-%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/date: {{ site.time | date: \"%d.%m.%Y\" }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $CURRENT_DATE_DE/g" "temp/${name}_temp.md"
-        "${SED_I[@]}" "s/^date: .*/date: $CURRENT_DATE_DE/" "temp/${name}_temp.md"
-
-        # title2 → subtitle (wie im GitHub Workflow)
-        "${SED_I[@]}" "s/^title2:/subtitle:/" "temp/${name}_temp.md"
-
-        # TOC-Syntax für LaTeX ersetzen
-        awk '
-          { sub(/\r$/, ""); }
-          $0 == "* TOC" || $0 == "TOC {:toc}" || $0 == "* TOC {:toc}" {
-            print "\\clearpage\\renewcommand{\\contentsname}{Inhaltsverzeichnis}";
-            print "\\tableofcontents";
-            print "\\clearpage";
-            skip = 1;
-            next;
-          }
-          skip && $0 == "{:toc}" { skip = 0; next; }
-          { print; }
-        ' "temp/${name}_temp.md" > "temp/${name}_temp.md.tmp" && mv "temp/${name}_temp.md.tmp" "temp/${name}_temp.md"
-
-        # HTML-only-Blöcke entfernen
-        "${SED_I[@]}" '/<div class="html-only"/,/^<\/div>$/d' "temp/${name}_temp.md"
-
-        # Alphabetische HTML-Listen → LaTeX
-        "${SED_I[@]}" '
-        s|<ol type="a">|\\begin{enumerate}[label=\\alph*.]|g;
-        s|</ol>|\\end{enumerate}|g;
-        s|<li>|\\item |g;
-        s|</li>||g;
-        ' "temp/${name}_temp.md"
-
-        # Markdown → PDF konvertieren
-        if pandoc "temp/${name}_temp.md" -o "assets/pdf/${name}.pdf" \
-            $number_sections \
-            --toc-depth=2 \
-            --pdf-engine=xelatex \
-            -V geometry:margin=1in \
-            --include-in-header="$header_file" \
-            --resource-path=".:./docs:./templates:./templates/$template_name"; then
-            success "  → assets/pdf/${name}.pdf"
-        else
-            error "  → Fehler bei ${name}.pdf"
-        fi
-
-        count=$((count + 1))
-    done < <(find docs -name "*.md" -print0)
-
     echo ""
-    success "$count PDF(s) generiert in assets/pdf/"
+    bash scripts/generate_pdfs.sh
+    echo ""
+    success "PDFs generiert in assets/pdf/"
+}
+
+# -- Tests -----------------------------------------------------------------
+run_tests() {
+    info "Starte Tests …"
+    echo ""
+    bash scripts/test_pdfs.sh
 }
 
 # -- Jekyll-Website --------------------------------------------------------
@@ -354,10 +237,11 @@ show_help() {
   build.sh – Website & PDF Build-Tool für macOS
 
   Verwendung:
-    bash build.sh              Alles bauen (PDFs + Website)
+    bash build.sh              Interaktives Menü
     bash build.sh pdf          Nur PDFs generieren
     bash build.sh web          Nur Jekyll-Website bauen (nach _site/)
     bash build.sh serve        Jekyll-Entwicklungsserver starten (Live-Reload)
+    bash build.sh test         PDF-Tests ausführen
     bash build.sh install      Nur Abhängigkeiten prüfen/installieren
     bash build.sh clean        Temporäre Dateien aufräumen
     bash build.sh help         Diese Hilfe anzeigen
@@ -369,6 +253,9 @@ show_help() {
     • XeLaTeX           (PDF-Rendering – via BasicTeX oder MacTeX)
     • Ruby + Jekyll     (Website-Generierung)
     • Jekyll-Gems       (jekyll-toc, jekyll-theme-minimal, jekyll-relative-links)
+
+  Die PDF-Logik liegt in scripts/generate_pdfs.sh und wird identisch
+  vom GitHub Actions Workflow verwendet.
 
 HELP
 }
@@ -384,8 +271,9 @@ show_menu() {
     echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
     echo -e "  ${GREEN}3)${NC}  Nur Website bauen    (→ _site/)"
     echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
-    echo -e "  ${GREEN}5)${NC}  Abhängigkeiten prüfen / installieren"
-    echo -e "  ${GREEN}6)${NC}  Temporäre Dateien aufräumen"
+    echo -e "  ${GREEN}5)${NC}  Tests ausführen"
+    echo -e "  ${GREEN}6)${NC}  Abhängigkeiten prüfen / installieren"
+    echo -e "  ${GREEN}7)${NC}  Temporäre Dateien aufräumen"
     echo -e "  ${GREEN}q)${NC}  Beenden"
     echo ""
     printf "  Auswahl: "
@@ -396,8 +284,9 @@ show_menu() {
         2) install_deps; echo ""; generate_pdfs ;;
         3) install_deps; echo ""; build_web ;;
         4) install_deps; echo ""; serve_web ;;
-        5) install_deps ;;
-        6) clean ;;
+        5) run_tests ;;
+        6) install_deps ;;
+        7) clean ;;
         q|Q) echo "  Tschüss!"; exit 0 ;;
         *) error "Ungültige Auswahl: $choice"; show_menu ;;
     esac
@@ -426,6 +315,9 @@ main() {
             install_deps
             echo ""
             serve_web
+            ;;
+        test)
+            run_tests
             ;;
         install)
             install_deps
