@@ -224,7 +224,13 @@ serve_web() {
     echo "  Beenden mit Ctrl+C"
     echo ""
     setup_ruby_path
-    jekyll serve --livereload --baseurl "" --destination ".jekyll/_site" --source .
+    # Prüfen ob LiveReload-Port (35729) frei ist; falls belegt ohne LiveReload starten
+    if lsof -iTCP:35729 -sTCP:LISTEN &>/dev/null; then
+        warn "LiveReload-Port 35729 belegt – starte ohne Live-Reload"
+        jekyll serve --baseurl "" --destination ".jekyll/_site" --source .
+    else
+        jekyll serve --livereload --baseurl "" --destination ".jekyll/_site" --source .
+    fi
 }
 
 # -- Aufräumen -------------------------------------------------------------
