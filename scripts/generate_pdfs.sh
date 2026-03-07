@@ -32,47 +32,64 @@ else
     SED_I=(sed -i)
 fi
 
-# -- Ausgabe-Verzeichnisse ----------------------------------------------------
-mkdir -p "$OUTPUT_DIR" temp
+# -- Parallelisierung ---------------------------------------------------------
+MAX_JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+RESULT_DIR="temp/pdf_results_$$"
+mkdir -p "$OUTPUT_DIR" temp "$RESULT_DIR"
 
-count=0
-errors=0
+# Aufräumen bei Exit (auch bei Fehler)
+trap 'rm -rf "$RESULT_DIR"' EXIT
 
-# -- Alle Markdown-Dateien im Source-Verzeichnis (rekursiv) ------------------
-while IFS= read -r -d '' file; do
-    filename=$(basename -- "$file")
-    name="${filename%.*}"
-    cp "$file" "temp/${name}_temp.md"
-    header_file="temp/${name}_header.tex"
-    number_sections=""
-    template_name=""
-    template_dir=""
-
-    echo "  -> $filename"
-
-    # Template-Name aus Front Matter lesen
-    template_name=$(python3 - "$file" <<'PY'
+# -- Front Matter in einem Python-Aufruf lesen --------------------------------
+read_frontmatter() {
+    python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
 
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
 lines = text.splitlines()
-if not lines or lines[0].strip() != "---":
-    sys.exit(0)
-try:
-    fm_end = lines.index("---", 1)
-except ValueError:
-    sys.exit(0)
-for line in lines[1:fm_end]:
-    if line.lower().startswith("template:"):
-        value = line.split(":", 1)[1].strip().strip("'\"")
-        print(value.lower())
-        break
+fm = {}
+if lines and lines[0].strip() == "---":
+    try:
+        end = lines.index("---", 1)
+        for line in lines[1:end]:
+            if ":" in line:
+                k, _, v = line.partition(":")
+                fm[k.strip().lower()] = v.strip().strip("'\"").lower()
+    except ValueError:
+        pass
+print(fm.get("template", ""))
+print(fm.get("section_numbering", ""))
 PY
-    )
+}
 
-    # Fallback auf "base" (nicht "default" – das Verzeichnis existiert nicht)
+# -- Verarbeitung einer einzelnen Datei (läuft im Hintergrund) ---------------
+process_file() {
+    local file="$1"
+    local filename name out_file header_file template_name template_dir
+    local section_numbering number_sections extra_flags
+    filename=$(basename -- "$file")
+    name="${filename%.*}"
+    out_file="${OUTPUT_DIR}/${name}.${FORMAT}"
+    header_file="temp/${name}_header.tex"
+    number_sections=""
+
+    # Mtime-Check: Ausgabe neuer als Quelle → überspringen (nur bei pdf)
+    if [[ "$FORMAT" == "pdf" && -f "$out_file" && "$out_file" -nt "$file" ]]; then
+        echo "  -- $filename  (unverändert)"
+        echo "skip" > "$RESULT_DIR/${name}.result"
+        return 0
+    fi
+
+    echo "  -> $filename"
+
+    # Front Matter: template + section_numbering in einem Python-Aufruf
+    local fm_out
+    fm_out=$(read_frontmatter "$file")
+    template_name=$(echo "$fm_out" | sed -n '1p')
+    section_numbering=$(echo "$fm_out" | sed -n '2p')
+
+    # Template-Fallback
     [[ -z "$template_name" ]] && template_name="base"
     if [[ -d "templates/$template_name" ]]; then
         template_dir="templates/$template_name"
@@ -82,27 +99,6 @@ PY
     fi
 
     # LaTeX-Header erstellen
-    # section_numbering: paragraph → §1, §2 … (z.B. BTFV-Satzung)
-    # section_numbering: arabic   → 1, 1.1 … (z.B. DTFB-Ausschreibungen)
-    # (nicht gesetzt)             → keine Nummerierung
-    section_numbering=$(python3 - "$file" <<'PY'
-import sys
-from pathlib import Path
-text = Path(sys.argv[1]).read_text(encoding="utf-8")
-lines = text.splitlines()
-if not lines or lines[0].strip() != "---":
-    sys.exit(0)
-try:
-    fm_end = lines.index("---", 1)
-except ValueError:
-    sys.exit(0)
-for line in lines[1:fm_end]:
-    if line.lower().startswith("section_numbering:"):
-        print(line.split(":", 1)[1].strip().strip("'\"").lower())
-        break
-PY
-    )
-
     case "$section_numbering" in
         paragraph)
             number_sections="--number-sections"
@@ -130,7 +126,10 @@ EOF
         cat "$template_dir/pdf-header.tex" >> "$header_file"
     fi
 
-    # Datum-Platzhalter ersetzen (alle bekannten Formate)
+    # Temp-Kopie vorverarbeiten
+    cp "$file" "temp/${name}_temp.md"
+
+    # Datum-Platzhalter ersetzen
     "${SED_I[@]}" "s/{{ site.time | date: \"%d-%m-%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
     "${SED_I[@]}" "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g"  "temp/${name}_temp.md"
     "${SED_I[@]}" "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
@@ -167,7 +166,6 @@ EOF
 
     # Markdown → PDF oder LaTeX
     # shellcheck disable=SC2086
-    out_file="${OUTPUT_DIR}/${name}.${FORMAT}"
     extra_flags=""
     [[ "$FORMAT" == "pdf" ]] && extra_flags="--pdf-engine=xelatex -V geometry:margin=1in"
     if pandoc "temp/${name}_temp.md" \
@@ -178,14 +176,62 @@ EOF
         --include-in-header="$header_file" \
         --resource-path=".:$(dirname "$file"):./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
         echo "     OK  $out_file"
-        count=$((count + 1))
+        echo "ok" > "$RESULT_DIR/${name}.result"
     else
         echo "     ERR ${name}.${FORMAT}" >&2
-        errors=$((errors + 1))
+        echo "err" > "$RESULT_DIR/${name}.result"
     fi
+}
 
+export -f process_file read_frontmatter
+export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR
+export SED_I
+
+# -- Alle Markdown-Dateien parallel verarbeiten -------------------------------
+declare -a BGPIDS
+BGPIDS=()
+
+limit_jobs() {
+    local running=() pid
+    if (( ${#BGPIDS[@]} > 0 )); then
+        for pid in "${BGPIDS[@]}"; do
+            kill -0 "$pid" 2>/dev/null && running+=("$pid")
+        done
+        BGPIDS=("${running[@]+"${running[@]}"}")
+    fi
+    while (( ${#BGPIDS[@]} >= MAX_JOBS )); do
+        sleep 0.1
+        running=()
+        for pid in "${BGPIDS[@]}"; do
+            kill -0 "$pid" 2>/dev/null && running+=("$pid")
+        done
+        BGPIDS=("${running[@]+"${running[@]}"}")
+    done
+}
+
+while IFS= read -r -d '' file; do
+    limit_jobs
+    process_file "$file" &
+    BGPIDS+=($!)
 done < <(find "$SOURCE_DIR" -name "*.md" -print0)
 
+# Auf alle Hintergrund-Jobs warten
+for pid in "${BGPIDS[@]+"${BGPIDS[@]}"}"; do
+    wait "$pid" || true
+done
+
+# -- Ergebnisse auswerten -----------------------------------------------------
+count=0; errors=0; skipped=0
+for f in "$RESULT_DIR"/*.result; do
+    [[ -f "$f" ]] || continue
+    result=$(cat "$f")
+    case "$result" in
+        ok)   count=$((count + 1))   ;;
+        err)  errors=$((errors + 1)) ;;
+        skip) skipped=$((skipped + 1)) ;;
+    esac
+done
+
 echo ""
-echo "${count} Datei(en) generiert, ${errors} Fehler"
+echo "${count} Datei(en) generiert, ${skipped} übersprungen, ${errors} Fehler"
 [[ $errors -eq 0 ]]
