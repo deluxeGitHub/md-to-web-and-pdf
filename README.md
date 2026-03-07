@@ -67,13 +67,24 @@ Jedes Template enthält:
 ```yaml
 ---
 title: "Satzung"
-subtitle: "des BTFV e.V."
+subtitle: "des BTFV e.V."              # optional
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
-# template: dtfb               # nur setzen, wenn vom Default in _config.yml abweichend
-section_numbering: paragraph    # paragraph=§ | arabic=1.1 | weglassen=keine
-pdf: /assets/pdf/satzung.pdf
+template: dtfb                         # optional – nur wenn vom Default in _config.yml abweichend
+section_numbering: paragraph           # optional – paragraph | arabic | weglassen = keine
+pdf: /assets/pdf/satzung.pdf          # optional – für Download-Link auf der Website
 ---
+```
+
+`layout` und `template` müssen nicht gesetzt werden, wenn der Repo-weite Default aus `_config.yml` passt:
+
+```yaml
+# _config.yml
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      template: btfv
 ```
 
 ### Abschnittsnummerierung
