@@ -109,8 +109,8 @@ PY
             cat > "$header_file" <<'EOF'
 \usepackage{enumitem}
 \renewcommand{\thesection}{\S\arabic{section}}
-\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
-\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+\renewcommand{\thesubsection}{\S\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\S\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
 \makeatletter
 \renewcommand{\@seccntformat}[1]{\ifcsname the#1\endcsname\csname the#1\endcsname\hspace{0.4em}\fi}
 \renewcommand{\numberline}[1]{#1\hspace{0.6em}}

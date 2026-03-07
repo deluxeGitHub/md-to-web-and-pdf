@@ -379,6 +379,18 @@ body[class*="template-"].section-prefix h1::before {
     content: "\00A7 " counter(section) " ";
 }
 
+body[class*="template-"].section-prefix h2::before {
+    content: "\00A7 " counter(section) "." counter(subsection) " ";
+}
+
+body[class*="template-"].section-prefix h3::before {
+    content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+}
+
+body[class*="template-"].section-prefix h4::before {
+    content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
+}
+
 body[class*="template-"] h2::before {
     counter-increment: subsection;
     content: counter(section) "." counter(subsection) " ";
