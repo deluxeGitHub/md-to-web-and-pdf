@@ -293,7 +293,7 @@ body[class*="template-"] #markdown-toc li a::before {
     color: var(--color-brand-primary);
 }
 
-body.section-prefix[class*="template-"] #markdown-toc > li > a::before {
+body.section-prefix[class*="template-"] #markdown-toc li a::before {
     content: "\00A7 " counters(item, ".") " ";
 }
 
