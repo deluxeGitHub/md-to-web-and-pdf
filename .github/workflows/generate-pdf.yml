@@ -20,7 +20,30 @@ jobs:
           LAST_COMMIT_DATE_DE=$(date -d "$LAST_COMMIT_DATE" +%d.%m.%Y)
           echo "BUILD_DATE=$LAST_COMMIT_DATE_DE" >> "$GITHUB_ENV"
 
+      - name: Prüfen ob Neugenerierung nötig ist
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: manuell ausgelöst (workflow_dispatch)"
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
+            docs/ \
+            'templates/*/pdf-header.tex' \
+            scripts/generate_pdfs.sh \
+            2>/dev/null || true)
+          if [[ -n "$CHANGED" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild nötig – geänderte Dateien:"
+            echo "$CHANGED"
+          else
+            echo "needs_rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "Keine relevanten Änderungen – Build wird übersprungen."
+          fi
+
       - name: Install Pandoc and LaTeX
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends \
@@ -36,12 +59,15 @@ jobs:
           fc-cache -fv
 
       - name: Generate PDFs
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: bash scripts/generate_pdfs.sh "$BUILD_DATE"
 
       - name: Run tests
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: bash scripts/test_pdfs.sh
 
       - name: Commit PDFs to repository
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
