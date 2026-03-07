@@ -6,9 +6,8 @@ Dieses Repository enthält die offiziellen Dokumente des Bayerischen Tischfußba
 
 - **docs/**: Enthält die Markdown-Quellen der Verbandsdokumente (`satzung.md`, `spielordnung.md`, `gebuehrenordnung.md` usw.).
 - **assets/pdf/**: Hier werden die automatisch generierten PDF-Versionen der Dokumente abgelegt.
-- **assets/css/**: Enthält das Stylesheet für die HTML-Darstellung.
-- **templates/**: Enth?lt modulare Templates (Web + PDF) f?r verschiedene Verb?nde.
-- **generate_pdf_local.sh**: Skript zur lokalen PDF-Erzeugung aus den Markdown-Dateien.
+- **templates/**: Enthält modulare Templates (Web + PDF) für verschiedene Verbände.
+- **scripts/**: Build- und Test-Skripte (werden von `build.sh` aufgerufen).
 - **.github/workflows/generate-pdf.yml**: GitHub Actions Workflow zur automatischen PDF-Erstellung bei jedem Push auf den `main`-Branch.
 - **_layouts/** und **_config.yml**: Dateien für das Jekyll-Setup zur HTML-Darstellung auf GitHub Pages.
 
@@ -20,21 +19,24 @@ Die Dokumente werden im [Markdown-Format](https://www.markdownguide.org/basic-sy
 
 ### Automatische Platzhalter und "Magic"
 
-- **Datum:** Ganz oben im Dokument steht oft eine Zeile wie  
-  `date: {{ site.time | date: "%d-%m-%Y" }}`  
+- **Datum:** Ganz oben im Dokument steht oft eine Zeile wie
+  `date: {{ site.time | date: "%d-%m-%Y" }}`
   Beim PDF-Export wird dieser Platzhalter automatisch durch das Datum des letzten Commits ersetzt.
-- **TOC (Inhaltsverzeichnis):**  
-  Die Zeile  
+- **TOC (Inhaltsverzeichnis):**
+  Die Zeile
   ```
   * TOC
   {:toc}
   ```
   erzeugt beim Export ein automatisches Inhaltsverzeichnis an dieser Stelle.
-- **HTML-Blöcke:**  
+- **HTML-Blöcke:**
   Blöcke wie `<div class="html-only">...</div>` werden beim PDF-Export entfernt und erscheinen nur in der HTML-Version.
-- **Templates:**  
-  Mit `template: base` im Front-Matter werden Web- und PDF-Styles aus `templates/base` aktiviert.
-- **Alphabetische Listen:**  
+- **Templates:**
+  Mit `template: btfv` im Front-Matter werden Web- und PDF-Styles aus `templates/btfv` aktiviert.
+- **Abschnittsnummerierung:**
+  Mit `section_numbering: paragraph` werden Überschriften als §1, §1.1 … nummeriert.
+  Mit `section_numbering: arabic` als 1, 1.1 … nummeriert.
+- **Alphabetische Listen:**
   Für Listen mit Buchstaben (a, b, c, ...) wird in HTML folgendes verwendet:
   ```html
   <ol type="a">
@@ -42,16 +44,11 @@ Die Dokumente werden im [Markdown-Format](https://www.markdownguide.org/basic-sy
     <li>Zweiter Punkt</li>
   </ol>
   ```
-  Diese Syntax wird beim PDF-Export automatisch in eine passende Darstellung umgewandelt.  
-  **Hinweis:** Solche Listen bitte nur verwenden, wenn wirklich eine alphabetische Nummerierung (a, b, c, ...) benötigt wird.
-
-Alle diese Anpassungen werden automatisch durch das Skript und den GitHub Actions Workflow erledigt (siehe `.github/workflows/generate-pdf.yml`).
+  Diese Syntax wird beim PDF-Export automatisch in eine passende Darstellung umgewandelt.
 
 ---
 
 ### Überschriften
-
-Überschriften werden mit `#` markiert. Je mehr `#`, desto kleiner die Überschrift:
 
 ```
 # Überschrift 1
@@ -63,46 +60,17 @@ Alle diese Anpassungen werden automatisch durch das Skript und den GitHub Action
 
 ### Aufzählungen (Listen)
 
-**Ungeordnete Liste (Punkte):**
-
+**Ungeordnete Liste:**
 ```
 - Erster Punkt
 - Zweiter Punkt
   - Unterpunkt
 ```
 
-**Ergebnis:**
-- Erster Punkt
-- Zweiter Punkt
-  - Unterpunkt
-
-**Geordnete Liste (Nummerierung):**
-
+**Geordnete Liste:**
 ```
 1. Erster Punkt
 2. Zweiter Punkt
-   1. Unterpunkt
-```
-
-**Ergebnis:**
-1. Erster Punkt
-2. Zweiter Punkt
-   1. Unterpunkt
-
----
-
-### Bilder einfügen
-
-Bilder können mit folgender Syntax eingefügt werden:
-
-```
-![Alternativtext](pfad/zum/bild.png)
-```
-
-Beispiel:
-
-```
-![BTFV Logo](images/btfv-logo.png)
 ```
 
 ---
@@ -112,10 +80,8 @@ Beispiel:
 - **Fett:** `**Text**` → **Text**
 - **Kursiv:** `_Text_` → _Text_
 - **Links:** `[Linktext](URL)`
-- **Tabellen:** Siehe Beispiele in den bestehenden Dokumenten.
 
-Eine ausführliche Anleitung zu Markdown findest du z.B. hier:  
-👉 [Markdown Guide (deutsch)](https://www.markdownguide.org/basic-syntax/)
+Eine ausführliche Anleitung: [Markdown Guide](https://www.markdownguide.org/basic-syntax/)
 
 ---
 
@@ -127,44 +93,26 @@ Bei jedem Push auf den `main`-Branch wird der [GitHub Actions Workflow](.github/
 2. Die Markdown-Dateien werden mit Pandoc und LaTeX in PDFs umgewandelt.
 3. Die PDFs werden im Ordner [`assets/pdf/`](assets/pdf/) gespeichert und ins Repository zurückgepusht.
 
-**Hinweis:**  
-Wenn das Repository auf eine Organisation (wie BTFV) umgezogen wurde, muss für GitHub Actions das "Workflow permissions" Feature aktiviert werden, damit der Workflow Änderungen (z.B. neue PDFs) auf den `main`-Branch pushen darf.  
-Gehe dazu in die Repository-Einstellungen unter  
-`Settings` → `Actions` → `General` → `Workflow permissions`  
-und aktiviere **"Read and write permissions"**.
+**Hinweis:** Für GitHub Actions muss unter `Settings → Actions → General → Workflow permissions` die Einstellung **"Read and write permissions"** aktiviert sein.
 
 ---
 
-## Lokale PDF-Erstellung
+## Lokale Entwicklung
 
-Um die PDFs lokal zu generieren, führe das Skript aus:
-
-```sh
-bash generate_pdf_local.sh
-```
-
-Voraussetzungen:
-- [Pandoc](https://pandoc.org/)
-- [XeLaTeX](https://www.tug.org/xetex/)
-
----
-
-## Lokale Jekyll-Vorschau
-
-Für eine lokale Vorschau kannst du dieses Skript verwenden (installiert fehlende Dependencies automatisch):
+Alle lokalen Aufgaben werden über `build.sh` gesteuert:
 
 ```sh
-bash run_jekyll.sh
+bash build.sh
 ```
 
-Danach im Browser öffnen: `http://localhost:4000/`
+Das Skript zeigt ein interaktives Menü mit Optionen für PDF-Generierung, Jekyll-Vorschau und Tests.
+
+**Voraussetzungen:** [Pandoc](https://pandoc.org/), [XeLaTeX](https://www.tug.org/xetex/), [Jekyll](https://jekyllrb.com/) (für HTML-Vorschau)
 
 ---
 
 ## Lizenz
 
 [UNLICENSE](LICENSE) – Public Domain
-
----
 
 Bei Fragen oder Verbesserungsvorschlägen bitte ein Issue eröffnen oder einen Pull Request stellen.

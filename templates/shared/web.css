@@ -293,7 +293,7 @@ body[class*="template-"] #markdown-toc li a::before {
     color: var(--color-brand-primary);
 }
 
-body.section-prefix[class*="template-"] #markdown-toc > li > a::before {
+body.section-prefix[class*="template-"] #markdown-toc li a::before {
     content: "\00A7 " counters(item, ".") " ";
 }
 
@@ -379,6 +379,18 @@ body[class*="template-"].section-prefix h1::before {
     content: "\00A7 " counter(section) " ";
 }
 
+body[class*="template-"].section-prefix h2::before {
+    content: "\00A7 " counter(section) "." counter(subsection) " ";
+}
+
+body[class*="template-"].section-prefix h3::before {
+    content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+}
+
+body[class*="template-"].section-prefix h4::before {
+    content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
+}
+
 body[class*="template-"] h2::before {
     counter-increment: subsection;
     content: counter(section) "." counter(subsection) " ";
@@ -434,6 +446,30 @@ body[class*="template-"] .base-heading-link svg {
     width: 16px;
     height: 16px;
     display: block;
+}
+
+/* Link-kopiert-Toast */
+#base-toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--color-brand-primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 9999;
+    white-space: nowrap;
+}
+
+#base-toast.base-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Responsive Anpassungen */

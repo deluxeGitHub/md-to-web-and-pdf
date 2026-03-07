@@ -1,0 +1,281 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{enumitem}
+\renewcommand{\thesection}{\S\arabic{section}}
+\renewcommand{\thesubsection}{\S\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\S\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+\makeatletter
+\renewcommand{\@seccntformat}[1]{\ifcsname the#1\endcsname\csname the#1\endcsname\hspace{0.4em}\fi}
+\renewcommand{\numberline}[1]{#1\hspace{0.6em}}
+\makeatother
+% DTFB PDF header styling
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{fontspec}
+
+\definecolor{DTFBGreen}{HTML}{008F39}
+\definecolor{DTFBDark}{HTML}{011C1D}
+\definecolor{DTFBGray}{HTML}{4A4A49}
+
+\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
+\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\dtfbtitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\dtfbtitlefont{TeX Gyre Heros}[Weight=500]}
+
+\geometry{bottom=1.8in}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt}
+\setlength{\footskip}{34pt}
+\fancyhead[L]{}
+\fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/logo.png}}
+\fancyfoot[L]{\hspace*{15pt}\raisebox{-10pt}{\textcolor{DTFBGray}{\small \thedate}}}
+\fancyfoot[C]{\raisebox{0pt}{\IfFileExists{templates/dtfb/images/footer_decoration.png}{\includegraphics[width=\textwidth]{templates/dtfb/images/footer_decoration.png}}{}}}
+\fancyfoot[R]{\raisebox{-10pt}{\textcolor{DTFBGray}{\small Seite \thepage\ von \pageref{LastPage}}}}
+
+\titleformat{\section}{\Large\bfseries\color{DTFBGreen}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{DTFBGreen}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{DTFBGreen}}{\thesubsubsection}{0.6em}{}
+
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=DTFBGreen,
+  urlcolor=DTFBGreen
+}
+
+\makeatletter
+\newcommand{\dtfbsubtitle}{}
+\@ifundefined{subtitle}{
+  \newcommand{\subtitle}[1]{\gdef\dtfbsubtitle{#1}}
+}{
+  \let\dtfborigsubtitle\subtitle
+  \renewcommand{\subtitle}[1]{\gdef\dtfbsubtitle{#1}\dtfborigsubtitle{#1}}
+}
+\makeatother
+
+\makeatletter
+\renewcommand{\maketitle}{
+  \fancyhead[R]{}
+  \begin{titlepage}
+    \thispagestyle{fancy}
+    \vspace*{1.2cm}
+    \begin{center}
+      \includegraphics[height=80pt]{templates/dtfb/images/logo.png}\par
+      \vspace{0.9cm}
+      {\Huge\dtfbtitlefont\bfseries\color{DTFBGreen}\thetitle\par}
+      \ifx\dtfbsubtitle\@empty\else
+        \vspace{0.35cm}
+        {\Large\color{DTFBGray}\dtfbsubtitle\par}
+      \fi
+      \vspace{0.8cm}
+      {\large\color{DTFBGray}Stand: \thedate\par}
+    \end{center}
+    \vfill
+  \end{titlepage}
+  \setcounter{page}{2}
+  \fancyhead[R]{\includegraphics[height=50pt]{templates/dtfb/images/logo.png}}
+}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Testdokument DTFB},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Testdokument DTFB}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Design-Referenz für das DTFB-Template}
+\author{}
+\date{01.01.2000}
+
+\begin{document}
+\maketitle
+
+\clearpage\renewcommand{\contentsname}{Inhaltsverzeichnis}
+\tableofcontents
+\clearpage
+
+\section{Allgemeine Bestimmungen}\label{allgemeine-bestimmungen}
+
+Dieser Abschnitt prüft die grundlegende §-Nummerierung mit dem
+DTFB-Template. Der Abschnitts-Header soll in DTFB-Grün (\#008F39)
+erscheinen und das DTFB-Logo oben rechts sichtbar sein.
+
+\subsection{Zweck des Dokuments}\label{zweck-des-dokuments}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Dieses Dokument dient als Referenz-PDF für automatisierte Tests.
+\item
+  Es prüft Schriftart (TeX Gyre Heros), Farben, Logo, Datum und
+  §-Nummerierung.
+\item
+  Das Datum in der Fußzeile soll automatisch aufgelöst werden.
+\end{enumerate}
+
+\subsection{Geltungsbereich}\label{geltungsbereich}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Das Dokument gilt für alle Build-Umgebungen (lokal und CI).
+\item
+  Es soll auf macOS und Ubuntu identische Ausgaben erzeugen.
+\end{enumerate}
+
+\section{Textformatierung und Listen}\label{textformatierung-und-listen}
+
+\subsection{Geordnete Listen}\label{geordnete-listen}
+
+Normale nummerierte Liste:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Erster Punkt
+\item
+  Zweiter Punkt
+\item
+  Dritter Punkt
+\end{enumerate}
+
+\subsection{Alphabetische Listen}\label{alphabetische-listen}
+
+\begin{enumerate}[label=\alph*.]
+  \item Erster alphabetischer Punkt
+  \item Zweiter alphabetischer Punkt
+  \item Dritter alphabetischer Punkt
+\end{enumerate}
+
+\subsection{Ungeordnete Liste}\label{ungeordnete-liste}
+
+\begin{itemize}
+\tightlist
+\item
+  Stichpunkt A
+\item
+  Stichpunkt B
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Unterpunkt B1
+  \item
+    Unterpunkt B2
+  \end{itemize}
+\item
+  Stichpunkt C
+\end{itemize}
+
+\section{Sonderzeichen und
+Typografie}\label{sonderzeichen-und-typografie}
+
+\subsection{Umlaute}\label{umlaute}
+
+Dieser Abschnitt enthält deutsche Umlaute: ä, ö, ü, Ä, Ö, Ü, ß.
+
+\subsection{Hervorhebungen}\label{hervorhebungen}
+
+Text kann \textbf{fett}, \emph{kursiv} oder \texttt{inline-code}
+formatiert werden.
+
+\subsection{Bild}\label{bild}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Test-Logo}]{images/test-logo.png}}
+\caption{Test-Logo}
+\end{figure}
+
+\subsection{Fußzeile und Datum}\label{fuuxdfzeile-und-datum}
+
+Das Datum in der PDF-Fußzeile soll dem Ausstellungsdatum entsprechen.
+Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von
+Y''.
+
+\section{Abschlussbestimmungen}\label{abschlussbestimmungen}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Dieses Testdokument wird bei jedem Build neu generiert.
+\item
+  Abweichungen vom Referenz-PDF weisen auf Regressionen hin.
+\end{enumerate}
+
+\end{document}

@@ -1,9 +1,10 @@
-﻿name: Generate PDF
+name: Generate PDF
 
-"on":
+on:
   push:
     branches:
       - main
+      - development
   workflow_dispatch:
 
 jobs:
@@ -11,154 +12,77 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Datum des letzten Commits erhalten
-      - name: Get Last Commit Date
+      - name: Get last commit date (DD.MM.YYYY)
         run: |
-          echo "LAST_UPDATED_DATE=$(git log -1 --format=%cd --date=short)" >> $GITHUB_ENV
+          LAST_COMMIT_DATE=$(git log -1 --format=%cd --date=short)
+          LAST_COMMIT_DATE_DE=$(date -d "$LAST_COMMIT_DATE" +%d.%m.%Y)
+          echo "BUILD_DATE=$LAST_COMMIT_DATE_DE" >> "$GITHUB_ENV"
 
-      # Temporäre Markdown-Datei vorbereiten
-      - name: Prepare Markdown for PDF
+      - name: Prüfen ob Neugenerierung nötig ist
+        id: check
         run: |
-          mkdir -p temp
-          LAST_UPDATED_DATE_DE=$(date -d "$LAST_UPDATED_DATE" +%d.%m.%Y)
-          for file in docs/*.md; do
-            filename=$(basename -- "$file")
-            name="${filename%.*}" # Extract file name without extension
-            cp "$file" "temp/${name}_temp.md"
-            
-            # Map title2 to subtitle for PDF rendering
-            sed -i "s/^title2:/subtitle:/" "temp/${name}_temp.md"
-            
-            # Replace date placeholder in Markdown content
-            if grep -qi '^template:[[:space:]]*dtfb' "$file"; then
-              sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$LAST_UPDATED_DATE_DE/g" "temp/${name}_temp.md"
-              sed -i "s/{{ site.time | date: '%d.%m.%Y' }}/$LAST_UPDATED_DATE_DE/g" "temp/${name}_temp.md"
-              sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $LAST_UPDATED_DATE_DE/g" "temp/${name}_temp.md"
-              sed -i "s/date: {{ site.time | date: '%d.%m.%Y' }}/date: $LAST_UPDATED_DATE_DE/g" "temp/${name}_temp.md"
-              sed -i "s/^date: .*/date: $LAST_UPDATED_DATE_DE/" "temp/${name}_temp.md"
-            else
-              sed -i "s/{{ site.time | date: \"%d-%m-%Y\" }}/$LAST_UPDATED_DATE/g" "temp/${name}_temp.md"
-              sed -i "s/date: {{ site.time | date: \"%d-%m-%Y\" }}/date: $LAST_UPDATED_DATE/g" "temp/${name}_temp.md"
-            fi
-            
-            # Replace TOC syntax for LaTeX
-            awk '
-              { sub(/\r$/, ""); }
-              $0 == "* TOC" || $0 == "TOC {:toc}" || $0 == "* TOC {:toc}" {
-                print "\\clearpage\\renewcommand{\\contentsname}{Inhaltsverzeichnis}";
-                print "\\tableofcontents";
-                print "\\clearpage";
-                skip = 1;
-                next;
-              }
-              skip && $0 == "{:toc}" { skip = 0; next; }
-              { print; }
-            ' "temp/${name}_temp.md" > "temp/${name}_temp.md.tmp" && mv "temp/${name}_temp.md.tmp" "temp/${name}_temp.md"
-            
-            # Remove HTML-only blocks for PDF generation
-            sed -i '/<div class="html-only"/,/^<\/div>$/d' "temp/${name}_temp.md"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: manuell ausgelöst (workflow_dispatch)"
+            exit 0
+          fi
+          # Fehlende PDFs → immer neu bauen
+          MISSING=0
+          while IFS= read -r -d '' md; do
+            name="$(basename "${md%.md}")"
+            [[ ! -f "assets/pdf/${name}.pdf" ]] && MISSING=$((MISSING + 1))
+          done < <(find docs -name "*.md" -print0)
+          if [[ $MISSING -gt 0 ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: $MISSING fehlende PDF(s)"
+            exit 0
+          fi
+          # Relevante Dateiänderungen seit letztem Commit
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
+            docs/ \
+            'templates/*/pdf-header.tex' \
+            scripts/generate_pdfs.sh \
+            2>/dev/null || true)
+          if [[ -n "$CHANGED" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild nötig – geänderte Dateien:"
+            echo "$CHANGED"
+          else
+            echo "needs_rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "Keine relevanten Änderungen – Build wird übersprungen."
+          fi
 
-            sed -i '
-            s|<ol type="a">|\\begin{enumerate}[label=\\alph*.]|g;
-            s|</ol>|\\end{enumerate}|g;
-            s|<li>|\\item |g;
-            s|</li>||g;
-            ' "temp/${name}_temp.md"
-
-          done
-
-      # Save the temp markdown files as artifacts for inspection
-      #- name: Upload temp Markdown files as artifacts
-      #  uses: actions/upload-artifact@v3
-      #  with:
-      #    name: temp-markdown-files
-      #    path: temp/
-
-      # Pandoc und LaTeX installieren
       - name: Install Pandoc and LaTeX
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc texlive texlive-latex-extra texlive-fonts-recommended lmodern
-          sudo apt-get install -y texlive-xetex
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            pandoc \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-plain-generic \
+            texlive-fonts-recommended \
+            texlive-fonts-extra \
+            fonts-texgyre \
+            lmodern \
+            poppler-utils
+          fc-cache -fv
 
-      # Markdown zu PDF konvertieren
-      - name: Convert Markdown to PDF
-        run: |
-          mkdir -p assets/pdf
-          for file in temp/*.md; do
-            filename=$(basename -- "$file")
-            
-            # Remove the "_temp" suffix to restore original filename
-            name="${filename%_temp*}"
-            header_file="temp/${name}_header.tex"
-            number_sections=""
-            template_name=""
-            template_dir=""
-            template_name=$(python3 - "docs/${name}.md" <<'PY'
-          import sys
-          from pathlib import Path
-          path = Path(sys.argv[1])
-          text = path.read_text(encoding="utf-8")
-          lines = text.splitlines()
-          if not lines or lines[0].strip() != "---":
-              sys.exit(0)
-          try:
-              fm_end = lines.index("---", 1)
-          except ValueError:
-              sys.exit(0)
-          for line in lines[1:fm_end]:
-              if line.lower().startswith("template:"):
-                  value = line.split(":", 1)[1].strip().strip("'\"")
-                  print(value.lower())
-                  break
-          PY
-            )
-            if [ -z "$template_name" ]; then
-              template_name="default"
-            fi
-            if [ -d "templates/$template_name" ]; then
-              template_dir="templates/$template_name"
-            else
-              template_name="default"
-            fi
+      - name: Generate PDFs
+        if: steps.check.outputs.needs_rebuild == 'true'
+        run: bash scripts/generate_pdfs.sh "$BUILD_DATE"
 
-            if grep -q '^section_prefix:' "docs/${name}.md"; then
-              number_sections="--number-sections"
-              printf '%s\n' \
-                "\\usepackage{enumitem}" \
-                "\\renewcommand{\\thesection}{\\S\\arabic{section}}" \
-                "\\renewcommand{\\thesubsection}{\\arabic{section}.\\arabic{subsection}}" \
-                "\\renewcommand{\\thesubsubsection}{\\arabic{section}.\\arabic{subsection}.\\arabic{subsubsection}}" \
-                "\\makeatletter" \
-                "\\renewcommand{\\@seccntformat}[1]{\\ifcsname the#1\\endcsname\\csname the#1\\endcsname\\hspace{0.4em}\\fi}" \
-                "\\renewcommand{\\numberline}[1]{#1\\hspace{0.6em}}" \
-                "\\makeatother" \
-                > "$header_file"
-            else
-              echo "\\usepackage{enumitem}" > "$header_file"
-            fi
+      - name: Run tests
+        if: steps.check.outputs.needs_rebuild == 'true'
+        run: bash scripts/test_pdfs.sh
 
-            if [ -n "$template_dir" ] && [ -f "$template_dir/pdf-header.tex" ]; then
-              cat "$template_dir/pdf-header.tex" >> "$header_file"
-            fi
-
-            pandoc "$file" -o "assets/pdf/${name}.pdf" \
-            $number_sections \
-            --toc-depth=2 \
-            --pdf-engine=xelatex \
-            -V geometry:margin=1in \
-            --include-in-header="$header_file" \
-            --resource-path=.:./docs:./templates:./templates/$template_name
-
-          done
-
-      # Aktualisiertes PDF in das Repository committen
-      - name: Commit PDF to repository
+      - name: Commit PDFs to repository
+        if: steps.check.outputs.needs_rebuild == 'true'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add assets/pdf/*.pdf
-          git commit -m "Update PDF versions"
-          git push origin main
+          git add -f assets/pdf/
+          git diff --cached --quiet || git commit -m "Update PDF versions"
+          git push origin HEAD

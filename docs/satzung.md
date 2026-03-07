@@ -3,7 +3,7 @@ title: "Satzung"
 subtitle: "des BTFV e.V."
 date: 23.11.2025
 layout: default
-section_prefix: "§"
+section_numbering: paragraph
 template: dtfb
 pdf: /assets/pdf/satzung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/satzung.md

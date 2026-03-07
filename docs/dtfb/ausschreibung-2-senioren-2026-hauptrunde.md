@@ -3,6 +3,7 @@ title: "Ausschreibung_2.Senioren_2026_Hauptrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
+section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-2-senioren-2026-hauptrunde.pdf
 subtitle: "des DTFB e.V."
 ---

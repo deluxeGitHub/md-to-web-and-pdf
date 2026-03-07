@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testdokument BTFV</title>
+    
+    
+    
+    
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/png" href="/templates/btfv/images/favicon.png">
+        <link rel="stylesheet" href="/templates/shared/web.css">
+        <link rel="stylesheet" href="/templates/btfv/web.css">
+    
+</head>
+<body class=" template-btfv">
+    
+        
+<header class="base-hero"></header>
+<script>
+(() => {
+    const initThemeToggle = () => {
+        const root = document.documentElement;
+        const toggle = document.querySelector('[data-theme-toggle]');
+        const icon = document.querySelector('[data-theme-icon]');
+        if (!toggle || !icon) return;
+
+        const renderIcon = (mode) => {
+            if (mode === 'dark') {
+                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+            } else {
+                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/><line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/></g></svg>';
+            }
+        };
+
+        const applyTheme = (mode) => {
+            root.setAttribute('data-theme', mode);
+            toggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
+            renderIcon(mode);
+        };
+
+        const stored = localStorage.getItem('base-theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === 'light' || stored === 'dark') {
+            applyTheme(stored);
+        } else if (prefersDark) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+
+        toggle.addEventListener('click', () => {
+            const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            applyTheme(next);
+            localStorage.setItem('base-theme', next);
+        });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+        initThemeToggle();
+    }
+})();
+</script>
+
+    
+    
+        <div class="base-doc-heading">
+            <div class="base-doc-heading__top">
+                <div class="base-doc-heading__brand">
+                    <img class="base-doc-logo" src="/templates/btfv/images/logo.png" alt="Logo">
+                    <div class="base-doc-titles">
+                        <div class="base-doc-title">Testdokument BTFV</div>
+                        
+                            <div class="base-doc-subtitle">Design-Referenz für das BTFV-Template</div>
+                        
+                    </div>
+                </div>
+                <div class="base-doc-actions">
+                    <div class="base-hero__links">
+                        
+                            <a class="base-home-button" href="/">Home</a>
+                        
+                        
+                            <a href="/assets/pdf/test-btfv.pdf" target="_blank" rel="noopener">PDF</a>
+                        
+                        
+                        <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                            <span class="base-theme-toggle__icon" data-theme-icon>
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                        <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                        <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                        <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                        <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                        <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                        <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                        <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                        <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                                    </g>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                    
+                    
+                    
+                    
+                        
+                    
+                </div>
+            </div>
+        </div>
+    
+    <div class="wrapper">
+        <ul id="markdown-toc">
+  <li><a href="#allgemeine-bestimmungen" id="markdown-toc-allgemeine-bestimmungen">Allgemeine Bestimmungen</a>    <ul>
+      <li><a href="#zweck-des-dokuments" id="markdown-toc-zweck-des-dokuments">Zweck des Dokuments</a></li>
+      <li><a href="#geltungsbereich" id="markdown-toc-geltungsbereich">Geltungsbereich</a></li>
+    </ul>
+  </li>
+  <li><a href="#textformatierung-und-listen" id="markdown-toc-textformatierung-und-listen">Textformatierung und Listen</a>    <ul>
+      <li><a href="#geordnete-listen" id="markdown-toc-geordnete-listen">Geordnete Listen</a></li>
+      <li><a href="#alphabetische-listen" id="markdown-toc-alphabetische-listen">Alphabetische Listen</a></li>
+      <li><a href="#ungeordnete-liste" id="markdown-toc-ungeordnete-liste">Ungeordnete Liste</a></li>
+    </ul>
+  </li>
+  <li><a href="#sonderzeichen-und-typografie" id="markdown-toc-sonderzeichen-und-typografie">Sonderzeichen und Typografie</a>    <ul>
+      <li><a href="#umlaute" id="markdown-toc-umlaute">Umlaute</a></li>
+      <li><a href="#hervorhebungen" id="markdown-toc-hervorhebungen">Hervorhebungen</a></li>
+      <li><a href="#fußzeile-und-datum" id="markdown-toc-fußzeile-und-datum">Fußzeile und Datum</a></li>
+    </ul>
+  </li>
+  <li><a href="#abschlussbestimmungen" id="markdown-toc-abschlussbestimmungen">Abschlussbestimmungen</a></li>
+</ul>
+
+<h1 id="allgemeine-bestimmungen">Allgemeine Bestimmungen</h1>
+
+<p>Dieser Abschnitt prüft die grundlegende §-Nummerierung mit dem BTFV-Template.
+Der Abschnitts-Header soll in BTFV-Blau (#03326C) erscheinen und
+das BTFV-Logo oben rechts sichtbar sein.</p>
+
+<h2 id="zweck-des-dokuments">Zweck des Dokuments</h2>
+
+<ol>
+  <li>Dieses Dokument dient als Referenz-PDF für automatisierte Tests.</li>
+  <li>Es prüft Schriftart (TeX Gyre Heros), Farben, Logo, Datum und §-Nummerierung.</li>
+  <li>Das Datum in der Fußzeile soll automatisch aufgelöst werden.</li>
+</ol>
+
+<h2 id="geltungsbereich">Geltungsbereich</h2>
+
+<ol>
+  <li>Das Dokument gilt für alle Build-Umgebungen (lokal und CI).</li>
+  <li>Es soll auf macOS und Ubuntu identische Ausgaben erzeugen.</li>
+</ol>
+
+<h1 id="textformatierung-und-listen">Textformatierung und Listen</h1>
+
+<h2 id="geordnete-listen">Geordnete Listen</h2>
+
+<p>Normale nummerierte Liste:</p>
+
+<ol>
+  <li>Erster Punkt</li>
+  <li>Zweiter Punkt</li>
+  <li>Dritter Punkt</li>
+</ol>
+
+<h2 id="alphabetische-listen">Alphabetische Listen</h2>
+
+<ol type="a">
+  <li>Erster alphabetischer Punkt</li>
+  <li>Zweiter alphabetischer Punkt</li>
+  <li>Dritter alphabetischer Punkt</li>
+</ol>
+
+<h2 id="ungeordnete-liste">Ungeordnete Liste</h2>
+
+<ul>
+  <li>Stichpunkt A</li>
+  <li>Stichpunkt B
+    <ul>
+      <li>Unterpunkt B1</li>
+      <li>Unterpunkt B2</li>
+    </ul>
+  </li>
+  <li>Stichpunkt C</li>
+</ul>
+
+<h1 id="sonderzeichen-und-typografie">Sonderzeichen und Typografie</h1>
+
+<h2 id="umlaute">Umlaute</h2>
+
+<p>Dieser Abschnitt enthält deutsche Umlaute: ä, ö, ü, Ä, Ö, Ü, ß.</p>
+
+<h2 id="hervorhebungen">Hervorhebungen</h2>
+
+<p>Text kann <strong>fett</strong>, <em>kursiv</em> oder <code class="language-plaintext highlighter-rouge">inline-code</code> formatiert werden.</p>
+
+<h2 id="fußzeile-und-datum">Fußzeile und Datum</h2>
+
+<div class="html-only">
+Dieser Block ist nur in der HTML-Version sichtbar, nicht im PDF.
+</div>
+
+<p>Das Datum in der PDF-Fußzeile soll dem Ausstellungsdatum entsprechen.
+Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.</p>
+
+<h1 id="abschlussbestimmungen">Abschlussbestimmungen</h1>
+
+<ol>
+  <li>Dieses Testdokument wird bei jedem Build neu generiert.</li>
+  <li>Abweichungen vom Referenz-PDF weisen auf Regressionen hin.</li>
+</ol>
+
+    </div>
+    
+    <!-- Nach oben Button -->
+    <a href="#markdown-toc" id="back-to-top">Nach oben</a>
+
+    <!-- Link-kopiert-Toast -->
+    <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
+
+    <script>
+        // Script, um den Button bei Scrollen einzublenden
+        const backToTopButton = document.getElementById("back-to-top");
+
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.style.display = "block"; // Zeigt den Button nach Scrollen an
+            } else {
+                backToTopButton.style.display = "none"; // Versteckt den Button, wenn man oben ist
+            }
+        };
+    </script>
+
+    <script>
+        const baseSlugify = (text) => text.toLowerCase()
+            .replace(/[^\w\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-");
+
+        const baseCopyText = async (text) => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            }
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            temp.setAttribute("readonly", "");
+            temp.style.position = "absolute";
+            temp.style.left = "-9999px";
+            document.body.appendChild(temp);
+            temp.select();
+            const success = document.execCommand("copy");
+            document.body.removeChild(temp);
+            return success;
+        };
+
+        let toastTimer = null;
+        const showCopyToast = () => {
+            const toast = document.getElementById("base-toast");
+            if (!toast) return;
+            clearTimeout(toastTimer);
+            toast.classList.add("base-toast--visible");
+            toastTimer = setTimeout(() => toast.classList.remove("base-toast--visible"), 2000);
+        };
+
+        const initHeadingLinks = () => {
+            const wrapper = document.querySelector(".wrapper");
+            if (!wrapper) return;
+            const headings = wrapper.querySelectorAll("h1, h2, h3, h4");
+
+            headings.forEach((heading) => {
+                if (heading.querySelector(".base-heading-link")) return;
+                let id = heading.getAttribute("id");
+                if (!id) {
+                    id = baseSlugify(heading.textContent || "section");
+                    let unique = id;
+                    let counter = 2;
+                    while (document.getElementById(unique)) {
+                        unique = `${id}-${counter++}`;
+                    }
+                    heading.setAttribute("id", unique);
+                }
+
+                const link = document.createElement("a");
+                link.className = "base-heading-link";
+                link.href = `#${id}`;
+                link.setAttribute("aria-label", "Link kopieren");
+                link.innerHTML = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M10.5 13.5l3-3\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M7 17a4 4 0 0 1 0-5.66l2.34-2.34a4 4 0 0 1 5.66 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M17 7a4 4 0 0 1 0 5.66l-2.34 2.34a4 4 0 0 1-5.66 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>";
+
+                link.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    const url = `${window.location.origin}${window.location.pathname}#${id}`;
+                    await baseCopyText(url);
+                    history.replaceState(null, "", `#${id}`);
+                    showCopyToast();
+                });
+
+                heading.appendChild(link);
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initHeadingLinks);
+        } else {
+            initHeadingLinks();
+        }
+    </script>
+</body>
+</html>
+

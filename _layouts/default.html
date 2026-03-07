@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
     {% endif %}
 </head>
-<body class="{% if page.section_prefix %}section-prefix{% endif %} template-{{ template_name }}">
+<body class="{% if page.section_numbering == 'paragraph' %}section-prefix{% endif %} template-{{ template_name }}">
     {% if supported_templates contains template_name %}
         {% include templates/base/header.html %}
     {% endif %}
@@ -84,6 +84,9 @@
     <!-- Nach oben Button -->
     <a href="#markdown-toc" id="back-to-top">Nach oben</a>
 
+    <!-- Link-kopiert-Toast -->
+    <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
+
     <script>
         // Script, um den Button bei Scrollen einzublenden
         const backToTopButton = document.getElementById("back-to-top");
@@ -120,6 +123,15 @@
             return success;
         };
 
+        let toastTimer = null;
+        const showCopyToast = () => {
+            const toast = document.getElementById("base-toast");
+            if (!toast) return;
+            clearTimeout(toastTimer);
+            toast.classList.add("base-toast--visible");
+            toastTimer = setTimeout(() => toast.classList.remove("base-toast--visible"), 2000);
+        };
+
         const initHeadingLinks = () => {
             const wrapper = document.querySelector(".wrapper");
             if (!wrapper) return;
@@ -149,6 +161,7 @@
                     const url = `${window.location.origin}${window.location.pathname}#${id}`;
                     await baseCopyText(url);
                     history.replaceState(null, "", `#${id}`);
+                    showCopyToast();
                 });
 
                 heading.appendChild(link);
