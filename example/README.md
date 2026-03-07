@@ -44,8 +44,14 @@ docs/
 ## Schritt 3: GitHub Pages aktivieren
 
 1. Gehe in deinem Repository auf **Settings** → **Pages**
-2. Unter "Source" wähle **"GitHub Actions"**
-3. Speichern
+2. Unter "Source" wähle **"Deploy from a branch"**
+3. Branch: **`gh-pages`**, Ordner: **`/ (root)`**
+4. Speichern
+
+> Der `gh-pages`-Branch wird automatisch beim ersten Workflow-Run angelegt.
+>
+> - `main`-Branch → live unter `https://<name>.github.io/<repo>/`
+> - `development`-Branch → Vorschau unter `https://<name>.github.io/<repo>/staging/`
 
 ---
 
