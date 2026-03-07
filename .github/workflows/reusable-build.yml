@@ -19,35 +19,33 @@ jobs:
       contents: write
 
     steps:
+      # Docs-Repo in den Workspace-Root auschecken (damit JamesIves .git findet)
       - name: Checkout Docs-Repo
         uses: actions/checkout@v4
-        with:
-          path: repo
 
+      # Framework in .framework/ auschecken (versteckter Ordner, wird nicht committet)
       - name: Checkout Framework (md-to-web-and-pdf)
         uses: actions/checkout@v4
         with:
           repository: deluxeGitHub/md-to-web-and-pdf
           ref: ${{ inputs.framework_ref }}
-          path: framework
+          path: .framework
 
       - name: Framework-Dateien in Workspace übernehmen
         run: |
-          cp -r framework/scripts       repo/scripts
-          cp -r framework/templates     repo/templates
-          cp -r framework/_layouts      repo/_layouts
-          cp -r framework/_includes     repo/_includes
+          cp -r .framework/scripts    scripts
+          cp -r .framework/templates  templates
+          cp -r .framework/_layouts   _layouts
+          cp -r .framework/_includes  _includes
 
       - name: Letztes Commit-Datum ermitteln
         run: |
-          cd repo
           DATE=$(git log -1 --format=%cd --date=short)
           echo "BUILD_DATE=$(date -d "$DATE" +%d.%m.%Y)" >> "$GITHUB_ENV"
 
       - name: Prüfen ob Neugenerierung nötig ist
         id: check
         run: |
-          cd repo
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
             echo "Rebuild: manuell ausgelöst"
@@ -94,12 +92,10 @@ jobs:
 
       - name: PDFs generieren
         if: steps.check.outputs.needs_rebuild == 'true'
-        working-directory: repo
         run: bash scripts/generate_pdfs.sh "$BUILD_DATE" "${{ inputs.source_dir }}"
 
       - name: PDFs committen
         if: steps.check.outputs.needs_rebuild == 'true'
-        working-directory: repo
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
@@ -120,24 +116,22 @@ jobs:
         id: pages
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "baseurl="          >> "$GITHUB_OUTPUT"
-            echo "target=."          >> "$GITHUB_OUTPUT"
+            echo "baseurl="              >> "$GITHUB_OUTPUT"
+            echo "target=."             >> "$GITHUB_OUTPUT"
             echo "clean_exclude=staging" >> "$GITHUB_OUTPUT"
           else
-            BRANCH="${{ github.ref_name }}"
-            echo "baseurl=/staging"  >> "$GITHUB_OUTPUT"
-            echo "target=staging"    >> "$GITHUB_OUTPUT"
-            echo "clean_exclude="    >> "$GITHUB_OUTPUT"
+            echo "baseurl=/staging"     >> "$GITHUB_OUTPUT"
+            echo "target=staging"       >> "$GITHUB_OUTPUT"
+            echo "clean_exclude="       >> "$GITHUB_OUTPUT"
           fi
 
       - name: Jekyll-Site bauen
-        working-directory: repo
         run: jekyll build --destination _site --baseurl "${{ steps.pages.outputs.baseurl }}"
 
       - name: Auf GitHub Pages deployen
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: repo/_site
+          folder: _site
           target-folder: ${{ steps.pages.outputs.target }}
           clean: true
           clean-exclude: ${{ steps.pages.outputs.clean_exclude }}
