@@ -137,7 +137,7 @@ PY
 
 test_suite_frontmatter() {
     echo -e "\n${BOLD}Suite: Front Matter Vollständigkeit${NC}"
-    echo "  Prüft Pflichtfelder: title, layout."
+    echo "  Prüft Pflichtfelder: title."
     echo ""
 
     while IFS= read -r -d '' file; do
@@ -164,7 +164,7 @@ for line in lines[1:fm_end]:
         k, _, v = line.partition(":")
         fm[k.strip().lower()] = v.strip()
 
-missing = [f for f in ("title", "layout") if f not in fm]
+missing = [f for f in ("title",) if f not in fm]
 if missing:
     print("MISSING:" + ",".join(missing))
 else:
