@@ -71,6 +71,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add assets/pdf/
+          git add -f assets/pdf/
           git diff --cached --quiet || git commit -m "Update PDF versions"
           git push origin HEAD
