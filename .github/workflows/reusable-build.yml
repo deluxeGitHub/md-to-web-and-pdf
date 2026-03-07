@@ -37,10 +37,11 @@ jobs:
 
       - name: Framework-Dateien in Workspace übernehmen
         run: |
-          cp -r .framework/scripts    scripts
-          cp -r .framework/templates  templates
-          cp -r .framework/_layouts   _layouts
-          cp -r .framework/_includes  _includes
+          # Framework-Dateien kopieren, ohne lokale Overrides im Docs-Repo zu überschreiben
+          cp -rn .framework/scripts/.    scripts/    2>/dev/null || cp -r .framework/scripts    scripts
+          cp -rn .framework/templates/. templates/  2>/dev/null || cp -r .framework/templates  templates
+          cp -rn .framework/_layouts/.  _layouts/   2>/dev/null || cp -r .framework/_layouts   _layouts
+          cp -rn .framework/_includes/. _includes/  2>/dev/null || cp -r .framework/_includes  _includes
 
       - name: Letztes Commit-Datum ermitteln
         run: |
