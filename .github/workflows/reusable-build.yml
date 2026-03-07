@@ -101,6 +101,7 @@ jobs:
           git config user.email "actions@github.com"
           git add -f assets/pdf/
           git diff --cached --quiet || git commit -m "Update PDF versions"
+          git pull --rebase origin HEAD
           git push origin HEAD
 
       - name: Ruby und Jekyll einrichten
