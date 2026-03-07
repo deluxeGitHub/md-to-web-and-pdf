@@ -1,0 +1,142 @@
+name: Reusable PDF & Pages Build
+
+on:
+  workflow_call:
+    inputs:
+      source_dir:
+        description: 'Verzeichnis mit Markdown-Dateien'
+        default: 'docs'
+        type: string
+      framework_ref:
+        description: 'Branch oder Tag von md-to-web-and-pdf'
+        default: 'main'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout Docs-Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout Framework (md-to-web-and-pdf)
+        uses: actions/checkout@v4
+        with:
+          repository: deluxeGitHub/md-to-web-and-pdf
+          ref: ${{ inputs.framework_ref }}
+          path: framework
+
+      - name: Framework-Dateien in Workspace übernehmen
+        run: |
+          cp -r framework/scripts       repo/scripts
+          cp -r framework/templates     repo/templates
+          cp -r framework/_layouts      repo/_layouts
+          cp -r framework/_includes     repo/_includes
+
+      - name: Letztes Commit-Datum ermitteln
+        run: |
+          cd repo
+          DATE=$(git log -1 --format=%cd --date=short)
+          echo "BUILD_DATE=$(date -d "$DATE" +%d.%m.%Y)" >> "$GITHUB_ENV"
+
+      - name: Prüfen ob Neugenerierung nötig ist
+        id: check
+        run: |
+          cd repo
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: manuell ausgelöst"
+            exit 0
+          fi
+          MISSING=0
+          while IFS= read -r -d '' md; do
+            name="$(basename "${md%.md}")"
+            [[ ! -f "assets/pdf/${name}.pdf" ]] && MISSING=$((MISSING + 1))
+          done < <(find "${{ inputs.source_dir }}" -name "*.md" -print0)
+          if [[ $MISSING -gt 0 ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: $MISSING fehlende PDF(s)"
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
+            "${{ inputs.source_dir }}/" \
+            'templates/*/pdf-header.tex' \
+            scripts/generate_pdfs.sh 2>/dev/null || true)
+          if [[ -n "$CHANGED" ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild nötig – geänderte Dateien:"
+            echo "$CHANGED"
+          else
+            echo "needs_rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "Keine relevanten Änderungen – Build wird übersprungen."
+          fi
+
+      - name: Install Pandoc und LaTeX
+        if: steps.check.outputs.needs_rebuild == 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            pandoc \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-plain-generic \
+            texlive-fonts-recommended \
+            texlive-fonts-extra \
+            fonts-texgyre \
+            lmodern \
+            poppler-utils
+          fc-cache -fv
+
+      - name: PDFs generieren
+        if: steps.check.outputs.needs_rebuild == 'true'
+        working-directory: repo
+        run: bash scripts/generate_pdfs.sh "$BUILD_DATE" "${{ inputs.source_dir }}"
+
+      - name: PDFs committen
+        if: steps.check.outputs.needs_rebuild == 'true'
+        working-directory: repo
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -f assets/pdf/
+          git diff --cached --quiet || git commit -m "Update PDF versions"
+          git push origin HEAD
+
+      - name: Ruby und Jekyll einrichten
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      - name: Jekyll installieren
+        run: gem install jekyll jekyll-toc jekyll-relative-links
+
+      - name: Jekyll-Site bauen
+        working-directory: repo
+        run: jekyll build --destination _site
+
+      - name: Pages-Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: repo/_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages deployen
+        id: deployment
+        uses: actions/deploy-pages@v4

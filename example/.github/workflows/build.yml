@@ -1,0 +1,17 @@
+name: PDFs generieren und Website deployen
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: deluxeGitHub/md-to-web-and-pdf/.github/workflows/reusable-build.yml@main
+    with:
+      source_dir: docs
+    permissions:
+      contents: write
+      pages: write
+      id-token: write

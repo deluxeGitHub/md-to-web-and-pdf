@@ -1,0 +1,14 @@
+title: "BTFV Dokumente"
+description: "Offizielle Dokumente des BTFV e.V."
+
+plugins:
+  - jekyll-toc
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+
+exclude:
+  - scripts/
+  - temp/
+  - framework/
