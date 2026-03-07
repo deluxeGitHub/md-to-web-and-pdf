@@ -28,6 +28,18 @@ jobs:
             echo "Rebuild: manuell ausgelöst (workflow_dispatch)"
             exit 0
           fi
+          # Fehlende PDFs → immer neu bauen
+          MISSING=0
+          while IFS= read -r -d '' md; do
+            name="$(basename "${md%.md}")"
+            [[ ! -f "assets/pdf/${name}.pdf" ]] && MISSING=$((MISSING + 1))
+          done < <(find docs -name "*.md" -print0)
+          if [[ $MISSING -gt 0 ]]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "Rebuild: $MISSING fehlende PDF(s)"
+            exit 0
+          fi
+          # Relevante Dateiänderungen seit letztem Commit
           CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
             docs/ \
             'templates/*/pdf-header.tex' \
