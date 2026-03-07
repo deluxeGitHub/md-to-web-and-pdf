@@ -11,6 +11,10 @@ on:
         description: 'Branch oder Tag von md-to-web-and-pdf'
         default: 'main'
         type: string
+      baseurl:
+        description: 'Jekyll baseurl (z.B. /docs-testrepo für GitHub Pages project pages)'
+        default: ''
+        type: string
 
 jobs:
   build:
@@ -117,13 +121,13 @@ jobs:
         id: pages
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "baseurl="              >> "$GITHUB_OUTPUT"
-            echo "target=."             >> "$GITHUB_OUTPUT"
-            echo "clean_exclude=staging" >> "$GITHUB_OUTPUT"
+            echo "baseurl=${{ inputs.baseurl }}"  >> "$GITHUB_OUTPUT"
+            echo "target=."                        >> "$GITHUB_OUTPUT"
+            echo "clean_exclude=staging"           >> "$GITHUB_OUTPUT"
           else
-            echo "baseurl=/staging"     >> "$GITHUB_OUTPUT"
-            echo "target=staging"       >> "$GITHUB_OUTPUT"
-            echo "clean_exclude="       >> "$GITHUB_OUTPUT"
+            echo "baseurl=${{ inputs.baseurl }}/staging" >> "$GITHUB_OUTPUT"
+            echo "target=staging"                         >> "$GITHUB_OUTPUT"
+            echo "clean_exclude="                         >> "$GITHUB_OUTPUT"
           fi
 
       - name: Jekyll-Site bauen
