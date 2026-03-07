@@ -109,7 +109,6 @@ Nach ca. 5 Minuten:
 title: "Spielordnung"           # Titel des Dokuments
 subtitle: "des BTFV e.V."      # Untertitel (optional)
 date: "{{ site.time | date: '%d.%m.%Y' }}"   # Datum – nicht ändern!
-layout: default                 # Immer so lassen
 template: btfv                  # btfv, dtfb, base oder eigenes Custom Theme
 section_numbering: paragraph    # paragraph=§1/§1.1 | arabic=1/1.1 | weglassen=keine
 pdf: /assets/pdf/spielordnung.pdf  # Pfad zur PDF (Name = Dateiname ohne .md)

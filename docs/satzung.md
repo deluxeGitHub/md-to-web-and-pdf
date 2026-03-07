@@ -2,7 +2,6 @@
 title: "Satzung"
 subtitle: "des BTFV e.V."
 date: 23.11.2025
-layout: default
 section_numbering: paragraph
 template: dtfb
 pdf: /assets/pdf/satzung.pdf

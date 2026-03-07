@@ -2,7 +2,6 @@
 title: "Vereinsordnung"
 subtitle: "des Meinverein e.V."
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: meinverein
 section_numbering: paragraph
 pdf: /assets/pdf/vereinsordnung.pdf

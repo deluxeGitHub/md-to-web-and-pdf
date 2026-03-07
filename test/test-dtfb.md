@@ -2,7 +2,6 @@
 title: "Testdokument DTFB"
 subtitle: "Design-Referenz für das DTFB-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: dtfb
 section_numbering: paragraph
 pdf: /assets/pdf/test-dtfb.pdf

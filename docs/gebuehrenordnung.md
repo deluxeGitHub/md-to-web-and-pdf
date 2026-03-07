@@ -1,7 +1,6 @@
 ---
 title: "Gebührenordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: dtfb
 section_numbering: paragraph
 pdf: /assets/pdf/gebuehrenordnung.pdf

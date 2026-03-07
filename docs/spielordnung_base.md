@@ -1,7 +1,6 @@
 ---
 title: "Spielordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 section_numbering: arabic
 pdf: /assets/pdf/spielordnung_base.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/spielordnung.md

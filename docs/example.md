@@ -1,7 +1,6 @@
 ---
 title: "Example"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: btfv
 section_numbering: arabic
 pdf: /assets/pdf/example.pdf

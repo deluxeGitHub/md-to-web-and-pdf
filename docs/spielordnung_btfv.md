@@ -1,7 +1,6 @@
 ---
 title: "Spielordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: btfv
 section_numbering: paragraph
 pdf: /assets/pdf/spielordnung_btfv.pdf

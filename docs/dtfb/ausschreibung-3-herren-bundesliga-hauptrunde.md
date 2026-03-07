@@ -1,7 +1,6 @@
 ---
 title: "Ausschreibung 3.Herren Bundesliga-Hauptrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: dtfb
 section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-3-herren-bundesliga-hauptrunde.pdf

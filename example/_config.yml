@@ -5,6 +5,12 @@ plugins:
   - jekyll-toc
   - jekyll-relative-links
 
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
 relative_links:
   enabled: true
 

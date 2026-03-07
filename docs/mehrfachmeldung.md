@@ -1,7 +1,6 @@
 ---
 title: "Vorschlag Mehrfachmeldung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: dtfb
 section_numbering: arabic
 pdf: /assets/pdf/mehrfachmeldung.pdf

@@ -1,7 +1,6 @@
 ---
 title: "Ausschreibung Damen Bundesligen-Hauptrunde"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: dtfb
 section_numbering: arabic
 pdf: /assets/pdf/ausschreibung-damen-bundesligen-hauptrunde.pdf

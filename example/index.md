@@ -1,6 +1,5 @@
 ---
 title: "Startseite"
-layout: default
 template: btfv
 ---
 
