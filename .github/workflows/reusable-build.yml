@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pages: write
-      id-token: write
 
     steps:
       - name: Checkout Docs-Repo
@@ -118,25 +116,28 @@ jobs:
       - name: Jekyll installieren
         run: gem install jekyll jekyll-toc jekyll-relative-links
 
+      - name: Baseurl und Deploy-Ziel ermitteln
+        id: pages
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "baseurl="          >> "$GITHUB_OUTPUT"
+            echo "target=."          >> "$GITHUB_OUTPUT"
+            echo "clean_exclude=staging" >> "$GITHUB_OUTPUT"
+          else
+            BRANCH="${{ github.ref_name }}"
+            echo "baseurl=/staging"  >> "$GITHUB_OUTPUT"
+            echo "target=staging"    >> "$GITHUB_OUTPUT"
+            echo "clean_exclude="    >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Jekyll-Site bauen
         working-directory: repo
-        run: jekyll build --destination _site
+        run: jekyll build --destination _site --baseurl "${{ steps.pages.outputs.baseurl }}"
 
-      - name: Pages-Artefakt hochladen
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: repo/_site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Auf GitHub Pages deployen
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: repo/_site
+          target-folder: ${{ steps.pages.outputs.target }}
+          clean: true
+          clean-exclude: ${{ steps.pages.outputs.clean_exclude }}
