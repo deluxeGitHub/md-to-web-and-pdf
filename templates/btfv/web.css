@@ -11,9 +11,9 @@
     /* Akzent- und Funktionsfarben */
     --color-ink-strong: #0f172a;
     --color-danger: #ef4444;
-    --color-brand-primary: #2563eb; /* h1-h4, Links, Buttons, Tabellenkopf */
-    --color-brand-primary-hover: #1d4ed8;
-    --color-brand-rgb: 37, 99, 235;
+    --color-brand-primary: #03326C; /* h1-h4, Links, Buttons, Tabellenkopf */
+    --color-brand-primary-hover: #022554;
+    --color-brand-rgb: 3, 50, 108;
     --color-brand-contrast: #0f172a; /* Hover fuer CTA/Back-to-top */
     --color-brand-contrast-rgb: 15, 23, 42;
     --color-header-band-bg: #0f172a;
