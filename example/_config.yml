@@ -8,7 +8,11 @@ plugins:
 relative_links:
   enabled: true
 
+custom_templates:
+  - meinverein
+
 exclude:
   - scripts/
   - temp/
   - framework/
+  - .framework/
