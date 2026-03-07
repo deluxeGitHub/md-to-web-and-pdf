@@ -6,3 +6,11 @@ plugins:
 
 relative_links:
   enabled: true
+
+exclude:
+  - scripts/
+  - temp/
+  - test/fixtures/
+  - build.sh
+  - generate_pdf_local.sh
+  - README.md

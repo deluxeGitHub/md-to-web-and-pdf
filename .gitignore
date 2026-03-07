@@ -1,6 +1,7 @@
 /temp/*
 /_site/temp/*
 .jekyll/
+.jekyll-cache/
 _site/
 
 # Lokal generierte PDFs – werden von der CI auf main gepusht,
