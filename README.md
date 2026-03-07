@@ -70,7 +70,7 @@ title: "Satzung"
 subtitle: "des BTFV e.V."
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
-template: btfv                  # base | btfv | dtfb | eigenes Custom Theme
+# template: dtfb               # nur setzen, wenn vom Default in _config.yml abweichend
 section_numbering: paragraph    # paragraph=§ | arabic=1.1 | weglassen=keine
 pdf: /assets/pdf/satzung.pdf
 ---

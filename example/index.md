@@ -1,6 +1,5 @@
 ---
 title: "Startseite"
-template: btfv
 ---
 
 Willkommen auf der Dokumentenseite des BTFV e.V.

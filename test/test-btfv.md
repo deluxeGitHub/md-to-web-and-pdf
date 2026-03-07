@@ -2,7 +2,6 @@
 title: "Testdokument BTFV"
 subtitle: "Design-Referenz für das BTFV-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-template: btfv
 section_numbering: arabic
 pdf: /assets/pdf/test-btfv.pdf
 ---
