@@ -3,7 +3,7 @@ title: "Gebührenordnung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 layout: default
 template: dtfb
-section_numbering: arabic
+section_numbering: paragraph
 pdf: /assets/pdf/gebuehrenordnung.pdf
 source: https://github.com/BTFVonline/btfv-docs/blob/main/docs/gebuehrenordnung.md
 subtitle: "des BTFV e.V."

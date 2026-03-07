@@ -9,11 +9,11 @@ Dieses Repository verwaltet offizielle Verbandsdokumente (primär für den BTFV)
 ### Dokumenten-Pipeline
 
 ```
-docs/*.md  →  [generate_pdf_local.sh / GitHub Actions]  →  assets/pdf/*.pdf
+docs/*.md  →  [build.sh / GitHub Actions]  →  assets/pdf/*.pdf
 docs/*.md  →  [Jekyll]  →  GitHub Pages (HTML)
 ```
 
-Die zentrale Logik liegt in `generate_pdf_local.sh`, das Markdown-Dateien vorverarbeitet und via `pandoc` + `xelatex` in PDFs konvertiert.
+Die zentrale Logik liegt in `scripts/generate_pdfs.sh`, das Markdown-Dateien vorverarbeitet und via `pandoc` + `xelatex` in PDFs konvertiert.
 
 ### Verzeichnisstruktur
 
@@ -22,7 +22,6 @@ Die zentrale Logik liegt in `generate_pdf_local.sh`, das Markdown-Dateien vorver
 | `docs/` | Quell-Dokumente im Markdown-Format |
 | `docs/images/` | Bilder, die in Dokumenten referenziert werden |
 | `assets/pdf/` | Automatisch generierte PDFs (nicht manuell bearbeiten) |
-| `assets/css/` | Globales CSS für HTML-Darstellung |
 | `templates/` | Modulare Web- und PDF-Templates pro Verband |
 | `templates/shared/` | Gemeinsame Stile (web.css) für alle Templates |
 | `templates/base/` | Basis-Template (Fallback) |
@@ -44,19 +43,19 @@ title: "Satzung"
 subtitle: "des BTFV e.V."
 date: 23.11.2025
 layout: default
-template: btfv          # Welches Template soll verwendet werden (base/btfv/dtfb)
-section_prefix: "§"     # Aktiviert §-Präfix für Überschriften-Nummerierung
-pdf: /assets/pdf/satzung.pdf   # Link zur generierten PDF-Version
-source: https://github.com/...  # Link zur Markdown-Quelle
+template: btfv                    # Welches Template (base/btfv/dtfb)
+section_numbering: paragraph      # paragraph=§1§1.1, arabic=1/1.1, nicht gesetzt=keine
+pdf: /assets/pdf/satzung.pdf      # Link zur generierten PDF-Version
+source: https://github.com/...    # Link zur Markdown-Quelle
 ---
 ```
 
 ### Wichtige Front-Matter-Felder
 
 - **`template`**: Wählt das Verband-Template (`base`, `btfv`, `dtfb`). Unbekannte Werte fallen auf `base` zurück.
-- **`section_prefix`**: Wenn gesetzt, werden Abschnittsnummern mit `§` dargestellt (LaTeX-Header wird angepasst).
+- **`section_numbering`**: `paragraph` → §1, §1.1 … / `arabic` → 1, 1.1 … / nicht gesetzt → keine Nummerierung.
 - **`pdf`**: Wird im HTML genutzt, um einen Download-Link zur PDF anzuzeigen.
-- **`date`**: Wird von `generate_pdf_local.sh` **überschrieben** – statische Datumsangaben im Front Matter haben im PDF keinen Bestand.
+- **`date`**: Wird von `scripts/generate_pdfs.sh` **überschrieben** – statische Datumsangaben im Front Matter haben im PDF keinen Bestand.
 
 ---
 
@@ -124,12 +123,12 @@ Gemeinsame Styles liegen in `templates/shared/web.css`.
 ### Lokal
 
 ```bash
-bash generate_pdf_local.sh
+bash build.sh
 ```
 
 **Voraussetzungen:** `pandoc`, `xelatex` (TeX Live / MiKTeX)
 
-Das Skript verarbeitet alle `*.md`-Dateien in `docs/` und legt PDFs in `assets/pdf/` ab.
+Das interaktive Menü bietet Optionen für PDF-Generierung, Jekyll-Vorschau und Tests. Die eigentliche Logik liegt in `scripts/generate_pdfs.sh`.
 
 ### Automatisch via GitHub Actions
 
@@ -143,10 +142,10 @@ Bei jedem Push auf `main` läuft `.github/workflows/generate-pdf.yml`. Dieser Wo
 ### Jekyll-Vorschau (lokal)
 
 ```bash
-bash run_jekyll.sh
+bash build.sh
 ```
 
-Öffne danach `http://localhost:4000/` im Browser. Das Skript installiert fehlende Gems automatisch.
+Im Menü die Option für Jekyll-Vorschau wählen. Öffne danach `http://localhost:4000/` im Browser.
 
 ---
 
