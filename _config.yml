@@ -9,7 +9,7 @@ defaults:
       path: ""
     values:
       layout: default
-      template: btfv
+      template: base
 
 relative_links:
   enabled: true
