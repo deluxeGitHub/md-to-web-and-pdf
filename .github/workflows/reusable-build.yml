@@ -15,6 +15,10 @@ on:
         description: 'Jekyll baseurl (z.B. /docs-testrepo für GitHub Pages project pages)'
         default: ''
         type: string
+      staging_branch:
+        description: 'Branch der als Staging deployt wird (leer = kein Staging-Deploy)'
+        default: 'staging'
+        type: string
 
 jobs:
   build:
@@ -125,16 +129,23 @@ jobs:
             echo "baseurl=${{ inputs.baseurl }}"  >> "$GITHUB_OUTPUT"
             echo "target=."                        >> "$GITHUB_OUTPUT"
             echo "clean_exclude=staging"           >> "$GITHUB_OUTPUT"
-          else
+            echo "deploy=true"                     >> "$GITHUB_OUTPUT"
+          elif [[ -n "${{ inputs.staging_branch }}" && "${{ github.ref }}" == "refs/heads/${{ inputs.staging_branch }}" ]]; then
             echo "baseurl=${{ inputs.baseurl }}/staging" >> "$GITHUB_OUTPUT"
             echo "target=staging"                         >> "$GITHUB_OUTPUT"
             echo "clean_exclude="                         >> "$GITHUB_OUTPUT"
+            echo "deploy=true"                            >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Kein Deploy für Branch ${{ github.ref_name }}"
           fi
 
       - name: Jekyll-Site bauen
+        if: steps.pages.outputs.deploy == 'true'
         run: jekyll build --destination _site --baseurl "${{ steps.pages.outputs.baseurl }}"
 
       - name: Auf GitHub Pages deployen
+        if: steps.pages.outputs.deploy == 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _site
