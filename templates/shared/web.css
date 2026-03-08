@@ -612,7 +612,8 @@ body[class*="template-"] .base-heading-link svg {
 
     body[class*="template-"] ul,
     body[class*="template-"] ol {
-        padding-left: 1rem;\n        list-style-position: inside;
+        padding-left: 1rem;
+        list-style-position: inside;
     }
 
     body[class*="template-"] .base-doc-sitename {
