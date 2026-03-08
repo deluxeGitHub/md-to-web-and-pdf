@@ -110,6 +110,13 @@ body[class*="template-"] .base-doc-brand-link {
     align-items: center;
     gap: 12px;
     text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+body[class*="template-"] .base-doc-back-icon {
+    display: none;
+    color: var(--color-text-muted);
     flex-shrink: 0;
 }
 
@@ -566,6 +573,12 @@ body[class*="template-"] .base-heading-link svg {
 
     body[class*="template-"] .base-doc-brand-link {
         flex: 1;
+    }
+
+    body[class*="template-"] .base-doc-back-icon {
+        display: block;
+        width: 36px;
+        height: 36px;
     }
 
     body[class*="template-"] .base-doc-sitename {

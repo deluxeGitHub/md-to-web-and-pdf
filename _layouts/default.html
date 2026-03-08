@@ -38,10 +38,23 @@
         {% endif %}
         <div class="base-doc-heading">
             <div class="base-doc-heading__top">
+                {% assign is_home = false %}
+                {% if page.url == "/" or page.url == "/index.html" %}{% assign is_home = true %}{% endif %}
+                {% if is_home %}
+                <div class="base-doc-brand-link">
+                {% else %}
                 <a class="base-doc-brand-link" href="{{ '/' | relative_url }}">
+                    <svg class="base-doc-back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                {% endif %}
                     <img class="base-doc-logo" src="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}" alt="Logo">
                     <span class="base-doc-sitename">{{ site.title }}</span>
+                {% if is_home %}
+                </div>
+                {% else %}
                 </a>
+                {% endif %}
                 <div class="base-doc-titles">
                     <div class="base-doc-title">{{ page.title }}</div>
                     {% if page.subtitle %}
