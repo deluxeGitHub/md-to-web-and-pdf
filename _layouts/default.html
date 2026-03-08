@@ -90,6 +90,14 @@
     <!-- Nach oben Button -->
     <a href="#markdown-toc" id="back-to-top">Nach oben</a>
 
+    <!-- Staging-Banner -->
+    {% assign baseurl_last = site.baseurl | split: "/" | last %}
+    {% if baseurl_last == "staging" %}
+    <div id="staging-banner">
+        Vorschau-Version – kein offizieller Stand
+    </div>
+    {% endif %}
+
     <!-- Link-kopiert-Toast -->
     <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
 

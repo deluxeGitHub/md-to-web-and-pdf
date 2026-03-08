@@ -1,6 +1,7 @@
 ---
 title: "MD to Web and PDF"
 subtitle: "Framework für Verbandsdokumente"
+show_home: false
 ---
 
 Framework zur automatischen Erstellung von Verbandsdokumenten als PDF und Website.

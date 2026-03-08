@@ -492,6 +492,22 @@ body[class*="template-"] .base-heading-link svg {
     transform: translateX(-50%) translateY(0);
 }
 
+#staging-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #b45309;
+    color: #fff;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    z-index: 9998;
+    letter-spacing: 0.03em;
+}
+
 /* Responsive Anpassungen */
 @media (max-width: 860px) {
     body[class*="template-"] .base-doc-heading {
