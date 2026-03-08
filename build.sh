@@ -233,6 +233,57 @@ serve_web() {
     fi
 }
 
+# -- Offline-Build (file://-kompatibel) ------------------------------------
+make_offline() {
+    local site="${1:-_site}"
+    [[ ! -d "$site" ]] && { error "Kein _site/-Ordner gefunden. Erst 'web' ausführen."; return 1; }
+
+    info "Schreibe absolute Pfade in relative um (file://-kompatibel) …"
+
+    python3 - "$site" <<'PY'
+import sys, os, re
+
+site = sys.argv[1]
+
+# Ersetzt absolute Pfade in href/src/action durch relative, basierend auf Dateipfadtiefe
+abs_path_re = re.compile(r'(?<=["\'])(\/[^"\'>\s]+)(?=["\'])')
+
+for dirpath, _, files in os.walk(site):
+    for fname in files:
+        if not fname.endswith(".html"):
+            continue
+        fpath = os.path.join(dirpath, fname)
+        rel_to_site = os.path.relpath(fpath, site)
+        depth = len(rel_to_site.split(os.sep)) - 1
+        prefix = ("../" * depth) if depth > 0 else ""
+
+        with open(fpath, encoding="utf-8") as f:
+            content = f.read()
+
+        def replace_path(m):
+            p = m.group(1)
+            # Anker und externe URLs unangetastet lassen
+            if p.startswith("//") or p.startswith("#"):
+                return m.group(0)
+            return prefix + p.lstrip("/")
+
+        new_content = abs_path_re.sub(replace_path, content)
+
+        if new_content != content:
+            with open(fpath, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+print(f"  Pfade angepasst in: {site}/")
+PY
+    success "Offline-Site fertig in ${site}/ – einfach index.html öffnen."
+}
+
+offline_build() {
+    build_web
+    echo ""
+    make_offline "_site"
+}
+
 # -- Aufräumen -------------------------------------------------------------
 clean() {
     info "Räume temporäre Dateien auf …"
@@ -252,6 +303,7 @@ show_help() {
     bash build.sh              Interaktives Menü
     bash build.sh pdf          Nur PDFs generieren
     bash build.sh web          Nur Jekyll-Website bauen (nach _site/)
+    bash build.sh offline      Website bauen + Pfade für file://-Öffnen anpassen
     bash build.sh serve        Jekyll-Entwicklungsserver starten (Live-Reload)
     bash build.sh test         PDF-Tests ausführen
     bash build.sh fixtures     Test-Fixtures (goldene Referenz-PDFs) aktualisieren
@@ -283,11 +335,12 @@ show_menu() {
     echo -e "  ${GREEN}1)${NC}  Alles bauen          (PDFs + Website)"
     echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
     echo -e "  ${GREEN}3)${NC}  Nur Website bauen    (→ _site/)"
-    echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
-    echo -e "  ${GREEN}5)${NC}  Tests ausführen"
-    echo -e "  ${GREEN}6)${NC}  Test-Fixtures aktualisieren"
-    echo -e "  ${GREEN}7)${NC}  Abhängigkeiten prüfen / installieren"
-    echo -e "  ${GREEN}8)${NC}  Temporäre Dateien aufräumen"
+    echo -e "  ${GREEN}4)${NC}  Offline-Website bauen (ohne Webserver öffenbar)"
+    echo -e "  ${GREEN}5)${NC}  Webserver starten    (Live-Reload)"
+    echo -e "  ${GREEN}6)${NC}  Tests ausführen"
+    echo -e "  ${GREEN}7)${NC}  Test-Fixtures aktualisieren"
+    echo -e "  ${GREEN}8)${NC}  Abhängigkeiten prüfen / installieren"
+    echo -e "  ${GREEN}9)${NC}  Temporäre Dateien aufräumen"
     echo -e "  ${GREEN}q)${NC}  Beenden"
     echo ""
     printf "  Auswahl: "
@@ -297,11 +350,12 @@ show_menu() {
         1) install_deps; echo ""; generate_pdfs; echo ""; build_web; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
         2) install_deps; echo ""; generate_pdfs ;;
         3) install_deps; echo ""; build_web ;;
-        4) install_deps; echo ""; serve_web ;;
-        5) run_tests ;;
-        6) install_deps; echo ""; generate_fixtures ;;
-        7) install_deps ;;
-        8) clean ;;
+        4) install_deps; echo ""; offline_build ;;
+        5) install_deps; echo ""; serve_web ;;
+        6) run_tests ;;
+        7) install_deps; echo ""; generate_fixtures ;;
+        8) install_deps ;;
+        9) clean ;;
         q|Q) echo "  Tschüss!"; exit 0 ;;
         *) error "Ungültige Auswahl: $choice"; show_menu ;;
     esac
@@ -325,6 +379,11 @@ main() {
             install_deps
             echo ""
             build_web
+            ;;
+        offline)
+            install_deps
+            echo ""
+            offline_build
             ;;
         serve)
             install_deps
