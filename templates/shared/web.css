@@ -110,12 +110,19 @@ body[class*="template-"] .base-doc-brand-link {
     align-items: center;
     gap: 12px;
     text-decoration: none;
+    border-bottom: none;
     color: inherit;
     flex-shrink: 0;
 }
 
+body[class*="template-"] .base-doc-brand-link:hover {
+    border-bottom: none;
+}
+
 body[class*="template-"] .base-doc-back-icon {
-    display: none;
+    display: block;
+    width: 20px;
+    height: 20px;
     color: var(--color-text-muted);
     flex-shrink: 0;
 }
@@ -576,9 +583,13 @@ body[class*="template-"] .base-heading-link svg {
     }
 
     body[class*="template-"] .base-doc-back-icon {
-        display: block;
         width: 36px;
         height: 36px;
+    }
+
+    body[class*="template-"] ul,
+    body[class*="template-"] ol {
+        padding-left: 1.4rem;
     }
 
     body[class*="template-"] .base-doc-sitename {
