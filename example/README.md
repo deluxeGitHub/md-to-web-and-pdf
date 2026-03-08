@@ -200,7 +200,7 @@ templates/btfv/pdf-header.tex ← überschreibt den PDF-Header
 Automatisch bei jedem Push. Unter "Actions" siehst du den Fortschritt.
 
 **Kann ich das Datum manuell setzen?**
-Nein – das Datum wird automatisch auf das Datum des letzten Commits gesetzt.
+Nein – das Datum wird automatisch auf das aktuelle Datum des Workflow-Laufs gesetzt.
 
 **Wo finde ich die fertige PDF?**
 Im Repository unter `assets/pdf/<dateiname>.pdf`, oder als Download-Link auf der Website.

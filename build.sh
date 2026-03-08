@@ -326,36 +326,38 @@ HELP
 
 # -- Interaktives Menü -----------------------------------------------------
 show_menu() {
-    echo ""
-    echo -e "  ${BLUE}╔══════════════════════════════════════╗${NC}"
-    echo -e "  ${BLUE}║${NC}   md-to-web-and-pdf  Build-Tool      ${BLUE}║${NC}"
-    echo -e "  ${BLUE}╚══════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "  ${GREEN}1)${NC}  Alles bauen          (PDFs + Website)"
-    echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
-    echo -e "  ${GREEN}3)${NC}  Website bauen        (direkt im Browser öffenbar)"
-    echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
-    echo -e "  ${GREEN}5)${NC}  Tests ausführen"
-    echo -e "  ${GREEN}6)${NC}  Test-Fixtures aktualisieren"
-    echo -e "  ${GREEN}7)${NC}  Abhängigkeiten prüfen / installieren"
-    echo -e "  ${GREEN}8)${NC}  Temporäre Dateien aufräumen"
-    echo -e "  ${GREEN}q)${NC}  Beenden"
-    echo ""
-    printf "  Auswahl: "
-    read -r choice
-    echo ""
-    case "$choice" in
-        1) install_deps; echo ""; generate_pdfs; echo ""; offline_build; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
-        2) install_deps; echo ""; generate_pdfs ;;
-        3) install_deps; echo ""; offline_build ;;
-        4) install_deps; echo ""; serve_web ;;
-        5) run_tests ;;
-        6) install_deps; echo ""; generate_fixtures ;;
-        7) install_deps ;;
-        8) clean ;;
-        q|Q) echo "  Tschüss!"; exit 0 ;;
-        *) error "Ungültige Auswahl: $choice"; show_menu ;;
-    esac
+    while true; do
+        echo ""
+        echo -e "  ${BLUE}╔══════════════════════════════════════╗${NC}"
+        echo -e "  ${BLUE}║${NC}   md-to-web-and-pdf  Build-Tool      ${BLUE}║${NC}"
+        echo -e "  ${BLUE}╚══════════════════════════════════════╝${NC}"
+        echo ""
+        echo -e "  ${GREEN}1)${NC}  Alles bauen          (PDFs + Website)"
+        echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
+        echo -e "  ${GREEN}3)${NC}  Website bauen        (direkt im Browser öffenbar)"
+        echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
+        echo -e "  ${GREEN}5)${NC}  Tests ausführen"
+        echo -e "  ${GREEN}6)${NC}  Test-Fixtures aktualisieren"
+        echo -e "  ${GREEN}7)${NC}  Abhängigkeiten prüfen / installieren"
+        echo -e "  ${GREEN}8)${NC}  Temporäre Dateien aufräumen"
+        echo -e "  ${GREEN}q)${NC}  Beenden"
+        echo ""
+        printf "  Auswahl: "
+        read -r choice
+        echo ""
+        case "$choice" in
+            1) install_deps; echo ""; generate_pdfs; echo ""; offline_build; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
+            2) install_deps; echo ""; generate_pdfs ;;
+            3) install_deps; echo ""; offline_build ;;
+            4) install_deps; echo ""; serve_web ;;
+            5) run_tests ;;
+            6) install_deps; echo ""; generate_fixtures ;;
+            7) install_deps ;;
+            8) clean ;;
+            q|Q) echo "  Tschüss!"; exit 0 ;;
+            *) error "Ungültige Auswahl: $choice" ;;
+        esac
+    done
 }
 
 # -- Hauptlogik ------------------------------------------------------------

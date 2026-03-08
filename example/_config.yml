@@ -21,5 +21,10 @@ custom_templates:
 exclude:
   - scripts/
   - temp/
+  - test/
   - framework/
   - .framework/
+  - build.sh
+  - README.md
+  - CLAUDE.md
+  - LICENSE
