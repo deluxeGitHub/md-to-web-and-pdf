@@ -1,0 +1,20 @@
+---
+layout: null
+---
+{% assign pwa_template = "base" %}
+{% for scope in site.defaults %}{% if scope.values.template %}{% assign pwa_template = scope.values.template %}{% endif %}{% endfor %}
+{
+  "name": {{ site.title | default: "Dokumente" | jsonify }},
+  "short_name": {{ site.title | default: "Dokumente" | truncate: 15, "" | jsonify }},
+  "display": "standalone",
+  "start_url": {{ "/" | relative_url | jsonify }},
+  "background_color": "#ffffff",
+  "theme_color": "#4a4a49",
+  "icons": [
+    {
+      "src": {{ "/templates/" | append: pwa_template | append: "/images/favicon.png" | relative_url | jsonify }},
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

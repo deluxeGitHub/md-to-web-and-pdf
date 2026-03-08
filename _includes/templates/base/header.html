@@ -16,10 +16,18 @@
             }
         };
 
+        const updateThemeColor = () => {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) return;
+            const color = getComputedStyle(root).getPropertyValue('--color-header-band-bg').trim();
+            if (color) meta.setAttribute('content', color);
+        };
+
         const applyTheme = (mode) => {
             root.setAttribute('data-theme', mode);
             toggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
             renderIcon(mode);
+            updateThemeColor();
         };
 
         const stored = localStorage.getItem('base-theme');

@@ -13,10 +13,13 @@
         {% assign template_name = "base" %}
     {% endunless %}
     {% if supported_templates contains template_name %}
+        <meta name="theme-color" content="#4a4a49">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="icon" type="image/png" href="{{ "/templates/" | append: template_name | append: "/images/favicon.png" | relative_url }}">
+        <link rel="apple-touch-icon" href="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}">
+        <link rel="manifest" href="{{ '/manifest.webmanifest' | relative_url }}">
         <link rel="stylesheet" href="{{ "/templates/shared/web.css" | relative_url }}">
         <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
     {% endif %}
