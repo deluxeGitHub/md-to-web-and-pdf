@@ -1,5 +1,5 @@
-title: "Spielordnung"
-description: "Spielordnung des BTFV"
+title: "BTFV Docs"
+description: "Offizielle Dokumente des BTFV e.V."
 plugins:
   - jekyll-toc
   - jekyll-relative-links
