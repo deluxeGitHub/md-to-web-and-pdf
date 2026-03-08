@@ -302,8 +302,7 @@ show_help() {
   Verwendung:
     bash build.sh              Interaktives Menü
     bash build.sh pdf          Nur PDFs generieren
-    bash build.sh web          Nur Jekyll-Website bauen (nach _site/)
-    bash build.sh offline      Website bauen + Pfade für file://-Öffnen anpassen
+    bash build.sh offline      Website bauen (direkt im Browser öffenbar)
     bash build.sh serve        Jekyll-Entwicklungsserver starten (Live-Reload)
     bash build.sh test         PDF-Tests ausführen
     bash build.sh fixtures     Test-Fixtures (goldene Referenz-PDFs) aktualisieren
@@ -334,28 +333,26 @@ show_menu() {
     echo ""
     echo -e "  ${GREEN}1)${NC}  Alles bauen          (PDFs + Website)"
     echo -e "  ${GREEN}2)${NC}  Nur PDFs generieren"
-    echo -e "  ${GREEN}3)${NC}  Nur Website bauen    (→ _site/)"
-    echo -e "  ${GREEN}4)${NC}  Offline-Website bauen (ohne Webserver öffenbar)"
-    echo -e "  ${GREEN}5)${NC}  Webserver starten    (Live-Reload)"
-    echo -e "  ${GREEN}6)${NC}  Tests ausführen"
-    echo -e "  ${GREEN}7)${NC}  Test-Fixtures aktualisieren"
-    echo -e "  ${GREEN}8)${NC}  Abhängigkeiten prüfen / installieren"
-    echo -e "  ${GREEN}9)${NC}  Temporäre Dateien aufräumen"
+    echo -e "  ${GREEN}3)${NC}  Website bauen        (direkt im Browser öffenbar)"
+    echo -e "  ${GREEN}4)${NC}  Webserver starten    (Live-Reload)"
+    echo -e "  ${GREEN}5)${NC}  Tests ausführen"
+    echo -e "  ${GREEN}6)${NC}  Test-Fixtures aktualisieren"
+    echo -e "  ${GREEN}7)${NC}  Abhängigkeiten prüfen / installieren"
+    echo -e "  ${GREEN}8)${NC}  Temporäre Dateien aufräumen"
     echo -e "  ${GREEN}q)${NC}  Beenden"
     echo ""
     printf "  Auswahl: "
     read -r choice
     echo ""
     case "$choice" in
-        1) install_deps; echo ""; generate_pdfs; echo ""; build_web; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
+        1) install_deps; echo ""; generate_pdfs; echo ""; offline_build; echo ""; success "Alles fertig! PDFs in assets/pdf/, Website in _site/" ;;
         2) install_deps; echo ""; generate_pdfs ;;
-        3) install_deps; echo ""; build_web ;;
-        4) install_deps; echo ""; offline_build ;;
-        5) install_deps; echo ""; serve_web ;;
-        6) run_tests ;;
-        7) install_deps; echo ""; generate_fixtures ;;
-        8) install_deps ;;
-        9) clean ;;
+        3) install_deps; echo ""; offline_build ;;
+        4) install_deps; echo ""; serve_web ;;
+        5) run_tests ;;
+        6) install_deps; echo ""; generate_fixtures ;;
+        7) install_deps ;;
+        8) clean ;;
         q|Q) echo "  Tschüss!"; exit 0 ;;
         *) error "Ungültige Auswahl: $choice"; show_menu ;;
     esac
