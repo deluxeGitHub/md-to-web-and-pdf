@@ -6,6 +6,9 @@
     <title>{{ page.title }}</title>
     {% assign template_name = page.template | default: "base" | downcase %}
     {% assign supported_templates = "base,dtfb,btfv" | split: "," %}
+    {% if site.custom_templates %}
+        {% assign supported_templates = supported_templates | concat: site.custom_templates %}
+    {% endif %}
     {% unless supported_templates contains template_name %}
         {% assign template_name = "base" %}
     {% endunless %}
@@ -18,7 +21,7 @@
         <link rel="stylesheet" href="{{ "/templates/" | append: template_name | append: "/web.css" | relative_url }}">
     {% endif %}
 </head>
-<body class="{% if page.section_numbering == 'paragraph' %}section-prefix{% endif %} template-{{ template_name }}">
+<body class="{% if page.section_numbering == 'paragraph' %}section-prefix{% elsif page.section_numbering == 'arabic' %}section-arabic{% endif %} template-{{ template_name }}">
     {% if supported_templates contains template_name %}
         {% include templates/base/header.html %}
     {% endif %}

@@ -2,8 +2,6 @@
 title: "Beispieldokument"
 subtitle: "Muster für neue Dokumente"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
-template: btfv
 section_numbering: paragraph
 pdf: /assets/pdf/beispiel.pdf
 ---

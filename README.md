@@ -1,118 +1,172 @@
-# BTFV Verbandsdokumente
+# md-to-web-and-pdf
 
-Dieses Repository enthält die offiziellen Dokumente des Bayerischen Tischfußballverbands e.V. (BTFV) als Markdown-Dateien. Die Dokumente werden automatisch in PDF-Dateien umgewandelt und stehen zum Download bereit.
-
-## Inhalt
-
-- **docs/**: Enthält die Markdown-Quellen der Verbandsdokumente (`satzung.md`, `spielordnung.md`, `gebuehrenordnung.md` usw.).
-- **assets/pdf/**: Hier werden die automatisch generierten PDF-Versionen der Dokumente abgelegt.
-- **templates/**: Enthält modulare Templates (Web + PDF) für verschiedene Verbände.
-- **scripts/**: Build- und Test-Skripte (werden von `build.sh` aufgerufen).
-- **.github/workflows/generate-pdf.yml**: GitHub Actions Workflow zur automatischen PDF-Erstellung bei jedem Push auf den `main`-Branch.
-- **_layouts/** und **_config.yml**: Dateien für das Jekyll-Setup zur HTML-Darstellung auf GitHub Pages.
+Framework zur automatischen Erstellung von Verbandsdokumenten als PDF und Website (GitHub Pages).
+Markdown-Dateien werden per GitHub Actions in PDFs umgewandelt und als Jekyll-Website veröffentlicht.
 
 ---
 
-## Hinweise zur Bearbeitung der Markdown-Dokumente
+## Funktionsweise
 
-Die Dokumente werden im [Markdown-Format](https://www.markdownguide.org/basic-syntax/) geschrieben. Markdown ist eine einfache Auszeichnungssprache, die leicht zu lesen und zu bearbeiten ist – auch für Nicht-ITler.
+```
+docs/*.md  →  GitHub Actions (Pandoc + XeLaTeX)  →  assets/pdf/*.pdf
+docs/*.md  →  Jekyll                              →  GitHub Pages (HTML)
+```
 
-### Automatische Platzhalter und "Magic"
-
-- **Datum:** Ganz oben im Dokument steht oft eine Zeile wie
-  `date: {{ site.time | date: "%d-%m-%Y" }}`
-  Beim PDF-Export wird dieser Platzhalter automatisch durch das Datum des letzten Commits ersetzt.
-- **TOC (Inhaltsverzeichnis):**
-  Die Zeile
-  ```
-  * TOC
-  {:toc}
-  ```
-  erzeugt beim Export ein automatisches Inhaltsverzeichnis an dieser Stelle.
-- **HTML-Blöcke:**
-  Blöcke wie `<div class="html-only">...</div>` werden beim PDF-Export entfernt und erscheinen nur in der HTML-Version.
-- **Templates:**
-  Mit `template: btfv` im Front-Matter werden Web- und PDF-Styles aus `templates/btfv` aktiviert.
-- **Abschnittsnummerierung:**
-  Mit `section_numbering: paragraph` werden Überschriften als §1, §1.1 … nummeriert.
-  Mit `section_numbering: arabic` als 1, 1.1 … nummeriert.
-- **Alphabetische Listen:**
-  Für Listen mit Buchstaben (a, b, c, ...) wird in HTML folgendes verwendet:
-  ```html
-  <ol type="a">
-    <li>Erster Punkt</li>
-    <li>Zweiter Punkt</li>
-  </ol>
-  ```
-  Diese Syntax wird beim PDF-Export automatisch in eine passende Darstellung umgewandelt.
+Dieses Repo stellt das Framework bereit. Dokument-Repos binden es als **reusable workflow** ein und pflegen nur ihre Markdown-Dateien.
 
 ---
 
-### Überschriften
+## Für Anwender: Eigenes Docs-Repo einrichten
 
-```
-# Überschrift 1
-## Überschrift 2
-### Überschrift 3
-```
+Siehe [`example/README.md`](example/README.md) für eine Schritt-für-Schritt-Anleitung.
 
----
-
-### Aufzählungen (Listen)
-
-**Ungeordnete Liste:**
-```
-- Erster Punkt
-- Zweiter Punkt
-  - Unterpunkt
-```
-
-**Geordnete Liste:**
-```
-1. Erster Punkt
-2. Zweiter Punkt
-```
+Kurzfassung:
+1. Neues GitHub-Repo erstellen
+2. Dateien aus [`example/`](example/) kopieren
+3. `baseurl` in `.github/workflows/build.yml` anpassen
+4. GitHub Pages aktivieren (`gh-pages`-Branch, Root)
+5. Workflow-Berechtigungen auf "Read and write" setzen
+6. Pushen – fertig
 
 ---
 
-### Weitere Tipps
+## Architektur
 
-- **Fett:** `**Text**` → **Text**
-- **Kursiv:** `_Text_` → _Text_
-- **Links:** `[Linktext](URL)`
+### Verzeichnisstruktur
 
-Eine ausführliche Anleitung: [Markdown Guide](https://www.markdownguide.org/basic-syntax/)
+| Pfad | Zweck |
+|---|---|
+| `templates/` | Modulare Web- und PDF-Templates pro Verband |
+| `templates/shared/web.css` | Gemeinsame Basis-CSS für alle Templates |
+| `templates/base/` | Neutrales Fallback-Template |
+| `templates/btfv/` | BTFV-spezifisches Design |
+| `templates/dtfb/` | DTFB-spezifisches Design |
+| `scripts/generate_pdfs.sh` | PDF-Generierung (Pandoc + XeLaTeX) |
+| `scripts/test_pdfs.sh` | Regressionstests gegen LaTeX-Fixtures |
+| `_layouts/default.html` | Jekyll-Layout für alle Seiten |
+| `_includes/templates/` | Jekyll-Partials (Header, Navigation) |
+| `.github/workflows/reusable-build.yml` | Reusable Workflow für Docs-Repos |
+| `example/` | Vollständiges Beispiel-Repo |
+| `test/` | Test-Dokumente und Fixtures |
+
+### Templates
+
+Jedes Template enthält:
+
+| Datei | Zweck |
+|---|---|
+| `web.css` | CSS-Variablen (Farben, Fonts) |
+| `pdf-header.tex` | LaTeX-Header (Fonts, Farben, Logo, Fußzeile) |
+| `images/logo.png` | Verbandslogo |
+| `images/favicon.png` | Favicon |
 
 ---
 
-## Automatische PDF-Erstellung
+## Dokument-Format
 
-Bei jedem Push auf den `main`-Branch wird der [GitHub Actions Workflow](.github/workflows/generate-pdf.yml) ausgeführt:
+```yaml
+---
+title: "Satzung"
+subtitle: "des BTFV e.V."              # optional
+date: "{{ site.time | date: '%d.%m.%Y' }}"
+template: dtfb                         # optional – nur wenn vom Default in _config.yml abweichend
+section_numbering: paragraph           # optional – paragraph | arabic | weglassen = keine
+pdf: /assets/pdf/satzung.pdf          # optional – für Download-Link auf der Website
+---
+```
 
-1. Das Änderungsdatum wird automatisch in die Dokumente eingefügt.
-2. Die Markdown-Dateien werden mit Pandoc und LaTeX in PDFs umgewandelt.
-3. Die PDFs werden im Ordner [`assets/pdf/`](assets/pdf/) gespeichert und ins Repository zurückgepusht.
+`layout` und `template` müssen nicht gesetzt werden, wenn der Repo-weite Default aus `_config.yml` passt:
 
-**Hinweis:** Für GitHub Actions muss unter `Settings → Actions → General → Workflow permissions` die Einstellung **"Read and write permissions"** aktiviert sein.
+```yaml
+# _config.yml
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      template: btfv
+```
+
+### Abschnittsnummerierung
+
+| Wert | HTML & PDF |
+|---|---|
+| `paragraph` | § 1, § 1.1, § 1.1.1 … |
+| `arabic` | 1, 1.1, 1.1.1 … |
+| *(nicht gesetzt)* | Keine Nummerierung |
+
+---
+
+## Custom Themes in Docs-Repos
+
+Docs-Repos können eigene Templates mitbringen, ohne dieses Framework-Repo zu verändern.
+
+**Struktur im Docs-Repo:**
+```
+templates/meinverein/
+├── web.css
+├── pdf-header.tex
+└── images/
+    ├── logo.png
+    └── favicon.png
+```
+
+**Registrierung in `_config.yml` des Docs-Repos:**
+```yaml
+custom_templates:
+  - meinverein
+```
+
+Eingebaute Templates können auch partiell überschrieben werden – Dateien im Docs-Repo haben Vorrang vor dem Framework.
+
+---
+
+## Reusable Workflow einbinden
+
+```yaml
+# .github/workflows/build.yml im Docs-Repo
+jobs:
+  build:
+    uses: deluxeGitHub/md-to-web-and-pdf/.github/workflows/reusable-build.yml@main
+    with:
+      source_dir: docs
+      baseurl: /mein-repo-name
+    permissions:
+      contents: write
+```
+
+### Workflow-Inputs
+
+| Input | Standard | Beschreibung |
+|---|---|---|
+| `source_dir` | `docs` | Ordner mit Markdown-Dateien |
+| `baseurl` | *(leer)* | Jekyll baseurl für GitHub Pages project pages |
+| `framework_ref` | `main` | Branch oder Tag des Framework-Repos |
 
 ---
 
 ## Lokale Entwicklung
 
-Alle lokalen Aufgaben werden über `build.sh` gesteuert:
-
-```sh
+```bash
 bash build.sh
 ```
 
-Das Skript zeigt ein interaktives Menü mit Optionen für PDF-Generierung, Jekyll-Vorschau und Tests.
+Interaktives Menü für PDF-Generierung, Jekyll-Vorschau und Tests.
 
-**Voraussetzungen:** [Pandoc](https://pandoc.org/), [XeLaTeX](https://www.tug.org/xetex/), [Jekyll](https://jekyllrb.com/) (für HTML-Vorschau)
+**Voraussetzungen:** `pandoc`, `xelatex` (TeX Live), `jekyll`
+
+---
+
+## Neues Template zum Framework hinzufügen
+
+1. Ordner `templates/<name>/` anlegen mit `web.css`, `pdf-header.tex`, `images/logo.png`, `images/favicon.png`
+2. Template-Namen in `_layouts/default.html` in die `supported_templates`-Liste aufnehmen:
+   ```liquid
+   {% assign supported_templates = "base,dtfb,btfv,<name>" | split: "," %}
+   ```
 
 ---
 
 ## Lizenz
 
 [UNLICENSE](LICENSE) – Public Domain
-
-Bei Fragen oder Verbesserungsvorschlägen bitte ein Issue eröffnen oder einen Pull Request stellen.

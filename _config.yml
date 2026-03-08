@@ -4,13 +4,23 @@ plugins:
   - jekyll-toc
   - jekyll-relative-links
 
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      template: base
+
 relative_links:
   enabled: true
 
 exclude:
   - scripts/
   - temp/
-  - test/fixtures/
+  - test/
+  - example/
   - build.sh
   - generate_pdf_local.sh
   - README.md
+  - CLAUDE.md
+  - LICENSE

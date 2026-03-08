@@ -351,24 +351,28 @@ body[class*="template-"] #back-to-top:hover {
     background-color: var(--color-brand-contrast);
 }
 
-/* Automatische Nummerierung fuer h1-h4 */
-body[class*="template-"] {
+/* Automatische Nummerierung fuer h1-h4 (nur wenn section_numbering gesetzt) */
+body[class*="template-"].section-arabic,
+body[class*="template-"].section-prefix {
     counter-reset: section;
 }
 
-body[class*="template-"] h1 {
+body[class*="template-"].section-arabic h1,
+body[class*="template-"].section-prefix h1 {
     counter-reset: subsection;
 }
 
-body[class*="template-"] h2 {
+body[class*="template-"].section-arabic h2,
+body[class*="template-"].section-prefix h2 {
     counter-reset: subsubsection;
 }
 
-body[class*="template-"] h3 {
+body[class*="template-"].section-arabic h3,
+body[class*="template-"].section-prefix h3 {
     counter-reset: subsubsubsection;
 }
 
-body[class*="template-"] h1::before {
+body[class*="template-"].section-arabic h1::before {
     counter-increment: section;
     content: counter(section) ". ";
     color: var(--color-brand-primary);
@@ -376,36 +380,48 @@ body[class*="template-"] h1::before {
 }
 
 body[class*="template-"].section-prefix h1::before {
+    counter-increment: section;
     content: "\00A7 " counter(section) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
 }
 
 body[class*="template-"].section-prefix h2::before {
+    counter-increment: subsection;
     content: "\00A7 " counter(section) "." counter(subsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
 }
 
 body[class*="template-"].section-prefix h3::before {
+    counter-increment: subsubsection;
     content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
 }
 
 body[class*="template-"].section-prefix h4::before {
+    counter-increment: subsubsubsection;
     content: "\00A7 " counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
+    color: var(--color-brand-primary);
+    margin-right: 6px;
 }
 
-body[class*="template-"] h2::before {
+body[class*="template-"].section-arabic h2::before {
     counter-increment: subsection;
     content: counter(section) "." counter(subsection) " ";
     color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
-body[class*="template-"] h3::before {
+body[class*="template-"].section-arabic h3::before {
     counter-increment: subsubsection;
     content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
     color: var(--color-brand-primary);
     margin-right: 6px;
 }
 
-body[class*="template-"] h4::before {
+body[class*="template-"].section-arabic h4::before {
     counter-increment: subsubsubsection;
     content: counter(section) "." counter(subsection) "." counter(subsubsection) "." counter(subsubsubsection) " ";
     color: var(--color-brand-primary);

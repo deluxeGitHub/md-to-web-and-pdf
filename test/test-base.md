@@ -2,7 +2,6 @@
 title: "Testdokument Base"
 subtitle: "Design-Referenz für das Base-Template"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
-layout: default
 template: base
 
 pdf: /assets/pdf/test-base.pdf
