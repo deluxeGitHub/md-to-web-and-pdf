@@ -29,57 +29,55 @@
         {% include templates/base/header.html %}
     {% endif %}
     {% if supported_templates contains template_name %}
+        {% assign template_date_raw = page.date | default: "" %}
+        {% assign template_date_str = template_date_raw | jsonify %}
+        {% if template_date_str contains "site.time" or template_date_str contains "=>" %}
+            {% assign template_date = site.time | date: "%d.%m.%Y" %}
+        {% else %}
+            {% assign template_date = template_date_raw %}
+        {% endif %}
         <div class="base-doc-heading">
             <div class="base-doc-heading__top">
-                <div class="base-doc-heading__brand">
+                <a class="base-doc-brand-link" href="{{ '/' | relative_url }}">
                     <img class="base-doc-logo" src="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}" alt="Logo">
-                    <div class="base-doc-titles">
-                        <div class="base-doc-title">{{ page.title }}</div>
-                        {% if page.subtitle %}
-                            <div class="base-doc-subtitle">{{ page.subtitle }}</div>
-                        {% endif %}
-                    </div>
+                    <span class="base-doc-sitename">{{ site.title }}</span>
+                </a>
+                <div class="base-doc-titles">
+                    <div class="base-doc-title">{{ page.title }}</div>
+                    {% if page.subtitle %}
+                        <div class="base-doc-subtitle">{{ page.subtitle }}</div>
+                    {% endif %}
                 </div>
                 <div class="base-doc-actions">
                     <div class="base-hero__links">
-                        {% if page.show_home != false %}
-                            <a class="base-home-button" href="{{ "/" | relative_url }}">Home</a>
-                        {% endif %}
                         {% if page.pdf %}
                             <a href="{{ page.pdf | relative_url }}" target="_blank" rel="noopener">PDF</a>
                         {% endif %}
                         {% if page.source %}
                             <a href="{{ page.source }}" target="_blank" rel="noopener">Quelle</a>
                         {% endif %}
-                        <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
-                            <span class="base-theme-toggle__icon" data-theme-icon>
-                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-                                    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                        <line x1="12" y1="2.5" x2="12" y2="5.5"/>
-                                        <line x1="12" y1="18.5" x2="12" y2="21.5"/>
-                                        <line x1="2.5" y1="12" x2="5.5" y2="12"/>
-                                        <line x1="18.5" y1="12" x2="21.5" y2="12"/>
-                                        <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
-                                        <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
-                                        <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
-                                        <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
-                                    </g>
-                                </svg>
-                            </span>
-                        </button>
                     </div>
-                    {% assign template_date_raw = page.date | default: "" %}
-                    {% assign template_date_str = template_date_raw | jsonify %}
-                    {% if template_date_str contains "site.time" or template_date_str contains "=>" %}
-                        {% assign template_date = site.time | date: "%d.%m.%Y" %}
-                    {% else %}
-                        {% assign template_date = template_date_raw %}
-                    {% endif %}
                     {% if template_date != "" %}
                         <div class="base-doc-date">Stand: {{ template_date }}</div>
                     {% endif %}
                 </div>
+                <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                    <span class="base-theme-toggle__icon" data-theme-icon>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                            </g>
+                        </svg>
+                    </span>
+                </button>
             </div>
         </div>
     {% endif %}
