@@ -591,6 +591,25 @@ body[class*="template-"] .base-heading-link svg {
         height: 36px;
     }
 
+    /* Startseite: Logo groß, Titel inline neben Logo (kein doppelter Seitenname) */
+    body[class*="template-"] .base-doc-heading--home .base-doc-sitename {
+        display: none;
+    }
+
+    body[class*="template-"] .base-doc-heading--home .base-doc-logo {
+        width: 70px;
+    }
+
+    body[class*="template-"] .base-doc-heading--home .base-doc-brand-link {
+        flex: none;
+    }
+
+    body[class*="template-"] .base-doc-heading--home .base-doc-titles {
+        order: unset;
+        width: auto;
+        flex: 1;
+    }
+
     body[class*="template-"] ul,
     body[class*="template-"] ol {
         padding-left: 1.4rem;

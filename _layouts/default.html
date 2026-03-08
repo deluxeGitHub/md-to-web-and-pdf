@@ -36,7 +36,7 @@
         {% else %}
             {% assign template_date = template_date_raw %}
         {% endif %}
-        <div class="base-doc-heading">
+        <div class="base-doc-heading{% if is_home %} base-doc-heading--home{% endif %}">
             <div class="base-doc-heading__top">
                 {% assign is_home = false %}
                 {% if page.url == "/" or page.url == "/index.html" %}{% assign is_home = true %}{% endif %}
