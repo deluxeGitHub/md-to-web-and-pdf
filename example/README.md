@@ -10,7 +10,7 @@ kommt automatisch aus dem Framework – du musst nur die Markdown-Dateien pflege
 
 - Automatische PDF-Erstellung bei jedem Push
 - Öffentliche Website (GitHub Pages) mit allen Dokumenten
-- Staging-Vorschau für jeden Branch unter `/staging/`
+- Vorschau-Website zum internen Review, bevor Änderungen veröffentlicht werden
 - Keine Installation nötig – alles läuft in der Cloud
 
 ---
@@ -48,12 +48,13 @@ templates/
 
 ## Schritt 3: `build.yml` anpassen
 
-Öffne `.github/workflows/build.yml` und trage die `baseurl` deines Repos ein:
+Öffne `.github/workflows/build.yml` und trage `baseurl` und optional `staging_branch` ein:
 
 ```yaml
 with:
   source_dir: docs
   baseurl: /meinverein-docs   # ← Name deines GitHub-Repos
+  staging_branch: staging     # ← Branch für die Vorschau-Website (optional, Standard: "staging")
 ```
 
 ---
@@ -67,8 +68,10 @@ with:
 
 > Der `gh-pages`-Branch wird automatisch beim ersten Workflow-Run angelegt.
 >
-> - `main`-Branch → live unter `https://<name>.github.io/<repo>/`
-> - Alle anderen Branches → Vorschau unter `https://<name>.github.io/<repo>/staging/`
+> - `main`-Branch → öffentliche Website unter `https://<name>.github.io/<repo>/`
+> - `staging`-Branch → Vorschau-Website unter `https://<name>.github.io/<repo>/staging/`
+>   Hier kannst du Änderungen intern prüfen, bevor sie auf der öffentlichen Seite erscheinen.
+> - Alle anderen Branches → nur PDF-Generierung, kein Website-Deploy
 
 ---
 
