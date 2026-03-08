@@ -36,10 +36,10 @@
         {% else %}
             {% assign template_date = template_date_raw %}
         {% endif %}
+        {% assign is_home = false %}
+        {% if page.url == "/" or page.url == "/index.html" %}{% assign is_home = true %}{% endif %}
         <div class="base-doc-heading{% if is_home %} base-doc-heading--home{% endif %}">
             <div class="base-doc-heading__top">
-                {% assign is_home = false %}
-                {% if page.url == "/" or page.url == "/index.html" %}{% assign is_home = true %}{% endif %}
                 {% if is_home %}
                 <div class="base-doc-brand-link">
                 {% else %}
