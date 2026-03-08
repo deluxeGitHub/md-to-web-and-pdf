@@ -1,6 +1,6 @@
 ---
-title: "MD to Web and PDF"
-subtitle: "Framework für Verbandsdokumente"
+title: "MD to PDF and Web"
+subtitle: "Convert Markdown to web and PDF with ease"
 show_home: false
 ---
 

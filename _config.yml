@@ -1,5 +1,5 @@
-title: "BTFV Docs"
-description: "Offizielle Dokumente des BTFV e.V."
+title: "MD to PDF and Web"
+description: "Convert Markdown to web and PDF with ease"
 plugins:
   - jekyll-toc
   - jekyll-relative-links
