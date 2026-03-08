@@ -19,7 +19,7 @@
         const updateThemeColor = () => {
             const meta = document.querySelector('meta[name="theme-color"]');
             if (!meta) return;
-            const color = getComputedStyle(root).getPropertyValue('--color-header-band-bg').trim();
+            const color = getComputedStyle(root).getPropertyValue('--color-surface-page').trim();
             if (color) meta.setAttribute('content', color);
         };
 
