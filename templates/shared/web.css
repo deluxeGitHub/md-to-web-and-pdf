@@ -375,6 +375,10 @@ body[class*="template-"] #back-to-top:hover {
     background-color: var(--color-brand-contrast);
 }
 
+body:has(#staging-banner) #back-to-top {
+    bottom: 52px;
+}
+
 /* Automatische Nummerierung fuer h1-h4 (nur wenn section_numbering gesetzt) */
 body[class*="template-"].section-arabic,
 body[class*="template-"].section-prefix {
