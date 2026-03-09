@@ -1,3 +1,7 @@
+:root {
+    --font-primary: "Lato", "Helvetica Neue", Arial, sans-serif;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -9,7 +13,7 @@ html {
 /* Seitenlayout und Grundfarben */
 body[class*="template-"] {
     margin: 0;
-    font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-primary);
     color: var(--color-text-primary);
     background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
     line-height: 1.6;
@@ -166,7 +170,7 @@ body[class*="template-"] {
 
     /* Header-Buttons (Home/PDF/Quelle) */
     & .base-hero__links a {
-        font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+        font-family: var(--font-primary);
         font-size: 12px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -193,7 +197,7 @@ body[class*="template-"] {
     & h2,
     & h3,
     & h4 {
-        font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+        font-family: var(--font-primary);
         color: var(--color-brand-primary);
         margin-top: 30px;
         margin-bottom: 12px;
@@ -212,7 +216,7 @@ body[class*="template-"] {
     & h4 { font-size: 17px; }
 
     & .base-doc-title {
-        font-family: "Oswald", "Lato", "Helvetica Neue", Arial, sans-serif;
+        font-family: "Oswald", var(--font-primary);
         font-size: 30px;
         letter-spacing: 0.01em;
         color: var(--color-brand-primary);
@@ -262,7 +266,7 @@ body[class*="template-"] {
     & th {
         background: var(--color-brand-primary);
         color: #ffffff;
-        font-family: "acumin-pro-extra-condensed", "Work Sans", "Lato", "Helvetica Neue", Arial, sans-serif;
+        font-family: "acumin-pro-extra-condensed", "Work Sans", var(--font-primary);
         letter-spacing: 0.04em;
     }
 
@@ -351,7 +355,7 @@ body[class*="template-"] {
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         display: none;
         transition: background-color 0.3s ease;
-        font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
+        font-family: var(--font-primary);
 
         &:hover {
             background-color: var(--color-brand-contrast);
