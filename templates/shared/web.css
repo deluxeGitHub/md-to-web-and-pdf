@@ -610,12 +610,6 @@ body[class*="template-"] .base-heading-link svg {
         flex: 1;
     }
 
-    body[class*="template-"] ul,
-    body[class*="template-"] ol {
-        padding-left: 1rem;
-        list-style-position: inside;
-    }
-
     body[class*="template-"] .base-doc-sitename {
         display: block;
         font-size: 17px;
@@ -685,7 +679,7 @@ body[class*="template-"] .base-heading-link svg {
     body[class*="template-"] ul,
     body[class*="template-"] ol {
         margin: 0 0 12px;
-        padding-left: 1.05rem;
+        padding-left: 1.5rem;
     }
 
     body[class*="template-"] ul ul,
