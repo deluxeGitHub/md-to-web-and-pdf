@@ -813,6 +813,14 @@ body:has(#staging-banner) #back-to-top {
     min-width: min(480px, calc(100vw - 32px));
 }
 
+@media (max-width: 540px) {
+    #base-search-bar {
+        bottom: auto;
+        top: calc(env(safe-area-inset-top, 0px) + 8px);
+        border-radius: 10px;
+    }
+}
+
 #base-search-input {
     flex: 1;
     border: none;
