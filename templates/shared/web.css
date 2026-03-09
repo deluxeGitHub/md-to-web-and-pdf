@@ -473,7 +473,7 @@ body[class*="template-"] {
 
         & .wrapper {
             margin: 0 0 36px;
-            padding: 16px 16px 28px;
+            padding: 16px 12px 28px;
             border-radius: 0;
             border-left: none;
             border-right: none;
