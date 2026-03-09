@@ -617,7 +617,7 @@ body[class*="template-"] {
 /* Scroll-Fortschrittsbalken */
 #scroll-progress {
     position: fixed;
-    top: 0;
+    top: env(safe-area-inset-top, 0px);
     left: 0;
     width: 0%;
     height: 3px;
