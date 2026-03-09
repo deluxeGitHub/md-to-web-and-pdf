@@ -461,16 +461,23 @@ body[class*="template-"] {
 
         & .base-hero__content {
             margin: -10px auto 0;
-            padding: 0 8px;
+            padding: 0 16px;
         }
 
         & .base-doc-heading {
-            margin: 0 8px 16px;
+            margin: 0 0 16px;
+            border-radius: 0;
+            border-left-width: 4px;
+            box-shadow: none;
         }
 
         & .wrapper {
-            margin: 0 8px 36px;
-            padding: 16px 12px 28px;
+            margin: 0 0 36px;
+            padding: 16px 16px 28px;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            box-shadow: none;
         }
 
         & .base-doc-brand-link {
