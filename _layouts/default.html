@@ -76,25 +76,42 @@
                     {% endif %}
                 </div>
                 <div class="base-toolbar">
-                    <button class="base-font-btn" type="button" data-font-decrease aria-label="Schrift verkleinern">A−</button>
-                    <button class="base-font-btn" type="button" data-font-increase aria-label="Schrift vergrößern">A+</button>
-                    <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
-                        <span class="base-theme-toggle__icon" data-theme-icon>
-                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-                                <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                    <line x1="12" y1="2.5" x2="12" y2="5.5"/>
-                                    <line x1="12" y1="18.5" x2="12" y2="21.5"/>
-                                    <line x1="2.5" y1="12" x2="5.5" y2="12"/>
-                                    <line x1="18.5" y1="12" x2="21.5" y2="12"/>
-                                    <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
-                                    <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
-                                    <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
-                                    <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
-                                </g>
+                    <div class="base-settings-wrap">
+                        <button class="base-settings-btn" type="button" data-settings-toggle aria-label="Einstellungen" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                             </svg>
-                        </span>
-                    </button>
+                        </button>
+                        <div class="base-settings-panel" data-settings-panel hidden>
+                            <div class="base-settings-row">
+                                <span class="base-settings-font-small" aria-hidden="true">A</span>
+                                <input class="base-font-slider" type="range" min="0" max="4" step="1" value="2" data-font-slider aria-label="Schriftgröße">
+                                <span class="base-settings-font-large" aria-hidden="true">A</span>
+                            </div>
+                            <div class="base-settings-font-pct" data-font-pct aria-live="polite">100%</div>
+                            <div class="base-settings-row">
+                                <span class="base-settings-label">Theme</span>
+                                <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                                    <span class="base-theme-toggle__icon" data-theme-icon>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                                <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                                <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                                <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                                <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                                <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                                <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                                <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                                <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -124,20 +141,46 @@
     <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
 
     <script>
+        // Einstellungen-Panel
+        const settingsToggle = document.querySelector("[data-settings-toggle]");
+        const settingsPanel = document.querySelector("[data-settings-panel]");
+        if (settingsToggle && settingsPanel) {
+            settingsToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const open = !settingsPanel.hidden;
+                settingsPanel.hidden = open;
+                settingsToggle.setAttribute("aria-expanded", String(!open));
+            });
+            settingsPanel.addEventListener("click", (e) => { e.stopPropagation(); });
+            document.addEventListener("click", () => {
+                if (!settingsPanel.hidden) {
+                    settingsPanel.hidden = true;
+                    settingsToggle.setAttribute("aria-expanded", "false");
+                }
+            });
+        }
+
         // Schriftgröße
-        const fontSteps = [0.875, 1, 1.125, 1.25];
-        let fontIndex = parseInt(localStorage.getItem("fontIndex") ?? "1", 10);
+        const fontSteps = [0.70, 0.85, 1.0, 1.25, 1.50];
+        let fontIndex = parseInt(localStorage.getItem("fontIndex") ?? "2", 10);
+        const fontSlider = document.querySelector("[data-font-slider]");
+        const fontPct = document.querySelector("[data-font-pct]");
         const applyFontZoom = () => {
             document.documentElement.style.setProperty("--font-zoom", fontSteps[fontIndex]);
-            document.querySelector("[data-font-decrease]").disabled = fontIndex === 0;
-            document.querySelector("[data-font-increase]").disabled = fontIndex === fontSteps.length - 1;
+            if (fontSlider) {
+                fontSlider.value = fontIndex;
+                const pct = (fontIndex / (fontSteps.length - 1)) * 100;
+                fontSlider.style.setProperty("--slider-fill", pct + "%");
+            }
+            if (fontPct) fontPct.textContent = Math.round(fontSteps[fontIndex] * 100) + "%";
         };
-        document.querySelector("[data-font-decrease]").addEventListener("click", () => {
-            if (fontIndex > 0) { fontIndex--; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
-        });
-        document.querySelector("[data-font-increase]").addEventListener("click", () => {
-            if (fontIndex < fontSteps.length - 1) { fontIndex++; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
-        });
+        if (fontSlider) {
+            fontSlider.addEventListener("input", () => {
+                fontIndex = parseInt(fontSlider.value, 10);
+                localStorage.setItem("fontIndex", fontIndex);
+                applyFontZoom();
+            });
+        }
         applyFontZoom();
     </script>
 
