@@ -98,6 +98,9 @@
         {{ content }}
     </div>
     
+    <!-- Scroll-Fortschrittsbalken -->
+    <div id="scroll-progress"></div>
+
     <!-- Nach oben Button -->
     <a href="#" id="back-to-top">Nach oben</a>
 
@@ -113,15 +116,14 @@
     <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
 
     <script>
-        // Script, um den Button bei Scrollen einzublenden
         const backToTopButton = document.getElementById("back-to-top");
+        const scrollProgress = document.getElementById("scroll-progress");
 
         window.onscroll = function() {
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                backToTopButton.style.display = "block"; // Zeigt den Button nach Scrollen an
-            } else {
-                backToTopButton.style.display = "none"; // Versteckt den Button, wenn man oben ist
-            }
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrollProgress.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + "%" : "0%";
+            backToTopButton.style.display = scrollTop > 200 ? "block" : "none";
         };
     </script>
 
