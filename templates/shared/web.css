@@ -16,9 +16,6 @@ body[class*="template-"] {
     overflow-x: hidden;
 }
 
-:root[data-theme='dark'] body[class*="template-"] {
-    background: radial-gradient(circle at top left, var(--color-surface-card) 0%, var(--color-surface-page) 55%, var(--color-surface-page) 100%);
-}
 
 body[class*="template-"] .wrapper {
     max-width: 900px;
