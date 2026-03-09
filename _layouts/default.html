@@ -76,6 +76,11 @@
                     {% endif %}
                 </div>
                 <div class="base-toolbar">
+                    <button class="base-search-btn" type="button" data-search-open aria-label="Suche">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
                     <div class="base-settings-wrap">
                         <button class="base-settings-btn" type="button" data-settings-toggle aria-label="Einstellungen" aria-expanded="false">
                             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,6 +95,12 @@
                                 <button class="base-settings-font-large" type="button" data-font-increase aria-label="Schrift vergrößern">A</button>
                             </div>
                             <div class="base-settings-font-pct" data-font-pct aria-live="polite">100%</div>
+                            <div class="base-settings-row base-settings-search-row">
+                                <span class="base-settings-label">Suche</span>
+                                <button class="base-theme-toggle" type="button" data-search-open aria-label="Suche öffnen">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                </button>
+                            </div>
                             <div class="base-settings-row">
                                 <span class="base-settings-label">Theme</span>
                                 <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
@@ -120,6 +131,21 @@
         {{ content }}
     </div>
     
+    <!-- Suchleiste -->
+    <div id="base-search-bar" hidden role="search">
+        <input id="base-search-input" type="search" placeholder="Auf dieser Seite suchen…" aria-label="Suche" autocomplete="off">
+        <span id="base-search-count" aria-live="polite"></span>
+        <button id="base-search-prev" type="button" aria-label="Vorheriger Treffer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button id="base-search-next" type="button" aria-label="Nächster Treffer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button id="base-search-close" type="button" aria-label="Suche schließen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
     <!-- Safe-area Abdeckung (nur in PWA) -->
     <div id="safe-area-cover"></div>
 
@@ -283,6 +309,114 @@
         } else {
             initHeadingLinks();
         }
+    </script>
+
+    <script>
+        (() => {
+            const searchBar = document.getElementById("base-search-bar");
+            const searchInput = document.getElementById("base-search-input");
+            const searchCount = document.getElementById("base-search-count");
+            const btnPrev = document.getElementById("base-search-prev");
+            const btnNext = document.getElementById("base-search-next");
+            const btnClose = document.getElementById("base-search-close");
+            const openBtns = document.querySelectorAll("[data-search-open]");
+            const wrapper = document.querySelector(".wrapper");
+
+            if (!searchBar || !openBtns.length || !wrapper) return;
+
+            let marks = [];
+            let currentIndex = -1;
+
+            const clearMarks = () => {
+                wrapper.querySelectorAll("mark.base-search-mark").forEach(m => {
+                    const parent = m.parentNode;
+                    parent.replaceChild(document.createTextNode(m.textContent), m);
+                    parent.normalize();
+                });
+                marks = [];
+                currentIndex = -1;
+            };
+
+            const highlight = (query) => {
+                clearMarks();
+                if (!query) { searchCount.textContent = ""; return; }
+                const re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+                const walker = document.createTreeWalker(wrapper, NodeFilter.SHOW_TEXT, {
+                    acceptNode: n => {
+                        const tag = n.parentElement?.tagName;
+                        return (tag === "SCRIPT" || tag === "STYLE" || n.parentElement?.closest("mark"))
+                            ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                    }
+                });
+                const textNodes = [];
+                while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+                textNodes.forEach(node => {
+                    if (!re.test(node.textContent)) return;
+                    re.lastIndex = 0;
+                    const frag = document.createDocumentFragment();
+                    let last = 0, m;
+                    while ((m = re.exec(node.textContent)) !== null) {
+                        frag.appendChild(document.createTextNode(node.textContent.slice(last, m.index)));
+                        const mark = document.createElement("mark");
+                        mark.className = "base-search-mark";
+                        mark.textContent = m[0];
+                        frag.appendChild(mark);
+                        marks.push(mark);
+                        last = m.index + m[0].length;
+                    }
+                    frag.appendChild(document.createTextNode(node.textContent.slice(last)));
+                    node.parentNode.replaceChild(frag, node);
+                });
+
+                searchCount.textContent = marks.length ? `1 / ${marks.length}` : "Kein Treffer";
+                if (marks.length) { currentIndex = 0; goTo(0); }
+            };
+
+            const goTo = (idx) => {
+                marks.forEach((m, i) => m.classList.toggle("base-search-mark--active", i === idx));
+                if (marks[idx]) marks[idx].scrollIntoView({ behavior: "smooth", block: "center" });
+                searchCount.textContent = `${idx + 1} / ${marks.length}`;
+            };
+
+            const open = () => {
+                if (settingsPanel && !settingsPanel.hidden) {
+                    settingsPanel.hidden = true;
+                    document.querySelector("[data-settings-toggle]")?.setAttribute("aria-expanded", "false");
+                }
+                searchBar.hidden = false;
+                searchInput.focus();
+                searchInput.select();
+            };
+
+            const close = () => {
+                searchBar.hidden = true;
+                clearMarks();
+                searchInput.value = "";
+                searchCount.textContent = "";
+            };
+
+            openBtns.forEach(btn => btn.addEventListener("click", open));
+            btnClose.addEventListener("click", close);
+            btnPrev.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex - 1 + marks.length) % marks.length; goTo(currentIndex); } });
+            btnNext.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex + 1) % marks.length; goTo(currentIndex); } });
+
+            let debounce;
+            searchInput.addEventListener("input", () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => highlight(searchInput.value.trim()), 150);
+            });
+
+            searchInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") { e.preventDefault(); if (marks.length) { currentIndex = (currentIndex + 1) % marks.length; goTo(currentIndex); } }
+                if (e.key === "Escape") close();
+            });
+
+            document.addEventListener("keydown", (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === "f") { e.preventDefault(); open(); }
+                if (e.key === "Escape" && !searchBar.hidden) close();
+            });
+        })();
     </script>
 </body>
 </html>
