@@ -6,13 +6,13 @@ show_home: false
 
 Framework zur automatischen Erstellung von Verbandsdokumenten als PDF und Website.
 
-# Template-Showcases
+# Theme-Showcases
 
-| Template | Nummerierung | Beispiel | PDF |
+| Theme | Typ | Beispiel | PDF |
 |---|---|---|---|
-| `base` | keine | [Musterordnung](docs/showcase-base.html) | [PDF](assets/pdf/showcase-base.pdf) |
-| `btfv` | § 1, § 1.1 … | [Spielordnung](docs/showcase-btfv.html) | [PDF](assets/pdf/showcase-btfv.pdf) |
-| `dtfb` | 1, 1.1 … | [Ausschreibung](docs/showcase-dtfb.html) | [PDF](assets/pdf/showcase-dtfb.pdf) |
+| `base` | keine | [Basis](docs/showcase-base.html) | [PDF](assets/pdf/showcase-base.pdf) |
+| `btfv` | §1, §1.1 … | [BTFV](docs/showcase-btfv.html) | [PDF](assets/pdf/showcase-btfv.pdf) |
+| `dtfb` | 1, 1.1 … | [DTFB](docs/showcase-dtfb.html) | [PDF](assets/pdf/showcase-dtfb.pdf) |
 
 # Dokumente
 
