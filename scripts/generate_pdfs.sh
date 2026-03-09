@@ -134,7 +134,7 @@ EOF
     "${SED_I[@]}" "s/{{ site.time | date: '%d-%m-%Y' }}/$CURRENT_DATE_DE/g"  "temp/${name}_temp.md"
     "${SED_I[@]}" "s/{{ site.time | date: \"%d.%m.%Y\" }}/$CURRENT_DATE_DE/g" "temp/${name}_temp.md"
     "${SED_I[@]}" "s/{{ site.time | date: '%d.%m.%Y' }}/$CURRENT_DATE_DE/g"  "temp/${name}_temp.md"
-    "${SED_I[@]}" "s/^date: .*/date: $CURRENT_DATE_DE/"                       "temp/${name}_temp.md"
+    "${SED_I[@]}" "s/^date: {{.*}}/date: $CURRENT_DATE_DE/"                    "temp/${name}_temp.md"
 
     # title2 → subtitle
     "${SED_I[@]}" "s/^title2:/subtitle:/" "temp/${name}_temp.md"
