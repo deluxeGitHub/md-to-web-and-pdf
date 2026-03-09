@@ -1,5 +1,6 @@
 :root {
     --font-primary: "Lato", "Helvetica Neue", Arial, sans-serif;
+    --font-zoom: 1;
 }
 
 * {
@@ -52,6 +53,40 @@ body[class*="template-"] {
         padding: 12px 42px 0;
         display: flex;
         justify-content: flex-end;
+    }
+
+    & .base-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    & .base-font-btn {
+        background: var(--color-surface-card);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-default);
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 12px;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+        &:hover:not(:disabled) {
+            border-color: var(--color-brand-primary);
+            background-color: var(--color-surface-page);
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
     }
 
     & .base-theme-toggle {
@@ -206,14 +241,14 @@ body[class*="template-"] {
     }
 
     & h1 {
-        font-size: 26px;
+        font-size: calc(26px * var(--font-zoom));
         border-bottom: 2px solid var(--color-brand-primary);
         padding-bottom: 8px;
     }
 
-    & h2 { font-size: 22px; }
-    & h3 { font-size: 19px; }
-    & h4 { font-size: 17px; }
+    & h2 { font-size: calc(22px * var(--font-zoom)); }
+    & h3 { font-size: calc(19px * var(--font-zoom)); }
+    & h4 { font-size: calc(17px * var(--font-zoom)); }
 
     & .base-doc-title {
         font-family: "Oswald", var(--font-primary);
@@ -232,7 +267,7 @@ body[class*="template-"] {
 
     & p,
     & li {
-        font-size: 17px;
+        font-size: calc(17px * var(--font-zoom));
     }
 
     /* Fliesstext-Links */
@@ -294,7 +329,7 @@ body[class*="template-"] {
         & li {
             counter-increment: item;
             margin: 8px 0;
-            font-size: 16px;
+            font-size: calc(16px * var(--font-zoom));
             list-style: none;
         }
 
@@ -533,7 +568,7 @@ body[class*="template-"] {
 
         & p,
         & li {
-            font-size: 16px;
+            font-size: calc(16px * var(--font-zoom));
             line-height: 1.42;
             overflow-wrap: anywhere;
             word-break: break-word;
@@ -547,10 +582,10 @@ body[class*="template-"] {
             margin-bottom: 8px;
         }
 
-        & h1 { font-size: 23px; }
-        & h2 { font-size: 20px; }
-        & h3 { font-size: 18px; }
-        & h4 { font-size: 16px; }
+        & h1 { font-size: calc(23px * var(--font-zoom)); }
+        & h2 { font-size: calc(20px * var(--font-zoom)); }
+        & h3 { font-size: calc(18px * var(--font-zoom)); }
+        & h4 { font-size: calc(16px * var(--font-zoom)); }
 
         & ul,
         & ol {

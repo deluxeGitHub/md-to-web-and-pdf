@@ -74,23 +74,27 @@
                         <div class="base-doc-date">Stand: {{ template_date }}</div>
                     {% endif %}
                 </div>
-                <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
-                    <span class="base-theme-toggle__icon" data-theme-icon>
-                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-                            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                <line x1="12" y1="2.5" x2="12" y2="5.5"/>
-                                <line x1="12" y1="18.5" x2="12" y2="21.5"/>
-                                <line x1="2.5" y1="12" x2="5.5" y2="12"/>
-                                <line x1="18.5" y1="12" x2="21.5" y2="12"/>
-                                <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
-                                <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
-                                <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
-                                <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
-                            </g>
-                        </svg>
-                    </span>
-                </button>
+                <div class="base-toolbar">
+                    <button class="base-font-btn" type="button" data-font-decrease aria-label="Schrift verkleinern">A−</button>
+                    <button class="base-font-btn" type="button" data-font-increase aria-label="Schrift vergrößern">A+</button>
+                    <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                        <span class="base-theme-toggle__icon" data-theme-icon>
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                    <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                    <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                    <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                    <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                    <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                    <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                    <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                    <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     {% endif %}
@@ -114,6 +118,24 @@
 
     <!-- Link-kopiert-Toast -->
     <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
+
+    <script>
+        // Schriftgröße
+        const fontSteps = [0.875, 1, 1.125, 1.25];
+        let fontIndex = parseInt(localStorage.getItem("fontIndex") ?? "1", 10);
+        const applyFontZoom = () => {
+            document.documentElement.style.setProperty("--font-zoom", fontSteps[fontIndex]);
+            document.querySelector("[data-font-decrease]").disabled = fontIndex === 0;
+            document.querySelector("[data-font-increase]").disabled = fontIndex === fontSteps.length - 1;
+        };
+        document.querySelector("[data-font-decrease]").addEventListener("click", () => {
+            if (fontIndex > 0) { fontIndex--; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
+        });
+        document.querySelector("[data-font-increase]").addEventListener("click", () => {
+            if (fontIndex < fontSteps.length - 1) { fontIndex++; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
+        });
+        applyFontZoom();
+    </script>
 
     <script>
         const backToTopButton = document.getElementById("back-to-top");
