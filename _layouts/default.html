@@ -391,31 +391,17 @@
                 window.scrollTo({ top: scrollY, behavior: "smooth" });
             };
 
-            // Suchleiste per visualViewport neu positionieren wenn Tastatur aufgeht (iOS)
-            if (window.visualViewport) {
-                const reposition = () => {
-                    const vv = window.visualViewport;
-                    searchBar.style.top = (vv.offsetTop + 8) + "px";
-                    searchBar.style.bottom = "auto";
-                };
-                window.visualViewport.addEventListener("resize", reposition);
-                window.visualViewport.addEventListener("scroll", reposition);
-            }
-
             const open = () => {
                 if (settingsPanel && !settingsPanel.hidden) {
                     settingsPanel.hidden = true;
                     document.querySelector("[data-settings-toggle]")?.setAttribute("aria-expanded", "false");
                 }
                 searchBar.hidden = false;
-                // Auf Mobile kurz warten bis Tastatur offen, dann fokussieren
                 setTimeout(() => { searchInput.focus(); searchInput.select(); }, 50);
             };
 
             const close = () => {
                 searchBar.hidden = true;
-                searchBar.style.top = "";
-                searchBar.style.bottom = "";
                 clearMarks();
                 searchInput.value = "";
                 searchCount.textContent = "";
