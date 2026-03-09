@@ -95,6 +95,12 @@
                                 <button class="base-settings-font-large" type="button" data-font-increase aria-label="Schrift vergrößern">A</button>
                             </div>
                             <div class="base-settings-font-pct" data-font-pct aria-live="polite">100%</div>
+                            <div class="base-settings-row base-settings-search-row">
+                                <span class="base-settings-label">Suche</span>
+                                <button class="base-theme-toggle" type="button" data-search-open aria-label="Suche öffnen">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                </button>
+                            </div>
                             <div class="base-settings-row">
                                 <span class="base-settings-label">Theme</span>
                                 <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
@@ -313,10 +319,10 @@
             const btnPrev = document.getElementById("base-search-prev");
             const btnNext = document.getElementById("base-search-next");
             const btnClose = document.getElementById("base-search-close");
-            const openBtn = document.querySelector("[data-search-open]");
+            const openBtns = document.querySelectorAll("[data-search-open]");
             const wrapper = document.querySelector(".wrapper");
 
-            if (!searchBar || !openBtn || !wrapper) return;
+            if (!searchBar || !openBtns.length || !wrapper) return;
 
             let marks = [];
             let currentIndex = -1;
@@ -374,6 +380,10 @@
             };
 
             const open = () => {
+                if (settingsPanel && !settingsPanel.hidden) {
+                    settingsPanel.hidden = true;
+                    document.querySelector("[data-settings-toggle]")?.setAttribute("aria-expanded", "false");
+                }
                 searchBar.hidden = false;
                 searchInput.focus();
                 searchInput.select();
@@ -386,7 +396,7 @@
                 searchCount.textContent = "";
             };
 
-            openBtn.addEventListener("click", open);
+            openBtns.forEach(btn => btn.addEventListener("click", open));
             btnClose.addEventListener("click", close);
             btnPrev.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex - 1 + marks.length) % marks.length; goTo(currentIndex); } });
             btnNext.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex + 1) % marks.length; goTo(currentIndex); } });

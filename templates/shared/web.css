@@ -793,6 +793,14 @@ body:has(#staging-banner) #back-to-top {
     bottom: 52px;
 }
 
+/* Suche: Button im Toolbar nur auf Desktop, im Panel nur auf Mobile */
+@media (max-width: 540px) {
+    .base-search-btn { display: none !important; }
+}
+@media (min-width: 541px) {
+    .base-settings-search-row { display: none !important; }
+}
+
 /* Suchleiste */
 #base-search-bar[hidden] { display: none !important; }
 
