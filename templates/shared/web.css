@@ -718,6 +718,30 @@ body[class*="template-"] {
             padding: 8px 10px;
             font-size: 11px;
         }
+
+        & .base-settings-panel {
+            min-width: 210px;
+            padding: 14px 16px;
+            gap: 0;
+        }
+
+        & .base-settings-row {
+            padding: 8px 0;
+            justify-content: space-between;
+        }
+
+        & .base-settings-font-pct {
+            margin-top: 2px;
+        }
+
+        & .base-settings-label {
+            font-size: 14px;
+        }
+
+        & .base-theme-toggle {
+            width: 34px;
+            height: 34px;
+        }
     }
 }
 
