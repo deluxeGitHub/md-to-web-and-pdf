@@ -859,7 +859,7 @@ body:has(#staging-banner) #back-to-top {
     outline: none;
     background: transparent;
     font-family: var(--font-primary);
-    font-size: 15px;
+    font-size: 16px; /* min 16px verhindert Auto-Zoom auf iOS */
     color: var(--color-text-primary);
     padding: 4px 8px;
     min-width: 0;
