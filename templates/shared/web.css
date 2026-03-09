@@ -615,27 +615,26 @@ body[class*="template-"] {
     }
 }
 
-/* Safe-area Abdeckung */
+/* Safe-area Abdeckung + Scroll-Fortschrittsbalken */
 #safe-area-cover {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: env(safe-area-inset-top, 0px);
+    height: calc(env(safe-area-inset-top, 0px) + 3px);
     background: var(--color-header-band-bg);
-    z-index: 9999;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
-/* Scroll-Fortschrittsbalken */
 #scroll-progress {
-    position: fixed;
-    top: env(safe-area-inset-top, 0px);
-    left: 0;
-    width: 0%;
     height: 3px;
+    width: 0%;
     background: var(--color-brand-primary);
-    z-index: 10000;
     transition: width 0.1s linear;
+    flex-shrink: 0;
 }
 
 /* Link-kopiert-Toast */
