@@ -8,12 +8,14 @@
         const icon = document.querySelector('[data-theme-icon]');
         if (!toggle || !icon) return;
 
+        const SUN = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/><line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/></g></svg>';
+        const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+        const AUTO = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+
+        const getOsDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
         const renderIcon = (mode) => {
-            if (mode === 'dark') {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
-            } else {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/><line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/></g></svg>';
-            }
+            icon.innerHTML = mode === 'dark' ? MOON : mode === 'auto' ? AUTO : SUN;
         };
 
         const updateThemeColor = () => {
@@ -23,26 +25,30 @@
             if (color) meta.setAttribute('content', color);
         };
 
-        const applyTheme = (mode) => {
-            root.setAttribute('data-theme', mode);
-            toggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
+        let osMediaQuery = null;
+        const onOsChange = () => applyMode('auto');
+
+        const applyMode = (mode) => {
+            const visual = mode === 'auto' ? (getOsDark() ? 'dark' : 'light') : mode;
+            root.setAttribute('data-theme', visual);
+            toggle.setAttribute('aria-pressed', visual === 'dark' ? 'true' : 'false');
             renderIcon(mode);
             updateThemeColor();
+            if (osMediaQuery) { osMediaQuery.removeEventListener('change', onOsChange); osMediaQuery = null; }
+            if (mode === 'auto') {
+                osMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                osMediaQuery.addEventListener('change', onOsChange);
+            }
         };
 
+        const cycleMap = { light: 'dark', dark: 'auto', auto: 'light' };
         const stored = localStorage.getItem('base-theme');
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (stored === 'light' || stored === 'dark') {
-            applyTheme(stored);
-        } else if (prefersDark) {
-            applyTheme('dark');
-        } else {
-            applyTheme('light');
-        }
+        applyMode(stored === 'light' || stored === 'dark' || stored === 'auto' ? stored : 'auto');
 
         toggle.addEventListener('click', () => {
-            const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            applyTheme(next);
+            const current = localStorage.getItem('base-theme') || 'auto';
+            const next = cycleMap[current] || 'light';
+            applyMode(next);
             localStorage.setItem('base-theme', next);
         });
     };
