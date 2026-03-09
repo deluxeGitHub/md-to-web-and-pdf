@@ -55,12 +55,6 @@ body[class*="template-"] {
         justify-content: flex-end;
     }
 
-    & .base-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
     & .base-font-btn {
         background: var(--color-surface-card);
         color: var(--color-text-primary);
@@ -377,8 +371,8 @@ body[class*="template-"] {
 
     & #back-to-top {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        left: 20px;
         background-color: var(--color-brand-primary);
         color: white;
         padding: 10px 15px;
@@ -606,8 +600,8 @@ body[class*="template-"] {
         }
 
         & #back-to-top {
-            right: 10px;
-            bottom: 10px;
+            left: 10px;
+            bottom: calc(10px + env(safe-area-inset-bottom, 0px));
             padding: 8px 10px;
             font-size: 11px;
         }
@@ -666,6 +660,83 @@ body[class*="template-"] {
     letter-spacing: 0.03em;
 }
 
-body:has(#staging-banner) #back-to-top {
-    bottom: 52px;
+/* Floating Settings-Button */
+#base-settings-btn {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: 20px;
+    background: var(--color-surface-card);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-default);
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 16px var(--color-shadow-card);
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
+
+    & svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+    }
+
+    &:hover {
+        border-color: var(--color-brand-primary);
+        background-color: var(--color-surface-page);
+        box-shadow: 0 8px 24px var(--color-shadow-card);
+    }
+}
+
+/* Settings-Panel */
+#base-settings-panel {
+    position: fixed;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    right: 20px;
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border-default);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 196px;
+    transform-origin: bottom right;
+    animation: settings-in 0.15s ease;
+
+    &[hidden] {
+        display: none;
+    }
+}
+
+@keyframes settings-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.base-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    & + & {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--color-border-default);
+    }
+}
+
+.base-settings-label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.base-settings-controls {
+    display: flex;
+    gap: 6px;
 }
