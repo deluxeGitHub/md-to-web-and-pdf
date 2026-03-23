@@ -49,7 +49,8 @@
                         <polyline points="15 18 9 12 15 6"/>
                     </svg>
                 {% endif %}
-                    <img class="base-doc-logo" src="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}" alt="Logo">
+                    <img class="base-doc-logo base-doc-logo--light" src="{{ "/templates/" | append: template_name | append: "/images/logo.png" | relative_url }}" alt="Logo">
+                    <img class="base-doc-logo base-doc-logo--dark" src="{{ "/templates/" | append: template_name | append: "/images/logo-dark.png" | relative_url }}" alt="Logo">
                     <span class="base-doc-sitename">{{ site.title }}</span>
                 {% if is_home %}
                 </div>

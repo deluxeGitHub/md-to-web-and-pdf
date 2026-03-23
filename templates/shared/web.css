@@ -287,6 +287,10 @@ body[class*="template-"] {
         height: auto;
     }
 
+    & .base-doc-logo--dark {
+        display: none;
+    }
+
     & .base-doc-date {
         font-size: 13px;
         color: var(--color-text-muted);
