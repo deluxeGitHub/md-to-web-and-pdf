@@ -34,14 +34,25 @@ error()   { echo -e "${RED}✖${NC}  $*" >&2; }
 
 # -- Abhängigkeiten prüfen / installieren ----------------------------------
 check_homebrew() {
+    # Homebrew-Pfade für Apple Silicon, Intel und Linux vorab in PATH aufnehmen
+    if [[ -f /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -f /usr/local/bin/brew ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    fi
+
     if ! command -v brew &>/dev/null; then
         warn "Homebrew nicht gefunden. Installiere Homebrew …"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        # Homebrew-Pfade für Apple Silicon und Intel
+        # Nach Installation erneut einbinden
         if [[ -f /opt/homebrew/bin/brew ]]; then
             eval "$(/opt/homebrew/bin/brew shellenv)"
         elif [[ -f /usr/local/bin/brew ]]; then
             eval "$(/usr/local/bin/brew shellenv)"
+        elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         fi
         success "Homebrew installiert."
     fi
