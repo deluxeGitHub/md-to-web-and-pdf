@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>{{ page.title }}</title>
     {% assign template_name = page.template | default: "base" | downcase %}
-    {% assign supported_templates = "base,dtfb,btfv" | split: "," %}
+    {% assign supported_templates = "base,dtfb,btfv,stfv" | split: "," %}
     {% if site.custom_templates %}
         {% assign supported_templates = supported_templates | concat: site.custom_templates %}
     {% endif %}

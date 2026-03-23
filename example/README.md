@@ -211,6 +211,7 @@ Im Repository unter `assets/pdf/<dateiname>.pdf`, oder als Download-Link auf der
 **Was ist der Unterschied zwischen den eingebauten Templates?**
 - `btfv` – BTFV-Design (blau)
 - `dtfb` – DTFB-Design (grün)
+- `stfv` – STFV-Design (blau)
 - `base` – neutrales Design ohne Verbandslogo
 
 **Der Workflow schlägt fehl – was tun?**

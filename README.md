@@ -97,6 +97,7 @@ Klick auf ein Überschriften-Symbol kopiert den direkten Anker-Link in die Zwisc
 | `templates/base/` | Neutrales Fallback-Template |
 | `templates/btfv/` | BTFV-spezifisches Design |
 | `templates/dtfb/` | DTFB-spezifisches Design |
+| `templates/stfv/` | STFV-spezifisches Design |
 | `scripts/generate_pdfs.sh` | PDF-Generierung (Pandoc + XeLaTeX) |
 | `scripts/test_pdfs.sh` | Regressionstests gegen LaTeX-Fixtures |
 | `_layouts/default.html` | Jekyll-Layout für alle Seiten |

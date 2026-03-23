@@ -1,0 +1,67 @@
+:root {
+    /* Text und Flaechen */
+    --color-text-primary: #1f2933;
+    --color-text-primary-rgb: 31, 41, 51;
+    --color-text-muted: #6b7280;
+    --color-surface-page: #f5f6f8;
+    --color-surface-card: #ffffff;
+    --color-border-default: #e2e8f0;
+    --color-shadow-card: rgba(15, 23, 42, 0.12);
+
+    /* Akzent- und Funktionsfarben */
+    --color-danger: #ef4444;
+    --color-brand-primary: #03326C; /* h1-h4, Links, Buttons, Tabellenkopf */
+    --color-brand-primary-hover: #022554;
+    --color-brand-rgb: 3, 50, 108;
+    --color-brand-contrast: #0f172a; /* Hover fuer CTA/Back-to-top */
+    --color-brand-contrast-rgb: 15, 23, 42;
+    --color-header-band-bg: #0f172a;
+    --color-header-band-text: #ffffff;
+    --color-link-underline: rgba(var(--color-brand-rgb), 0.35);
+
+}
+
+:root[data-theme='dark'] {
+    /* Text und Flaechen */
+    --color-text-primary: #f1f5f9;
+    --color-text-primary-rgb: 241, 245, 249;
+    --color-text-muted: #94a3b8;
+    --color-surface-page: #0b1220;
+    --color-surface-card: #111827;
+    --color-border-default: #1f2937;
+    --color-shadow-card: rgba(0, 0, 0, 0.55);
+
+    /* Akzent- und Funktionsfarben */
+    --color-danger: #f87171;
+    --color-brand-primary: #60a5fa;
+    --color-brand-primary-hover: #3b82f6;
+    --color-brand-rgb: 96, 165, 250;
+    --color-brand-contrast: #64748b;
+    --color-brand-contrast-rgb: 100, 116, 139;
+    --color-header-band-bg: #050814;
+    --color-header-band-text: #ffffff;
+    --color-link-underline: rgba(var(--color-brand-rgb), 0.45);
+}
+
+/* Logo-Skalierung: STFV-Logo per Hoehe begrenzen */
+.base-doc-logo {
+    width: auto !important;
+    height: 60px !important;
+    max-width: 160px;
+}
+
+@media (max-width: 540px) {
+    .base-doc-logo {
+        height: 40px !important;
+        max-width: 110px;
+    }
+}
+
+/* Dark-Mode-Logo: light-Logo ausblenden, dark-Logo einblenden */
+:root[data-theme='dark'] .base-doc-logo--light {
+    display: none;
+}
+
+:root[data-theme='dark'] .base-doc-logo--dark {
+    display: inline-block;
+}
