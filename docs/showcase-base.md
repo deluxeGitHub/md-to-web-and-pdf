@@ -12,6 +12,7 @@ pdf: /assets/pdf/showcase-base.pdf
 # Allgemeine Bestimmungen
 
 Mein Text :)
+
 Dieses Dokument zeigt das **Base-Template** ohne Abschnittsnummerierung.
 Es eignet sich als neutrales Fallback-Design ohne Verbandsbranding.
 
