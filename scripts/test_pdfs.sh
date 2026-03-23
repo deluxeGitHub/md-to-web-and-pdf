@@ -120,7 +120,7 @@ print("(nicht gesetzt)")
 PY
         )
 
-        known=("base" "btfv" "dtfb" "(nicht gesetzt)" "(kein Front Matter)")
+        known=("base" "btfv" "dtfb" "stfv" "(nicht gesetzt)" "(kein Front Matter)")
         found=false
         for k in "${known[@]}"; do
             [[ "$template" == "$k" ]] && found=true && break
