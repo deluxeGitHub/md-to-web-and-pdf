@@ -71,6 +71,9 @@
                         {% if page.source %}
                             <a href="{{ page.source }}" target="_blank" rel="noopener">Quelle</a>
                         {% endif %}
+                        {% if page.path contains "docs/" and site.github_repo %}
+                            <a href="https://github.com/{{ site.github_repo }}/edit/{{ site.github_branch | default: 'main' }}/{{ page.path }}" target="_blank" rel="noopener">Bearbeiten</a>
+                        {% endif %}
                     </div>
                     {% if template_date != "" %}
                         <div class="base-doc-date">Stand: {{ template_date }}</div>

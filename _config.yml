@@ -1,4 +1,6 @@
 title: "MD to PDF and Web"
+github_repo: "deluxeGitHub/md-to-web-and-pdf"
+github_branch: "main"
 description: "Convert Markdown to web and PDF with ease"
 plugins:
   - jekyll-toc
