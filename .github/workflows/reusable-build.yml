@@ -30,6 +30,8 @@ jobs:
       # Docs-Repo in den Workspace-Root auschecken (damit JamesIves .git findet)
       - name: Checkout Docs-Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       # Framework in .framework/ auschecken (versteckter Ordner, wird nicht committet)
       - name: Checkout Framework (md-to-web-and-pdf)
@@ -41,48 +43,77 @@ jobs:
 
       - name: Framework-Dateien in Workspace übernehmen
         run: |
-          # Framework-Dateien kopieren, ohne lokale Overrides im Docs-Repo zu überschreiben
-          cp -rn .framework/scripts/.          scripts/             2>/dev/null || cp -r .framework/scripts    scripts
-          cp -rn .framework/templates/.        templates/           2>/dev/null || cp -r .framework/templates  templates
-          cp -rn .framework/_layouts/.         _layouts/            2>/dev/null || cp -r .framework/_layouts   _layouts
-          cp -rn .framework/_includes/.        _includes/           2>/dev/null || cp -r .framework/_includes  _includes
-          cp -n  .framework/manifest.webmanifest manifest.webmanifest 2>/dev/null || true
+          echo "::group::Kopierte Framework-Dateien"
+          for dir in scripts templates _layouts _includes; do
+            if [[ -d "$dir" ]]; then
+              echo "  ⚙️  $dir/ – lokaler Override bleibt erhalten"
+              cp -rn ".framework/$dir/." "$dir/" 2>/dev/null || true
+            else
+              echo "  📂 $dir/ – vom Framework übernommen"
+              cp -r ".framework/$dir" "$dir"
+            fi
+          done
+          cp -n .framework/manifest.webmanifest manifest.webmanifest 2>/dev/null \
+            && echo "  📄 manifest.webmanifest – vom Framework übernommen" \
+            || echo "  ⚙️  manifest.webmanifest – lokaler Override bleibt erhalten"
+          echo "::endgroup::"
 
       - name: Letztes Commit-Datum ermitteln
         run: |
           DATE=$(git log -1 --format=%cd --date=short)
-          echo "BUILD_DATE=$(date -d "$DATE" +%d.%m.%Y)" >> "$GITHUB_ENV"
+          BUILD_DATE="$(date -d "$DATE" +%d.%m.%Y)"
+          echo "BUILD_DATE=$BUILD_DATE" >> "$GITHUB_ENV"
+          echo "📅 Build-Datum: $BUILD_DATE (letztes Commit: $DATE)"
 
       - name: Prüfen ob Neugenerierung nötig ist
         id: check
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
-            echo "Rebuild: manuell ausgelöst"
+            echo "::notice::PDF-Generierung wird durchgeführt (manuell ausgelöst)"
             exit 0
           fi
+
+          echo "::group::Prüfung auf fehlende PDFs"
           MISSING=0
+          MISSING_LIST=""
           while IFS= read -r -d '' md; do
             name="$(basename "${md%.md}")"
-            [[ ! -f "assets/pdf/${name}.pdf" ]] && MISSING=$((MISSING + 1))
+            if [[ ! -f "assets/pdf/${name}.pdf" ]]; then
+              MISSING=$((MISSING + 1))
+              MISSING_LIST="$MISSING_LIST\n  ❌ ${name}.pdf"
+            else
+              echo "  ✅ ${name}.pdf vorhanden"
+            fi
           done < <(find "${{ inputs.source_dir }}" -name "*.md" -print0)
+          echo "::endgroup::"
+
           if [[ $MISSING -gt 0 ]]; then
             echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
-            echo "Rebuild: $MISSING fehlende PDF(s)"
+            echo "::notice::PDF-Generierung wird durchgeführt ($MISSING fehlende PDF(s))"
+            echo -e "Fehlende PDFs:$MISSING_LIST"
             exit 0
           fi
+
+          echo "::group::Prüfung auf geänderte Dateien (HEAD~1 → HEAD)"
           CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
             "${{ inputs.source_dir }}/" \
             'templates/*/pdf-header.tex' \
             scripts/generate_pdfs.sh \
             _config.yml 2>/dev/null || true)
           if [[ -n "$CHANGED" ]]; then
+            echo "$CHANGED" | while read -r f; do echo "  📝 $f"; done
+          else
+            echo "  Keine relevanten Dateien geändert."
+          fi
+          echo "::endgroup::"
+
+          if [[ -n "$CHANGED" ]]; then
             echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
-            echo "Rebuild nötig – geänderte Dateien:"
-            echo "$CHANGED"
+            echo "::notice::PDF-Generierung wird durchgeführt (geänderte Quelldateien erkannt)"
           else
             echo "needs_rebuild=false" >> "$GITHUB_OUTPUT"
-            echo "Keine relevanten Änderungen – Build wird übersprungen."
+            echo "::notice::PDF-Generierung übersprungen – keine relevanten Änderungen"
           fi
 
       - name: Install Pandoc und LaTeX
@@ -111,9 +142,18 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add -f assets/pdf/
-          git diff --cached --quiet || git commit -m "Update PDF versions"
-          git pull --rebase origin "$(git rev-parse --abbrev-ref HEAD)"
-          git push origin HEAD
+          if git diff --cached --quiet; then
+            echo "::notice::Keine geänderten PDFs – kein Commit nötig"
+          else
+            CHANGED_PDFS=$(git diff --cached --name-only | sed 's|^|  📄 |')
+            echo "::group::Aktualisierte PDFs"
+            echo "$CHANGED_PDFS"
+            echo "::endgroup::"
+            git commit -m "Update PDF versions"
+            git pull --rebase origin "$(git rev-parse --abbrev-ref HEAD)"
+            git push origin HEAD
+            echo "::notice::PDFs erfolgreich generiert und gepusht"
+          fi
 
       - name: Ruby und Jekyll einrichten
         uses: ruby/setup-ruby@v1
@@ -132,14 +172,16 @@ jobs:
             echo "target=."                        >> "$GITHUB_OUTPUT"
             echo "clean_exclude=staging"           >> "$GITHUB_OUTPUT"
             echo "deploy=true"                     >> "$GITHUB_OUTPUT"
+            echo "::notice::Deploy-Ziel: Produktion (Branch: main)"
           elif [[ -n "${{ inputs.staging_branch }}" && "${{ github.ref }}" == "refs/heads/${{ inputs.staging_branch }}" ]]; then
             echo "baseurl=${{ inputs.baseurl }}/staging" >> "$GITHUB_OUTPUT"
             echo "target=staging"                         >> "$GITHUB_OUTPUT"
             echo "clean_exclude="                         >> "$GITHUB_OUTPUT"
             echo "deploy=true"                            >> "$GITHUB_OUTPUT"
+            echo "::notice::Deploy-Ziel: Staging (Branch: ${{ github.ref_name }})"
           else
             echo "deploy=false" >> "$GITHUB_OUTPUT"
-            echo "Kein Deploy für Branch ${{ github.ref_name }}"
+            echo "::notice::Kein Deploy – Branch '${{ github.ref_name }}' ist weder main noch staging"
           fi
 
       - name: Jekyll-Site bauen
