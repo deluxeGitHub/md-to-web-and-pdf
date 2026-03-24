@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       # Docs-Repo in den Workspace-Root auschecken (damit JamesIves .git findet)
