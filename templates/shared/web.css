@@ -424,6 +424,14 @@ body[class*="template-"] {
         }
     }
 
+    /* Letzte Spalte (z.B. PDF-Link) schmal und kein Umbruch */
+    & td:last-child,
+    & th:last-child {
+        width: 4rem;
+        white-space: nowrap;
+        text-align: center;
+    }
+
     /* Inhaltsverzeichnis (TOC) */
     & #markdown-toc {
         counter-reset: item;
