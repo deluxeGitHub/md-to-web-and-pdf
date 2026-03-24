@@ -74,7 +74,8 @@ jobs:
           CHANGED=$(git diff --name-only HEAD~1 HEAD -- \
             "${{ inputs.source_dir }}/" \
             'templates/*/pdf-header.tex' \
-            scripts/generate_pdfs.sh 2>/dev/null || true)
+            scripts/generate_pdfs.sh \
+            _config.yml 2>/dev/null || true)
           if [[ -n "$CHANGED" ]]; then
             echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
             echo "Rebuild nötig – geänderte Dateien:"

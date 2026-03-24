@@ -25,6 +25,38 @@ SOURCE_DIR="${2:-docs}"
 OUTPUT_DIR="${3:-assets/pdf}"
 FORMAT="${4:-pdf}"
 
+# -- Default-Template aus _config.yml lesen -----------------------------------
+DEFAULT_TEMPLATE="base"
+if [[ -f "_config.yml" ]]; then
+    _cfg_template=$(python3 - <<'PY'
+import sys
+try:
+    import yaml
+    cfg = yaml.safe_load(open("_config.yml", encoding="utf-8"))
+    for d in cfg.get("defaults", []):
+        val = d.get("values", {}).get("template", "")
+        if val:
+            print(str(val).strip().lower())
+            sys.exit(0)
+except Exception:
+    in_defaults = in_values = False
+    for line in open("_config.yml", encoding="utf-8"):
+        s = line.rstrip()
+        if s == "defaults:":
+            in_defaults = True; continue
+        if in_defaults and "values:" in s:
+            in_values = True; continue
+        if in_values and "template:" in s:
+            _, _, v = s.partition("template:")
+            val = v.strip().strip("'\"").lower()
+            if val:
+                print(val); sys.exit(0)
+print("")
+PY
+    )
+    [[ -n "$_cfg_template" ]] && DEFAULT_TEMPLATE="$_cfg_template"
+fi
+
 # -- Plattform-kompatibles sed ------------------------------------------------
 if [[ "$(uname)" == "Darwin" ]]; then
     SED_I=(sed -i '')
@@ -89,8 +121,8 @@ process_file() {
     template_name=$(echo "$fm_out" | sed -n '1p')
     section_numbering=$(echo "$fm_out" | sed -n '2p')
 
-    # Template-Fallback
-    [[ -z "$template_name" ]] && template_name="base"
+    # Template-Fallback: erst _config.yml-Default, dann "base"
+    [[ -z "$template_name" ]] && template_name="$DEFAULT_TEMPLATE"
     if [[ -d "templates/$template_name" ]]; then
         template_dir="templates/$template_name"
     else
@@ -184,7 +216,7 @@ EOF
 }
 
 export -f process_file read_frontmatter
-export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR
+export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR DEFAULT_TEMPLATE
 export SED_I
 
 # -- Alle Markdown-Dateien parallel verarbeiten -------------------------------
