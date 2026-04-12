@@ -226,6 +226,21 @@
     </script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buildV = '{{ site.time | date: "%s" }}';
+            document.querySelectorAll('a[href]').forEach(a => {
+                const href = a.getAttribute('href');
+                if (!href || !href.match(/\.pdf(\?|$)/)) return;
+                if (!href.includes('?v=')) {
+                    a.setAttribute('href', href.replace(/\.pdf$/, '.pdf') + '?v=' + buildV);
+                }
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener');
+            });
+        });
+    </script>
+
+    <script>
         const backToTopButton = document.getElementById("back-to-top");
         const scrollProgress = document.getElementById("scroll-progress");
 
