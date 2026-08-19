@@ -84,6 +84,12 @@ date: {{ site.time | date: "%d.%m.%Y" }}
 
 Wird beim PDF-Export durch das aktuelle Datum (des Lauf-Zeitpunkts) ersetzt.
 
+### Breite Tabellen
+
+Breite Tabellen brauchen **kein** Sondermarkup. Ist eine Tabelle breiter als der Inhaltsbereich, legt das Layout-Skript in `_layouts/default.html` zur Laufzeit einen Scroll-Container (`div.table-scroll`) um sie, blendet einen Hinweis ein und lässt ab drei Spalten die erste Spalte stehen. Wrapper-Divs oder `<style>`-Blöcke in der Markdown-Datei sind dafür nicht nötig und sollen nicht eingefügt werden.
+
+Die schmale letzte Spalte (Index-Tabellen mit PDF-Link) wird ebenfalls automatisch erkannt – über die Klasse `table-linkcol`, die das Skript setzt, wenn jede Zelle der letzten Spalte ausschließlich einen Link enthält.
+
 ### HTML-Only-Blöcke
 
 ```html

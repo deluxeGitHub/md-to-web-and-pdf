@@ -445,6 +445,82 @@
             });
         })();
     </script>
+
+    <script>
+        // Breite Tabellen seitlich scrollbar machen (SPEC-001).
+        // kramdown liefert ein nacktes <table>; der Scroll-Container entsteht
+        // deshalb hier zur Laufzeit, damit kein Dokument Markup dafuer braucht.
+        const initTableScroll = () => {
+            const wrapper = document.querySelector(".wrapper");
+            if (!wrapper) return;
+
+            // Letzte Spalte enthaelt in jeder Zeile nur einen Link (Index-Tabellen)?
+            const isLinkColumn = (table) => {
+                const cells = [...table.rows].map(r => r.cells[r.cells.length - 1]);
+                if (cells.length < 2) return false;
+                return cells.every(cell => {
+                    if (!cell) return false;
+                    if (cell.tagName === "TH") return true;
+                    const links = cell.querySelectorAll("a");
+                    return links.length === 1 && cell.textContent.trim() === links[0].textContent.trim();
+                });
+            };
+
+            wrapper.querySelectorAll("table").forEach((table) => {
+                if (table.closest(".table-scroll")) return;
+
+                if (isLinkColumn(table)) table.classList.add("table-linkcol");
+
+                const box = document.createElement("div");
+                box.className = "table-scroll";
+                box.setAttribute("role", "region");
+                box.setAttribute("aria-label", "Tabelle, seitlich scrollbar");
+                table.parentNode.insertBefore(box, table);
+                box.appendChild(table);
+
+                const columns = table.rows.length ? table.rows[0].cells.length : 0;
+                if (columns > 2) box.classList.add("table-scroll--sticky");
+
+                const hint = document.createElement("p");
+                hint.className = "table-scroll-hint";
+                hint.textContent = "Die Tabelle lässt sich seitlich scrollen.";
+                hint.hidden = true;
+                box.after(hint);
+
+                const update = () => {
+                    const overflowing = table.scrollWidth > box.clientWidth + 1;
+                    box.classList.toggle("is-overflowing", overflowing);
+                    hint.hidden = !overflowing;
+                    // Fokus nur vergeben, wenn es auch etwas zu scrollen gibt.
+                    if (overflowing) {
+                        box.setAttribute("tabindex", "0");
+                    } else {
+                        box.removeAttribute("tabindex");
+                    }
+                };
+
+                update();
+
+                if (window.ResizeObserver) {
+                    const ro = new ResizeObserver(update);
+                    ro.observe(box);
+                    ro.observe(table);
+                }
+
+                // Die Schriftgröße hängt an --font-zoom auf <html>.
+                new MutationObserver(update).observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ["style"]
+                });
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initTableScroll);
+        } else {
+            initTableScroll();
+        }
+    </script>
 </body>
 </html>
 

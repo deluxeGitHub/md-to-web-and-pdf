@@ -58,6 +58,17 @@ Text kann **fett**, *kursiv* oder `inline-code` formatiert werden.
 | Wert A | Wert B | Wert C |
 | Wert D | Wert E | Wert F |
 
+## Breite Tabelle
+
+Braucht kein Sondermarkup: Ist die Tabelle breiter als der Inhaltsbereich, macht das
+Framework sie in der HTML-Ansicht seitlich scrollbar und lässt die erste Spalte stehen.
+
+| Merkmal | Variante A | Variante B | Variante C | Bemerkung |
+|---|---|---|---|---|
+| **Wertung** | vollständig | anteilig | keine | gilt ab Saisonbeginn |
+| **Voraussetzung** | Lizenz erforderlich | Grundlizenz, wird automatisch erteilt | keine Voraussetzung | Nachweis beim Ausrichter |
+| **Frist** | spätestens 6 Wochen vorher | spätestens 4 Wochen vorher | keine Frist | Ausschlussfrist |
+| **Endrunde** | nach Regelwerk | verpflichtend | nur für die Wertung nötig | ohne Endrunde keine Wertung |
 # Schlussbestimmungen
 
 Diese Ordnung tritt mit Beschluss des Vorstands in Kraft.
