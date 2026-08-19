@@ -180,4 +180,5 @@ Im Menü die Option für Jekyll-Vorschau wählen. Öffne danach `http://localhos
 - **`date` im Front Matter** wird vom Skript überschrieben; für ein fixes Datum muss die Datum-Ersetzung im Skript angepasst werden.
 - **Bilder in PDFs** müssen über `--resource-path` erreichbar sein (aktuell: `.`, `./docs`, `./templates`, `./templates/<name>`).
 - **Bilder stehen im PDF fest an ihrer Textstelle** (`\floatplacement{figure}{H}` im Preamble von `scripts/generate_pdfs.sh`). Passt ein Bild nicht mehr auf die Seite, beginnt eine neue – der Weißraum davor ist gewollt und keine Regression.
+- **Titelschrift ohne Condensed:** Der Schnitt „TeX Gyre Heros Condensed" existiert unter diesem Namen nicht (korrekt wäre `TeX Gyre Heros Cn`). Die Fallback-Kette in `templates/*/pdf-header.tex` nutzt bewusst weiter `TeX Gyre Heros` – nicht „reparieren", sonst ändern sich alle Titelblätter.
 - **`<ol type="a">`** sollte nur für wirklich alphabetisch nummerierte Listen verwendet werden – die Konvertierung ist ein einfaches Textersetzungs-Pattern und funktioniert nicht für verschachtelte oder gemischte Listen.
