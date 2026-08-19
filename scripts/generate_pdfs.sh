@@ -74,6 +74,15 @@ else
     SED_I=(sed -i)
 fi
 
+# -- Trennzeichen für --resource-path -----------------------------------------
+# Pandoc erwartet das Trennzeichen des Betriebssystems. Unter Git Bash/MSYS läuft
+# eine Windows-Binary, die ';' braucht — mit ':' wird die ganze Liste als ein
+# einziger Pfad gelesen und keine Bilddatei gefunden.
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) RESOURCE_SEP=";" ;;
+    *)                    RESOURCE_SEP=":" ;;
+esac
+
 # -- Parallelisierung ---------------------------------------------------------
 MAX_JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 RESULT_DIR="temp/pdf_results_$$"
@@ -231,7 +240,7 @@ EOF
         $extra_flags \
         --include-in-header="$header_file" \
         -V lang="$doc_lang" \
-        --resource-path=".:$(dirname "$file"):./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
+        --resource-path=".${RESOURCE_SEP}$(dirname "$file")${RESOURCE_SEP}./docs${RESOURCE_SEP}./${SOURCE_DIR}${RESOURCE_SEP}./templates${RESOURCE_SEP}./templates/$template_name"; then
         echo "     OK  $out_file"
         echo "ok" > "$RESULT_DIR/${name}.result"
     else
@@ -241,7 +250,7 @@ EOF
 }
 
 export -f process_file read_frontmatter
-export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR DEFAULT_TEMPLATE DEFAULT_LANG
+export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR DEFAULT_TEMPLATE DEFAULT_LANG RESOURCE_SEP
 export SED_I
 
 # -- Alle Markdown-Dateien parallel verarbeiten -------------------------------
