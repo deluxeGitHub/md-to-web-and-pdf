@@ -49,6 +49,7 @@ date: 23.11.2025
 layout: default
 template: btfv                    # Welches Template (base/btfv/dtfb)
 section_numbering: paragraph      # paragraph=§1§1.1, arabic=1/1.1, nicht gesetzt=keine
+lang: de                          # Dokumentsprache; Default aus _config.yml
 pdf: /assets/pdf/satzung.pdf      # Link zur generierten PDF-Version
 source: https://github.com/...    # Link zur Markdown-Quelle
 ---
@@ -57,6 +58,7 @@ source: https://github.com/...    # Link zur Markdown-Quelle
 ### Wichtige Front-Matter-Felder
 
 - **`template`**: Wählt das Verband-Template (`base`, `btfv`, `dtfb`). Unbekannte Werte fallen auf `base` zurück.
+- **`lang`**: Dokumentsprache für PDF **und** HTML. Steuert im PDF die Silbentrennung und die automatischen Bezeichner (`de` → „Abbildung“ statt „Figure“) und setzt `<html lang="…">`. Nicht gesetzt → Default aus `_config.yml` (`de`). Ohne `lang` lädt Pandoc kein `babel` und trennt deutschen Text nach englischen Regeln.
 - **`section_numbering`**: `paragraph` → §1, §1.1 … / `arabic` → 1, 1.1 … / nicht gesetzt → keine Nummerierung.
 - **`pdf`**: Wird im HTML genutzt, um einen Download-Link zur PDF anzuzeigen.
 - **`date`**: Wird von `scripts/generate_pdfs.sh` **überschrieben** – statische Datumsangaben im Front Matter haben im PDF keinen Bestand.

@@ -10,13 +10,14 @@ defaults:
     values:
       layout: default
       template: base
+      lang: de
 
 relative_links:
   enabled: true
 
 exclude:
-  - scripts/
   - harness/
+  - scripts/
   - temp/
   - test/
   - example/

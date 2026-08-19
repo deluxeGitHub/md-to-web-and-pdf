@@ -25,16 +25,17 @@ SOURCE_DIR="${2:-docs}"
 OUTPUT_DIR="${3:-assets/pdf}"
 FORMAT="${4:-pdf}"
 
-# -- Default-Template aus _config.yml lesen -----------------------------------
-DEFAULT_TEMPLATE="base"
-if [[ -f "_config.yml" ]]; then
-    _cfg_template=$(python3 - <<'PY'
+# -- Defaults aus _config.yml lesen -------------------------------------------
+# Liest defaults[].values.<key>, damit HTML und PDF dieselbe Quelle nutzen.
+config_default() {
+    python3 - "$1" <<'PY'
 import sys
+key = sys.argv[1]
 try:
     import yaml
     cfg = yaml.safe_load(open("_config.yml", encoding="utf-8"))
     for d in cfg.get("defaults", []):
-        val = d.get("values", {}).get("template", "")
+        val = d.get("values", {}).get(key, "")
         if val:
             print(str(val).strip().lower())
             sys.exit(0)
@@ -46,15 +47,24 @@ except Exception:
             in_defaults = True; continue
         if in_defaults and "values:" in s:
             in_values = True; continue
-        if in_values and "template:" in s:
-            _, _, v = s.partition("template:")
+        if in_values and (key + ":") in s:
+            _, _, v = s.partition(key + ":")
             val = v.strip().strip("'\"").lower()
             if val:
                 print(val); sys.exit(0)
 print("")
 PY
-    )
-    [[ -n "$_cfg_template" ]] && DEFAULT_TEMPLATE="$_cfg_template"
+}
+
+DEFAULT_TEMPLATE="base"
+DEFAULT_LANG="de"
+if [[ -f "_config.yml" ]]; then
+    # Kein "x && y=z": unter set -e wuerde die Kette den Lauf beenden,
+    # sobald ein Default in _config.yml fehlt.
+    _cfg=$(config_default template)
+    if [[ -n "$_cfg" ]]; then DEFAULT_TEMPLATE="$_cfg"; fi
+    _cfg=$(config_default lang)
+    if [[ -n "$_cfg" ]]; then DEFAULT_LANG="$_cfg"; fi
 fi
 
 # -- Plattform-kompatibles sed ------------------------------------------------
@@ -92,6 +102,7 @@ if lines and lines[0].strip() == "---":
         pass
 print(fm.get("template", ""))
 print(fm.get("section_numbering", ""))
+print(fm.get("lang", ""))
 PY
 }
 
@@ -99,7 +110,7 @@ PY
 process_file() {
     local file="$1"
     local filename name out_file header_file template_name template_dir
-    local section_numbering number_sections extra_flags
+    local section_numbering number_sections extra_flags doc_lang
     filename=$(basename -- "$file")
     name="${filename%.*}"
     out_file="${OUTPUT_DIR}/${name}.${FORMAT}"
@@ -115,11 +126,17 @@ process_file() {
 
     echo "  -> $filename"
 
-    # Front Matter: template + section_numbering in einem Python-Aufruf
+    # Front Matter: template + section_numbering + lang in einem Python-Aufruf
     local fm_out
     fm_out=$(read_frontmatter "$file")
     template_name=$(echo "$fm_out" | sed -n '1p')
     section_numbering=$(echo "$fm_out" | sed -n '2p')
+    doc_lang=$(echo "$fm_out" | sed -n '3p')
+
+    # Sprache: Front Matter schlaegt _config.yml, sonst DEFAULT_LANG.
+    # Ohne lang laedt Pandoc kein babel - englische Trennregeln, "Figure"
+    # statt "Abbildung".
+    [[ -z "$doc_lang" ]] && doc_lang="$DEFAULT_LANG"
 
     # Template-Fallback: erst _config.yml-Default, dann "base"
     [[ -z "$template_name" ]] && template_name="$DEFAULT_TEMPLATE"
@@ -137,6 +154,10 @@ process_file() {
 % der Bilder aus Listen heraus auf spätere Seiten schiebt.
 \usepackage{float}
 \floatplacement{figure}{H}
+% Keine Wortreste unter drei Zeichen am Zeilenende oder -anfang. babel setzt für
+% Deutsch 2/2, was Trennungen wie "ei-nem" erlaubt. Muss nach \begin{document}
+% gesetzt werden, weil babel die Werte bei der Sprachwahl überschreibt.
+\AtBeginDocument{\lefthyphenmin=3 \righthyphenmin=3}
 EOF
 
     case "$section_numbering" in
@@ -209,6 +230,7 @@ EOF
         --toc-depth=2 \
         $extra_flags \
         --include-in-header="$header_file" \
+        -V lang="$doc_lang" \
         --resource-path=".:$(dirname "$file"):./docs:./${SOURCE_DIR}:./templates:./templates/$template_name"; then
         echo "     OK  $out_file"
         echo "ok" > "$RESULT_DIR/${name}.result"
@@ -219,7 +241,7 @@ EOF
 }
 
 export -f process_file read_frontmatter
-export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR DEFAULT_TEMPLATE
+export FORMAT OUTPUT_DIR CURRENT_DATE_DE SOURCE_DIR RESULT_DIR DEFAULT_TEMPLATE DEFAULT_LANG
 export SED_I
 
 # -- Alle Markdown-Dateien parallel verarbeiten -------------------------------
