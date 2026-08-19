@@ -2,6 +2,7 @@
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \documentclass[
+  ngerman,
 ]{article}
 \usepackage{xcolor}
 \usepackage{amsmath,amssymb}
@@ -36,10 +37,26 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\ifLuaTeX
+\usepackage[bidi=basic,shorthands=off]{babel}
+\else
+\usepackage[bidi=default,shorthands=off]{babel}
+\fi
+\ifLuaTeX
+  \usepackage{selnolig} % disable illegal ligatures
+\fi
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{enumitem}
+% Bilder bleiben an ihrer Textstelle. Ohne das gilt der LaTeX-Default 'tbp',
+% der Bilder aus Listen heraus auf spätere Seiten schiebt.
+\usepackage{float}
+\floatplacement{figure}{H}
+% Keine Wortreste unter drei Zeichen am Zeilenende oder -anfang. babel setzt für
+% Deutsch 2/2, was Trennungen wie "ei-nem" erlaubt. Muss nach \begin{document}
+% gesetzt werden, weil babel die Werte bei der Sprachwahl überschreibt.
+\AtBeginDocument{\lefthyphenmin=3 \righthyphenmin=3}
 % BTFV PDF header styling
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -55,8 +72,16 @@
 \definecolor{BTFVDark}{HTML}{0F172A}
 \definecolor{BTFVGray}{HTML}{6B7280}
 
-\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
-\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\btfvtitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\btfvtitlefont{TeX Gyre Heros}[Weight=500]}
+\IfFontExistsTF{TeX Gyre Heros}
+  {\setmainfont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}{\setmainfont{Latin Modern Sans}}{}}
+% Titelschrift bewusst ohne Condensed: "TeX Gyre Heros Condensed" existierte nie
+% unter diesem Namen, der Zweig war immer tot. Aussehen bleibt wie gehabt.
+\IfFontExistsTF{TeX Gyre Heros}
+  {\newfontfamily\btfvtitlefont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}
+     {\newfontfamily\btfvtitlefont{Latin Modern Sans}}
+     {\newcommand{\btfvtitlefont}{\sffamily}}}
 
 \geometry{bottom=1.8in}
 
@@ -122,6 +147,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Testdokument BTFV},
+  pdflang={de},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 

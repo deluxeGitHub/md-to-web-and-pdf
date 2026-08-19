@@ -2,6 +2,7 @@
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \documentclass[
+  ngerman,
 ]{article}
 \usepackage{xcolor}
 \usepackage{amsmath,amssymb}
@@ -36,10 +37,41 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\ifLuaTeX
+\usepackage[bidi=basic,shorthands=off]{babel}
+\else
+\usepackage[bidi=default,shorthands=off]{babel}
+\fi
+\ifLuaTeX
+  \usepackage{selnolig} % disable illegal ligatures
+\fi
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{enumitem}
+% Bilder bleiben an ihrer Textstelle. Ohne das gilt der LaTeX-Default 'tbp',
+% der Bilder aus Listen heraus auf spätere Seiten schiebt.
+\usepackage{float}
+\floatplacement{figure}{H}
+% Keine Wortreste unter drei Zeichen am Zeilenende oder -anfang. babel setzt für
+% Deutsch 2/2, was Trennungen wie "ei-nem" erlaubt. Muss nach \begin{document}
+% gesetzt werden, weil babel die Werte bei der Sprachwahl überschreibt.
+\AtBeginDocument{\lefthyphenmin=3 \righthyphenmin=3}
 % Base PDF header styling
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -55,8 +87,16 @@
 \definecolor{BaseDark}{HTML}{2B2B2B}
 \definecolor{BaseGray}{HTML}{4A4A49}
 
-\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
-\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\basetitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\basetitlefont{TeX Gyre Heros}[Weight=500]}
+\IfFontExistsTF{TeX Gyre Heros}
+  {\setmainfont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}{\setmainfont{Latin Modern Sans}}{}}
+% Titelschrift bewusst ohne Condensed: "TeX Gyre Heros Condensed" existierte nie
+% unter diesem Namen, der Zweig war immer tot. Aussehen bleibt wie gehabt.
+\IfFontExistsTF{TeX Gyre Heros}
+  {\newfontfamily\basetitlefont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}
+     {\newfontfamily\basetitlefont{Latin Modern Sans}}
+     {\newcommand{\basetitlefont}{\sffamily}}}
 
 \geometry{bottom=1.8in}
 
@@ -122,6 +162,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Testdokument Base},
+  pdflang={de},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
@@ -233,6 +274,35 @@ formatiert werden.
 \subsection{Fußzeile und Datum}\label{fuuxdfzeile-und-datum}
 
 Das Datum in der PDF-Fußzeile soll dem Ausstellungsdatum entsprechen.
+
+\section{Bildplatzierung}\label{bildplatzierung}
+
+Prüft, dass ein Bild im PDF an seiner Textstelle bleibt. Ohne
+\texttt{\textbackslash{}floatplacement\{figure\}\{H\}} im Preamble
+verschiebt LaTeX das Bild aus der Liste heraus hinter die folgenden
+Absätze.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Erster Schritt vor dem Bild.
+\item
+  Zweiter Schritt, zu dem das Bild gehört:
+
+  \begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio,alt={Test-Logo}]{images/test-logo.png}}
+  \caption{Test-Logo}
+  \end{figure}
+\item
+  Dritter Schritt nach dem Bild.
+\end{enumerate}
+
+Dieser Absatz steht in der Quelle \textbf{nach} dem Bild und muss auch
+im PDF danach stehen.
+
+Ein zweiter Absatz, damit LaTeX genug Text hat, um das Bild bei falscher
+Platzierung zu überholen.
 
 \section{Abschlussbestimmungen}\label{abschlussbestimmungen}
 

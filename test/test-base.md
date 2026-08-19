@@ -71,6 +71,24 @@ Dieser Block ist nur in der HTML-Version sichtbar, nicht im PDF.
 
 Das Datum in der PDF-Fußzeile soll dem Ausstellungsdatum entsprechen.
 
+# Bildplatzierung
+
+Prüft, dass ein Bild im PDF an seiner Textstelle bleibt. Ohne
+`\floatplacement{figure}{H}` im Preamble verschiebt LaTeX das Bild aus der Liste
+heraus hinter die folgenden Absätze.
+
+1. Erster Schritt vor dem Bild.
+1. Zweiter Schritt, zu dem das Bild gehört:
+
+   ![Test-Logo](images/test-logo.png)
+1. Dritter Schritt nach dem Bild.
+
+Dieser Absatz steht in der Quelle **nach** dem Bild und muss auch im PDF danach
+stehen.
+
+Ein zweiter Absatz, damit LaTeX genug Text hat, um das Bild bei falscher
+Platzierung zu überholen.
+
 # Abschlussbestimmungen
 
 1. Dieses Testdokument wird bei jedem Build neu generiert.

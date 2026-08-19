@@ -2,6 +2,10 @@
 
 Dieses Repository verwaltet offizielle Verbandsdokumente (primär für den BTFV) als Markdown-Dateien und rendert sie sowohl als Jekyll-Website (GitHub Pages) als auch als PDF.
 
+> **Lokaler Entwicklungs-Harness:** Falls das Verzeichnis `harness/` existiert (gitignored,
+> nur lokal), zuerst `harness/AGENTS.md` lesen — dort liegen Spec-Prozess, Infrastruktur-
+> Fakten und der aktuelle Arbeitsstand.
+
 ---
 
 ## Architektur
@@ -45,6 +49,7 @@ date: 23.11.2025
 layout: default
 template: btfv                    # Welches Template (base/btfv/dtfb)
 section_numbering: paragraph      # paragraph=§1§1.1, arabic=1/1.1, nicht gesetzt=keine
+lang: de                          # Dokumentsprache; Default aus _config.yml
 pdf: /assets/pdf/satzung.pdf      # Link zur generierten PDF-Version
 source: https://github.com/...    # Link zur Markdown-Quelle
 ---
@@ -53,6 +58,7 @@ source: https://github.com/...    # Link zur Markdown-Quelle
 ### Wichtige Front-Matter-Felder
 
 - **`template`**: Wählt das Verband-Template (`base`, `btfv`, `dtfb`). Unbekannte Werte fallen auf `base` zurück.
+- **`lang`**: Dokumentsprache für PDF **und** HTML. Steuert im PDF die Silbentrennung und die automatischen Bezeichner (`de` → „Abbildung“ statt „Figure“) und setzt `<html lang="…">`. Nicht gesetzt → Default aus `_config.yml` (`de`). Ohne `lang` lädt Pandoc kein `babel` und trennt deutschen Text nach englischen Regeln.
 - **`section_numbering`**: `paragraph` → §1, §1.1 … / `arabic` → 1, 1.1 … / nicht gesetzt → keine Nummerierung.
 - **`pdf`**: Wird im HTML genutzt, um einen Download-Link zur PDF anzuzeigen.
 - **`date`**: Wird von `scripts/generate_pdfs.sh` **überschrieben** – statische Datumsangaben im Front Matter haben im PDF keinen Bestand.
@@ -79,6 +85,12 @@ date: {{ site.time | date: "%d.%m.%Y" }}
 ```
 
 Wird beim PDF-Export durch das aktuelle Datum (des Lauf-Zeitpunkts) ersetzt.
+
+### Breite Tabellen
+
+Breite Tabellen brauchen **kein** Sondermarkup. Ist eine Tabelle breiter als der Inhaltsbereich, legt das Layout-Skript in `_layouts/default.html` zur Laufzeit einen Scroll-Container (`div.table-scroll`) um sie, blendet einen Hinweis ein und lässt ab drei Spalten die erste Spalte stehen. Wrapper-Divs oder `<style>`-Blöcke in der Markdown-Datei sind dafür nicht nötig und sollen nicht eingefügt werden.
+
+Die schmale letzte Spalte (Index-Tabellen mit PDF-Link) wird ebenfalls automatisch erkannt – über die Klasse `table-linkcol`, die das Skript setzt, wenn jede Zelle der letzten Spalte ausschließlich einen Link enthält.
 
 ### HTML-Only-Blöcke
 
@@ -174,5 +186,7 @@ Im Menü die Option für Jekyll-Vorschau wählen. Öffne danach `http://localhos
 
 - **PDFs nicht manuell bearbeiten** – sie werden bei jedem Workflow-Lauf überschrieben.
 - **`date` im Front Matter** wird vom Skript überschrieben; für ein fixes Datum muss die Datum-Ersetzung im Skript angepasst werden.
-- **Bilder in PDFs** müssen über `--resource-path` erreichbar sein (aktuell: `.`, `./docs`, `./templates`, `./templates/<name>`).
+- **Bilder in PDFs** müssen über `--resource-path` erreichbar sein (aktuell: `.`, `./docs`, `./templates`, `./templates/<name>`). Das Trennzeichen der Liste ist plattformabhängig – unter Git Bash/MSYS `;`, sonst `:`; `scripts/generate_pdfs.sh` setzt das über `RESOURCE_SEP`. Mit dem falschen Trennzeichen findet Pandoc keine Bilddatei und ersetzt das Bild kommentarlos durch seinen Alt-Text.
+- **Bilder stehen im PDF fest an ihrer Textstelle** (`\floatplacement{figure}{H}` im Preamble von `scripts/generate_pdfs.sh`). Passt ein Bild nicht mehr auf die Seite, beginnt eine neue – der Weißraum davor ist gewollt und keine Regression.
+- **Titelschrift ohne Condensed:** Der Schnitt „TeX Gyre Heros Condensed" existiert unter diesem Namen nicht (korrekt wäre `TeX Gyre Heros Cn`). Die Fallback-Kette in `templates/*/pdf-header.tex` nutzt bewusst weiter `TeX Gyre Heros` – nicht „reparieren", sonst ändern sich alle Titelblätter.
 - **`<ol type="a">`** sollte nur für wirklich alphabetisch nummerierte Listen verwendet werden – die Konvertierung ist ein einfaches Textersetzungs-Pattern und funktioniert nicht für verschachtelte oder gemischte Listen.
