@@ -259,13 +259,20 @@ test_suite_fixtures() {
         fi
 
         # Body-Extraktion + Normalisierung für pandoc-versions-unabhängigen Vergleich:
-        #   1. Nur ab \begin{document} vergleichen (Präambel-Unterschiede ignorieren)
-        #   2. \hypertarget-Wrapping normalisieren: pandoc ≤3.1 schreibt
+        #   1. Wagenrückläufe entfernen: die Fixtures liegen unter Windows mit
+        #      CRLF im Arbeitsverzeichnis, frisch erzeugte .tex unter Linux mit LF.
+        #   2. Nur ab der Zeile \begin{document} vergleichen
+        #      (Präambel-Unterschiede ignorieren). Das Muster ist verankert:
+        #      unverankert trifft es auch einen Kommentar im Preamble, der den
+        #      Befehl erwähnt, und dann landet die restliche Präambel im
+        #      Vergleich — wo sich Pandoc-Versionen unterscheiden.
+        #   3. \hypertarget-Wrapping normalisieren: pandoc ≤3.1 schreibt
         #        \hypertarget{foo}{%\n\section{...}\label{foo}}\n
         #      pandoc ≥3.6 schreibt direkt:
         #        \section{...}\label{foo}\n
         normalize_tex() {
-            sed -n '/\\begin{document}/,$p' "$1" \
+            tr -d '\r' < "$1" \
+            | sed -n '/^\\begin{document}$/,$p' \
             | sed '/^\\hypertarget{/d' \
             | sed 's/\\label{\([^}]*\)}}$/\\label{\1}/' \
             | sed 's/\\pandocbounded{\\includegraphics\[.*\]{\([^}]*\)}}/\\includegraphics{\1}/g' \

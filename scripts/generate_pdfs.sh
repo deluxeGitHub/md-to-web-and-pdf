@@ -164,8 +164,10 @@ process_file() {
 \usepackage{float}
 \floatplacement{figure}{H}
 % Keine Wortreste unter drei Zeichen am Zeilenende oder -anfang. babel setzt für
-% Deutsch 2/2, was Trennungen wie "ei-nem" erlaubt. Muss nach \begin{document}
-% gesetzt werden, weil babel die Werte bei der Sprachwahl überschreibt.
+% Deutsch 2/2, was Trennungen wie "ei-nem" erlaubt. Die Zuweisung muss
+% verzögert erfolgen, weil babel die Werte bei der Sprachwahl sonst wieder
+% überschreibt. Den Befehl hier nicht wörtlich nennen — die Fixture-Prüfung
+% in scripts/test_pdfs.sh sucht danach, um die Präambel abzuschneiden.
 \AtBeginDocument{\lefthyphenmin=3 \righthyphenmin=3}
 EOF
 
