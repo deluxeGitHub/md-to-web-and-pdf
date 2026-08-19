@@ -2,6 +2,10 @@
 
 Dieses Repository verwaltet offizielle Verbandsdokumente (primär für den BTFV) als Markdown-Dateien und rendert sie sowohl als Jekyll-Website (GitHub Pages) als auch als PDF.
 
+> **Lokaler Entwicklungs-Harness:** Falls das Verzeichnis `harness/` existiert (gitignored,
+> nur lokal), zuerst `harness/AGENTS.md` lesen — dort liegen Spec-Prozess, Infrastruktur-
+> Fakten und der aktuelle Arbeitsstand.
+
 ---
 
 ## Architektur
