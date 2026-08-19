@@ -130,12 +130,19 @@ process_file() {
         template_dir="templates/base"
     fi
 
-    # LaTeX-Header erstellen
+    # LaTeX-Header erstellen: erst der gemeinsame Teil, dann die Nummerierung
+    cat > "$header_file" <<'EOF'
+\usepackage{enumitem}
+% Bilder bleiben an ihrer Textstelle. Ohne das gilt der LaTeX-Default 'tbp',
+% der Bilder aus Listen heraus auf spätere Seiten schiebt.
+\usepackage{float}
+\floatplacement{figure}{H}
+EOF
+
     case "$section_numbering" in
         paragraph)
             number_sections="--number-sections"
-            cat > "$header_file" <<'EOF'
-\usepackage{enumitem}
+            cat >> "$header_file" <<'EOF'
 \renewcommand{\thesection}{\S\arabic{section}}
 \renewcommand{\thesubsection}{\S\arabic{section}.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\S\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
@@ -147,10 +154,6 @@ EOF
             ;;
         arabic)
             number_sections="--number-sections"
-            echo "\\usepackage{enumitem}" > "$header_file"
-            ;;
-        *)
-            echo "\\usepackage{enumitem}" > "$header_file"
             ;;
     esac
 
