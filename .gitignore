@@ -15,3 +15,6 @@ _site/
 /test/fixtures/tex/*.pdf
 /test/fixtures/pdf/
 .claude/
+
+# Lokaler Entwicklungs-Harness (Specs/Notizen) – nie ins Repo
+harness/

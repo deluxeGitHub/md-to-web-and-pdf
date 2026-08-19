@@ -13,8 +13,16 @@
 \definecolor{BaseDark}{HTML}{2B2B2B}
 \definecolor{BaseGray}{HTML}{4A4A49}
 
-\IfFontExistsTF{TeX Gyre Heros}{\setmainfont{TeX Gyre Heros}}{\setmainfont{Latin Modern Sans}}
-\IfFontExistsTF{TeX Gyre Heros Condensed}{\newfontfamily\basetitlefont{TeX Gyre Heros Condensed}[Weight=500]}{\newfontfamily\basetitlefont{TeX Gyre Heros}[Weight=500]}
+\IfFontExistsTF{TeX Gyre Heros}
+  {\setmainfont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}{\setmainfont{Latin Modern Sans}}{}}
+% Titelschrift bewusst ohne Condensed: "TeX Gyre Heros Condensed" existierte nie
+% unter diesem Namen, der Zweig war immer tot. Aussehen bleibt wie gehabt.
+\IfFontExistsTF{TeX Gyre Heros}
+  {\newfontfamily\basetitlefont{TeX Gyre Heros}}
+  {\IfFontExistsTF{Latin Modern Sans}
+     {\newfontfamily\basetitlefont{Latin Modern Sans}}
+     {\newcommand{\basetitlefont}{\sffamily}}}
 
 \geometry{bottom=1.8in}
 
