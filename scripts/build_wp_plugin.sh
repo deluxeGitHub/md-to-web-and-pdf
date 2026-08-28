@@ -2,7 +2,7 @@
 # =============================================================================
 # scripts/build_wp_plugin.sh – WordPress-Plugin als ZIP packen (SPEC-007)
 #
-# Erzeugt temp/md-docs-embed-<version>.zip aus wordpress/md-docs-embed/.
+# Erzeugt wordpress/dist/md-docs-embed-<version>.zip aus wordpress/md-docs-embed/.
 # Die Version wird aus dem Plugin-Header gelesen.
 #
 # Verwendung:
@@ -44,19 +44,19 @@ else
     info "PHP nicht gefunden – Syntaxprüfung übersprungen."
 fi
 
-mkdir -p temp
-STAGE="temp/_wp_plugin_build"
-TARGET="temp/${PLUGIN_SLUG}-${VERSION}.zip"
+DIST_DIR="wordpress/dist"
+mkdir -p "$DIST_DIR"
+STAGE="$(mktemp -d)"
+TARGET="${DIST_DIR}/${PLUGIN_SLUG}-${VERSION}.zip"
 
-rm -rf "$STAGE"
-mkdir -p "$STAGE"
 cp -r "$PLUGIN_DIR" "$STAGE/$PLUGIN_SLUG"
 
 # Nichts einpacken, was nur zur Entwicklung gehoert.
 find "$STAGE" \( -name '.DS_Store' -o -name '*.map' -o -name 'node_modules' \) -exec rm -rf {} + 2>/dev/null || true
 
 rm -f "$TARGET"
-( cd "$STAGE" && zip -rq "../$(basename "$TARGET")" "$PLUGIN_SLUG" )
+ABS_TARGET="${ROOT_DIR}/${TARGET}"
+( cd "$STAGE" && zip -rq "$ABS_TARGET" "$PLUGIN_SLUG" )
 rm -rf "$STAGE"
 
 success "Plugin gepackt: ${TARGET}  ($(du -h "$TARGET" | cut -f1))"

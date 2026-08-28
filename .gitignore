@@ -18,3 +18,6 @@ _site/
 
 # Lokaler Entwicklungs-Harness (Specs/Notizen) – nie ins Repo
 harness/
+
+# Gebautes WordPress-Plugin (Artefakt, siehe scripts/build_wp_plugin.sh)
+wordpress/dist/
