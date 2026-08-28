@@ -461,6 +461,82 @@ ${BOLD}Suite: HTML-Fixtures (Regression)${NC}"
     rm -rf "$run_dir"
 }
 
+# -- WordPress-Plugin (PHP) ------------------------------------------------
+
+# Erste brauchbare PHP-Binary: php im Pfad, sonst das mit LocalWP
+# mitgelieferte (harness/INFRA.md). Leer, wenn keine gefunden wurde.
+find_php() {
+    if command -v php &>/dev/null; then
+        command -v php
+        return 0
+    fi
+
+    local base candidate
+    base="${LOCALAPPDATA:-}"
+    if [[ -n "$base" ]]; then
+        base="${base//\\//}"   # Windows-Pfadtrenner fuer das Globbing umdrehen
+        for candidate in "$base/Programs/Local/resources/extraResources/lightning-services"/php-*/bin/win32/php.exe; do
+            if [[ -x "$candidate" ]]; then
+                echo "$candidate"
+                return 0
+            fi
+        done
+    fi
+
+    return 1
+}
+
+test_suite_wordpress() {
+    echo -e "
+${BOLD}Suite: WordPress-Plugin (PHP)${NC}"
+    echo "  Syntaxpruefung des Plugins und Testfaelle fuer URL-Bau und Pfad-Positivliste."
+    echo ""
+
+    # Das Plugin liegt nur im Framework-Repo, nicht in den Kind-Repos.
+    if [[ ! -d "wordpress/md-docs-embed" ]]; then
+        skip "WordPress-Plugin  -> kein wordpress/md-docs-embed/ in diesem Repo"
+        return
+    fi
+
+    local php_bin
+    if ! php_bin="$(find_php)"; then
+        skip "WordPress-Plugin  -> kein PHP gefunden (LocalWP liefert eines unter resources/extraResources/lightning-services/php-*/bin/win32/)"
+        return
+    fi
+
+    # -n: ohne php.ini der Installation, damit der Lauf nicht an einer
+    # fremden Konfiguration haengt.
+    local file out lint_failed=0
+    while IFS= read -r -d '' file; do
+        if ! out="$("$php_bin" -n -l "$file" 2>&1)"; then
+            fail "php -l  -> ${file}"
+            echo "$out" | head -5 | sed 's/^/    /' >&2
+            lint_failed=1
+        fi
+    done < <(find wordpress/md-docs-embed -name "*.php" -print0)
+
+    if [[ "$lint_failed" -eq 0 ]]; then
+        pass "php -l  -> alle Plugin-Dateien ohne Syntaxfehler"
+    fi
+
+    if [[ ! -d "test/wordpress" ]]; then
+        skip "PHP-Testfaelle  -> kein test/wordpress/"
+        return
+    fi
+
+    local test_file name cases
+    while IFS= read -r -d '' test_file; do
+        name="$(basename "$test_file")"
+        if out="$("$php_bin" -n "$test_file" 2>&1)"; then
+            cases="$(grep -c '^OK' <<< "$out" || true)"
+            pass "${name}  -> ${cases} Faelle gruen"
+        else
+            fail "${name}  -> Testfaelle fehlgeschlagen"
+            echo "$out" | grep -v '^OK' | head -20 | sed 's/^/    /' >&2
+        fi
+    done < <(find test/wordpress -maxdepth 1 -name "*-test.php" -print0)
+}
+
 # -- Zusammenfassung ------------------------------------------------------
 
 run_all() {
@@ -474,6 +550,7 @@ run_all() {
     test_suite_frontmatter
     test_suite_fixtures
     test_suite_html_fixtures
+    test_suite_wordpress
     test_suite_html
 
     echo -e "\n${BOLD}========================================${NC}"
