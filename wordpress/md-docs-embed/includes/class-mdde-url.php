@@ -154,6 +154,46 @@ class MDDE_URL {
 	}
 
 	/**
+	 * Einen von aussen kommenden Pfad annehmen oder verwerfen.
+	 *
+	 * Bewusst eine Positivliste: Der Wert stammt aus einer URL, die jeder
+	 * erzeugen kann. Absolute URLs, protokoll-relative Adressen und
+	 * Verzeichniswechsel werden verworfen, damit die Einbettung nicht auf ein
+	 * fremdes Ziel umgelenkt werden kann.
+	 *
+	 * Liegt hier und nicht in MDDE_Render, weil Pfad- und Adressprüfung
+	 * inhaltlich hierher gehört und diese Klasse ohne WordPress ladbar ist —
+	 * der Test in test/wordpress/ prüft damit die Logik des Plugins selbst und
+	 * keine Kopie davon.
+	 *
+	 * @param string $raw Roher Pfad, etwa aus einem Abfrageparameter.
+	 * @return string Relativer Pfad ohne führenden Schrägstrich, oder leerer String.
+	 */
+	public static function safe_relative_path( $raw ) {
+		$raw = (string) $raw;
+
+		// Vor dem Abschneiden prüfen: "//host/pfad" wäre nach dem ltrim nicht
+		// mehr als protokoll-relative Adresse erkennbar.
+		if ( 0 === strpos( $raw, '//' ) ) {
+			return '';
+		}
+		if ( false !== strpos( $raw, '://' ) || false !== strpos( $raw, '..' ) ) {
+			return '';
+		}
+
+		$raw = ltrim( $raw, '/' );
+
+		if ( '' === $raw ) {
+			return '';
+		}
+		if ( ! preg_match( '#^[A-Za-z0-9._/-]+$#', $raw ) ) {
+			return '';
+		}
+
+		return $raw;
+	}
+
+	/**
 	 * Vollständige Iframe-URL bauen.
 	 *
 	 * @param array<string, mixed> $args Aufbereitete Attribute.
