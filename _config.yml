@@ -17,6 +17,7 @@ relative_links:
 
 exclude:
   - harness/
+  - wordpress/
   - scripts/
   - temp/
   - test/

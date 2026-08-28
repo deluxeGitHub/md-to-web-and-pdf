@@ -1,0 +1,201 @@
+<script>
+// Embed-Bruecke (SPEC-007): meldet Hoehe und Pfad an die einbettende Seite und
+// regelt, welche Links im Iframe bleiben duerfen.
+//
+// Liegt bewusst in _includes/ und nicht in assets/: die Reusable Workflow kopiert
+// scripts/, templates/, _layouts/ und _includes/ in die Kind-Repos, assets/ nicht.
+(() => {
+    const root = document.documentElement;
+    if (!root.classList.contains("is-embed")) return;
+
+    const nav = root.getAttribute("data-embed-nav") === "framework" ? "framework" : "pinned";
+    const chrome = root.getAttribute("data-embed-chrome") || "none";
+    const theme = root.getAttribute("data-embed-theme") || "";
+
+    // Zielorigin: die einbettende Seite. Gesendet werden nur Hoehe, Pfad und Titel.
+    //
+    // Der Wert kommt aus dem Parameter host, den die einbettende Seite setzt.
+    // Aus document.referrer laesst er sich nur beim ersten Laden ableiten: Nach
+    // einer Navigation im Rahmen ist der Referrer die vorige Dokumentseite, und
+    // die Nachrichten gingen an die eigene statt an die einbettende Adresse.
+    const hostParam = new URLSearchParams(location.search).get("host") || "";
+    const parentOrigin = (() => {
+        if (/^https?:\/\/[^/?#]+$/.test(hostParam)) {
+            return hostParam;
+        }
+        try {
+            return document.referrer ? new URL(document.referrer).origin : "*";
+        } catch (e) {
+            return "*";
+        }
+    })();
+
+    const send = (payload) => {
+        if (window.parent === window) return;
+        try {
+            window.parent.postMessage(payload, parentOrigin);
+        } catch (e) { /* einbettende Seite nicht erreichbar - nicht kritisch */ }
+    };
+
+    /* --- Hoehe melden ------------------------------------------------------- */
+
+    let lastHeight = 0;
+    let pending = null;
+
+    // Gemessen wird die Hoehe des Inhalts, nicht die des Dokuments: scrollHeight von
+    // <html> ist immer mindestens so gross wie das Sichtfenster - und das Sichtfenster
+    // ist hier das Iframe in seiner bisherigen Hoehe. Ein kurzes Dokument meldete so
+    // beim Zurueckgehen die Hoehe des vorigen, langen.
+    const measure = () => {
+        const body = document.body;
+        if (!body) return 0;
+
+        let height = body.getBoundingClientRect().height;
+
+        // Der untere Aussenabstand des letzten Kindes zaehlt nicht zur Box des body.
+        const children = body.children;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const style = getComputedStyle(child);
+            if (style.position === "fixed" || style.display === "none") continue;
+
+            const bottom = child.getBoundingClientRect().bottom
+                + window.scrollY
+                + (parseFloat(style.marginBottom) || 0);
+            if (bottom > height) height = bottom;
+        }
+
+        return Math.ceil(height);
+    };
+
+    const reportHeight = () => {
+        const height = measure();
+        if (height === lastHeight) return;
+        lastHeight = height;
+        send({ type: "mdde:height", height: height });
+    };
+
+    // Drosselung: waehrend Layoutaenderungen feuert der ResizeObserver haeufig.
+    const scheduleHeight = () => {
+        if (pending) return;
+        pending = setTimeout(() => { pending = null; reportHeight(); }, 100);
+    };
+
+    if (window.ResizeObserver) {
+        new ResizeObserver(scheduleHeight).observe(document.documentElement);
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", scheduleHeight);
+    document.addEventListener("DOMContentLoaded", scheduleHeight);
+
+    // Bilder aendern die Hoehe erst, wenn sie geladen sind.
+    document.addEventListener("load", (e) => {
+        if (e.target && e.target.tagName === "IMG") scheduleHeight();
+    }, true);
+
+    /* --- Pfad melden -------------------------------------------------------- */
+
+    const locationPayload = () => ({
+        type: "mdde:location",
+        path: location.pathname,
+        hash: location.hash,
+        title: document.title
+    });
+
+    if (nav === "framework") {
+        window.addEventListener("hashchange", () => send(locationPayload()));
+    }
+
+    /* --- Navigation --------------------------------------------------------- */
+
+    // nav="pinned": kein Weg zurueck ins Framework. Der Marken-Link wird durch ein
+    // nicht klickbares div ersetzt - dieselbe Markup-Variante, die das Layout auf
+    // der Startseite ohnehin ausgibt. Nur per CSS zu verstecken wuerde einen
+    // fokussierbaren Link stehen lassen.
+    const unlinkBrand = () => {
+        const brand = document.querySelector("a.base-doc-brand-link");
+        if (!brand) return;
+        const div = document.createElement("div");
+        div.className = brand.className;
+        div.innerHTML = brand.innerHTML;
+        brand.replaceWith(div);
+    };
+
+    const isPdf = (url) => /\.pdf(\?|#|$)/i.test(url.pathname + url.search);
+
+    const withEmbedParams = (url) => {
+        url.searchParams.set("embed", "1");
+        url.searchParams.set("chrome", chrome);
+        url.searchParams.set("nav", nav);
+        if (theme) url.searchParams.set("theme", theme);
+        // Ohne host verlieren die Folgeseiten die Adresse der einbettenden Seite.
+        if (hostParam) url.searchParams.set("host", hostParam);
+        return url;
+    };
+
+    const onClick = (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const anchor = e.target.closest && e.target.closest("a[href]");
+        if (!anchor) return;
+
+        const href = anchor.getAttribute("href");
+        if (!href || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+
+        let url;
+        try {
+            url = new URL(anchor.href, location.href);
+        } catch (err) {
+            return;
+        }
+
+        // Anker auf derselben Seite bleiben immer im Iframe.
+        const samePage = url.origin === location.origin && url.pathname === location.pathname && url.hash;
+        if (samePage) return;
+
+        const external = url.origin !== location.origin;
+        if (external || isPdf(url) || nav === "pinned") {
+            e.preventDefault();
+            window.open(url.href, "_blank", "noopener");
+            return;
+        }
+
+        // nav="framework": im Iframe navigieren, Embed-Zustand mitnehmen.
+        e.preventDefault();
+        location.href = withEmbedParams(url).href;
+    };
+
+    /* --- Nachrichten der einbettenden Seite ---------------------------------- */
+
+    window.addEventListener("message", (ev) => {
+        if (parentOrigin !== "*" && ev.origin !== parentOrigin) return;
+        if (ev.source !== window.parent) return;
+        const data = ev.data;
+        if (!data || typeof data !== "object") return;
+
+        if (data.type === "mdde:scrollTo" && typeof data.hash === "string" && data.hash) {
+            const target = document.getElementById(data.hash.replace(/^#/, ""));
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (data.type === "mdde:theme" && (data.theme === "light" || data.theme === "dark")) {
+            root.setAttribute("data-theme", data.theme);
+            root.setAttribute("data-embed-theme", data.theme);
+            scheduleHeight();
+        }
+    });
+
+    /* --- Start -------------------------------------------------------------- */
+
+    const init = () => {
+        if (nav === "pinned") unlinkBrand();
+        document.addEventListener("click", onClick);
+        send({ type: "mdde:ready", path: location.pathname, title: document.title });
+        send(locationPayload());
+        reportHeight();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>

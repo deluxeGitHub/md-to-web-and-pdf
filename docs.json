@@ -1,0 +1,37 @@
+---
+layout: null
+---
+{%- comment -%}
+Manifest aller einbettbaren Dokumente (SPEC-007). Wird vom WordPress-Plugin gelesen,
+um im Editor eine Auswahlliste anzubieten. Ausschluss einzelner Seiten ueber
+`manifest: false` im Front Matter.
+
+Wird per `cp -n` von der Reusable Workflow in die Kind-Repos uebernommen; die Inhalte
+entstehen dort aus den jeweils eigenen Seiten.
+{%- endcomment -%}
+{%- assign listed = "" | split: "" -%}
+{%- for p in site.pages -%}
+  {%- if p.title and p.url != "/docs.json" and p.manifest != false -%}
+    {%- assign listed = listed | push: p -%}
+  {%- endif -%}
+{%- endfor -%}
+{
+  "generated": "{{ site.time | date_to_xmlschema }}",
+  "site": {{ site.title | jsonify }},
+  "documents": [
+{%- for p in listed %}
+    {
+      "slug": "{% assign s = p.url | split: '/' | last | replace: '.html', '' | replace: '.md', '' %}{{ s | default: 'index' }}",
+      "title": {{ p.title | jsonify }},
+      "subtitle": {{ p.subtitle | default: "" | jsonify }},
+      "url": "{{ p.url | relative_url }}",
+      "pdf": {{ p.pdf | default: "" | jsonify }},
+      "source": {{ p.source | default: "" | jsonify }},
+      "template": "{{ p.template | default: site.template | default: 'base' }}",
+      "section_numbering": {{ p.section_numbering | default: "" | jsonify }},
+      "lang": "{{ p.lang | default: site.lang | default: 'de' }}",
+      "home": {% if p.url == "/" or p.url == "/index.html" %}true{% else %}false{% endif %}
+    }{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+  ]
+}

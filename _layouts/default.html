@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: 'de' }}">
 <head>
+    <script>
+        // Embed-Modus (SPEC-007): Zustand setzen, bevor gezeichnet wird - kein Flackern
+        // der Kopfzeile und kein kurzes Aufblitzen des falschen Farbschemas.
+        (function () {
+            var p = new URLSearchParams(location.search);
+            if (p.get("embed") !== "1") return;
+            var root = document.documentElement;
+            root.classList.add("is-embed");
+            root.setAttribute("data-embed-chrome", p.get("chrome") || "none");
+            root.setAttribute("data-embed-nav", p.get("nav") === "framework" ? "framework" : "pinned");
+            var theme = p.get("theme") || "light";
+            if (theme !== "auto") {
+                root.setAttribute("data-embed-theme", theme);
+                root.setAttribute("data-theme", theme);
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -329,6 +346,13 @@
 
     <script>
         (() => {
+            // Im Embed-Modus (SPEC-007) bleibt die Suche aus: Die Leiste ist
+            // position:fixed und richtet sich am Sichtfenster aus - ein Iframe,
+            // dessen Hoehe dem Inhalt folgt, hat aber keins, die Leiste landete
+            // also irgendwo im Dokument. Ohne den Strg+F-Handler greift statt
+            // dessen die Suche des Browsers, und die funktioniert.
+            if (document.documentElement.classList.contains("is-embed")) return;
+
             const searchBar = document.getElementById("base-search-bar");
             const searchInput = document.getElementById("base-search-input");
             const searchCount = document.getElementById("base-search-count");
@@ -521,6 +545,8 @@
             initTableScroll();
         }
     </script>
+
+    {% include templates/base/embed-bridge.html %}
 </body>
 </html>
 

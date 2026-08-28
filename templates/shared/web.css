@@ -1039,3 +1039,85 @@ mark.base-search-mark--active {
     outline: 2px solid rgba(255, 140, 0, 0.8);
     outline-offset: 1px;
 }
+
+/* --- Embed-Modus: Einbettung per Iframe (SPEC-007) -----------------------
+
+   Zur Spezifitaet: Die Regeln oben sind unter body[class*="template-"]
+   verschachtelt und erreichen damit (0,2,1). Wo hier dieselbe Eigenschaft
+   ueberschrieben wird, muss der Selektor das schlagen - deshalb steht in
+   einigen Regeln body[class*="template-"] mit drin.
+
+   Das !important gilt nur innerhalb von .is-embed und kann die Website nicht
+   beeinflussen. Es ist noetig, weil das Layout-Skript #back-to-top und
+   #scroll-progress per Inline-Style einblendet, und Inline schlaegt jeden
+   Selektor. */
+
+.is-embed,
+.is-embed body {
+    background: transparent;
+}
+
+.is-embed body {
+    padding-top: 0;
+}
+
+/* Seiten-Chrome, die in keiner Embed-Stufe ausser "full" auftaucht */
+.is-embed:not([data-embed-chrome="full"]) #scroll-progress,
+.is-embed:not([data-embed-chrome="full"]) #back-to-top,
+.is-embed #staging-banner,
+.is-embed #safe-area-cover {
+    display: none !important;
+}
+
+/* chrome="none": auch der Titelblock verschwindet */
+.is-embed[data-embed-chrome="none"] .base-doc-heading {
+    display: none !important;
+}
+
+/* chrome="minimal": Titel und Aktions-Links bleiben, Marke und Werkzeuge nicht */
+.is-embed[data-embed-chrome="minimal"] .base-doc-brand-link,
+.is-embed[data-embed-chrome="minimal"] .base-toolbar {
+    display: none !important;
+}
+
+/* Suche: im Embed-Modus komplett aus. Die Leiste ist position:fixed und braucht
+   ein Sichtfenster; ein Iframe mit inhaltsabhaengiger Hoehe hat keins. Der
+   Strg+F-Handler im Layout bleibt deshalb ebenfalls aus, damit die Suche des
+   Browsers greift. Auch bei chrome="full" - eine sichtbare, aber nutzlose
+   Schaltflaeche waere schlechter als keine. */
+.is-embed #base-search-bar,
+.is-embed [data-search-open] {
+    display: none !important;
+}
+
+/* nav="pinned": kein Weg zurueck ins Framework, unabhaengig von chrome.
+   Den Link selbst entfernt die Embed-Bruecke - hier faellt nur der Pfeil weg. */
+.is-embed[data-embed-nav="pinned"] .base-doc-back-icon {
+    display: none !important;
+}
+
+/* Kartenoptik aufloesen: Auf der Website liegt der Inhalt als Karte auf dem
+   Seitenhintergrund - eingebettet ergaebe das eine Box in der Box. Der Inhalt
+   soll stattdessen im Fluss der Gastgeberseite stehen, deren Breite und
+   Innenabstand gelten. Bei chrome="full" bleibt die Karte, weil dort bewusst
+   die Website nachgebildet wird. */
+.is-embed:not([data-embed-chrome="full"]) body[class*="template-"] .wrapper {
+    max-width: none;
+    margin: 0;
+    padding: 0 0 8px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.is-embed:not([data-embed-chrome="full"]) body[class*="template-"] .base-doc-heading {
+    max-width: none;
+    margin: 0 0 20px;
+    padding: 0 0 16px;
+    border: 0;
+    border-bottom: 1px solid var(--color-border-default);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
