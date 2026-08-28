@@ -5,6 +5,7 @@ date: "{{ site.time | date: '%d.%m.%Y' }}"
 template: btfv
 section_numbering: paragraph
 pdf: /assets/pdf/showcase-btfv.pdf
+manifest: false        # SPEC-007: Showcase, nicht im Einbettungs-Manifest
 ---
 
 * TOC

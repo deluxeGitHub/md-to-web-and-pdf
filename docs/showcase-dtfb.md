@@ -5,6 +5,7 @@ date: "{{ site.time | date: '%d.%m.%Y' }}"
 template: dtfb
 section_numbering: arabic
 pdf: /assets/pdf/showcase-dtfb.pdf
+manifest: false        # SPEC-007: Showcase, nicht im Einbettungs-Manifest
 ---
 
 * TOC

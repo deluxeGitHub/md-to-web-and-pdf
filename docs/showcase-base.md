@@ -4,6 +4,7 @@ subtitle: "Base-Template · Keine Nummerierung"
 date: "{{ site.time | date: '%d.%m.%Y' }}"
 template: base
 pdf: /assets/pdf/showcase-base.pdf
+manifest: false        # SPEC-007: Showcase, nicht im Einbettungs-Manifest
 ---
 
 * TOC

@@ -58,6 +58,10 @@ jobs:
           cp -n .framework/manifest.webmanifest manifest.webmanifest 2>/dev/null \
             && echo "  📄 manifest.webmanifest – vom Framework übernommen" \
             || echo "  ⚙️  manifest.webmanifest – lokaler Override bleibt erhalten"
+          # docs.json: Manifest fuer die WordPress-Einbettung (SPEC-007)
+          cp -n .framework/docs.json docs.json 2>/dev/null \
+            && echo "  📄 docs.json – vom Framework übernommen" \
+            || echo "  ⚙️  docs.json – lokaler Override bleibt erhalten"
           echo "::endgroup::"
 
       - name: Letztes Commit-Datum ermitteln
