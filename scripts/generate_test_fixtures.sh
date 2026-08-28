@@ -58,12 +58,20 @@ GEM_USER_DIR="$(ruby -e 'print Gem.user_dir' 2>/dev/null || true)"
 if ! command -v jekyll &>/dev/null; then
     warn "jekyll nicht gefunden – HTML-Fixtures werden übersprungen."
 else
-    jekyll build --destination "_site" --source . --quiet 2>/dev/null || \
-    jekyll build --destination "_site" --source .
+    # In ein temporaeres Verzeichnis bauen, nicht nach _site: ein Fixture-Lauf
+    # darf die lokale Vorschau nicht ueberschreiben.
+    BUILD_DIR="temp/fixtures-html"
+    rm -rf "$BUILD_DIR"
+
+    # test/ steht in _config.yml unter exclude; ohne die Ueberschreibung entsteht
+    # kein test/-Verzeichnis in der Ausgabe und es gaebe nichts zu sichern.
+    JEKYLL_CFG="_config.yml,test/_config.test.yml"
+    jekyll build --config "$JEKYLL_CFG" --destination "$BUILD_DIR" --source . --baseurl "" --quiet 2>/dev/null ||
+        jekyll build --config "$JEKYLL_CFG" --destination "$BUILD_DIR" --source . --baseurl ""
 
     while IFS= read -r -d '' md; do
         name="$(basename "${md%.md}")"
-        src="_site/test/${name}.html"
+        src="${BUILD_DIR}/test/${name}.html"
         dst="${HTML_DIR}/${name}.html"
 
         if [[ ! -f "$src" ]]; then
@@ -71,10 +79,13 @@ else
             continue
         fi
 
-        # Datum normalisieren (site.time variiert bei jedem Build)
-        sed 's|<div class="base-doc-date">.*</div>||g' "$src" > "$dst"
+        # Dieselbe Normalisierung wie im Vergleich (scripts/test_pdfs.sh) -
+        # eine gemeinsame Quelle, kein zweiter Satz sed-Aufrufe.
+        bash scripts/normalize_html.sh "$src" > "$dst"
         success "HTML: ${name}.html"
     done < <(find test -maxdepth 1 -name "*.md" -print0)
+
+    rm -rf "$BUILD_DIR"
 fi
 
 echo ""

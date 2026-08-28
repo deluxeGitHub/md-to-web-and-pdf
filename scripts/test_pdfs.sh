@@ -399,52 +399,66 @@ for l in lines[1:end]:
 # -- HTML-Fixture-Suite ---------------------------------------------------
 
 test_suite_html_fixtures() {
-    echo -e "\n${BOLD}Suite: HTML-Fixtures (Regression)${NC}"
-    echo "  Vergleicht frisch gebaute HTML-Seiten der Testdokumente gegen Referenz-Fixtures."
+    echo -e "
+${BOLD}Suite: HTML-Fixtures (Regression)${NC}"
+    echo "  Baut die Testdokumente selbst und vergleicht gegen die Referenz-Fixtures."
     echo ""
 
     local fixture_dir="test/fixtures/html"
+    local run_dir="temp/test-html"
 
     if [[ ! -d "$fixture_dir" ]]; then
-        skip "HTML-Fixtures  → kein ${fixture_dir}/ (bash build.sh fixtures ausführen)"
+        skip "HTML-Fixtures  -> kein ${fixture_dir}/ (bash build.sh fixtures ausfuehren)"
         return
     fi
 
-    if [[ ! -d "_site/test" ]]; then
-        skip "HTML-Fixtures  → _site/test/ nicht vorhanden (bash build.sh web ausführen)"
+    # Unter Windows gibt es kein lauffaehiges Jekyll (siehe harness/INFRA.md);
+    # der Lauf gehoert dort in die WSL. Fehlendes Jekyll ist kein Fehler.
+    if ! command -v jekyll &>/dev/null; then
+        skip "HTML-Fixtures  -> jekyll nicht gefunden (unter Windows in der WSL ausfuehren)"
+        return
+    fi
+
+    # Selbst bauen statt _site/ zu benutzen: _site entsteht nur, wenn jemand
+    # vorher eine Vorschau gebaut hat, und enthaelt wegen exclude: test/ ohnehin
+    # kein test/-Verzeichnis. Die Konfigurationsueberschreibung nimmt test/
+    # wieder auf.
+    rm -rf "$run_dir"
+    if ! jekyll build --config "_config.yml,test/_config.test.yml"             --destination "$run_dir" --source . --baseurl "" --quiet &>/dev/null; then
+        fail "HTML-Fixtures  -> jekyll build fehlgeschlagen"
+        rm -rf "$run_dir"
         return
     fi
 
     while IFS= read -r -d '' md; do
-        local name fixture src tmp
+        local name src fixture
         name="$(basename "${md%.md}")"
+        src="${run_dir}/test/${name}.html"
         fixture="${fixture_dir}/${name}.html"
-        src="_site/test/${name}.html"
 
         if [[ ! -f "$src" ]]; then
-            fail "${name}.html  → keine HTML-Ausgabe in _site/test/ gefunden"
+            fail "${name}.html  -> keine HTML-Ausgabe in ${run_dir}/test/"
             continue
         fi
 
         if [[ ! -f "$fixture" ]]; then
-            skip "${name}.html  → kein Fixture (bash build.sh fixtures ausführen)"
+            skip "${name}.html  -> kein Fixture (bash build.sh fixtures ausfuehren)"
             continue
         fi
 
-        # Datum normalisieren (identisch zur Fixture-Erstellung)
-        tmp="temp/${name}_html_normalized.html"
-        mkdir -p temp
-        sed 's|<div class="base-doc-date">.*</div>||g' "$src" > "$tmp"
-
-        if diff -q "$fixture" "$tmp" &>/dev/null; then
-            pass "${name}.html  → identisch mit Fixture"
+        # Dieselbe Normalisierung wie bei der Fixture-Erstellung; auch das
+        # Fixture laeuft hindurch, damit Zeilenenden aus dem Arbeitsverzeichnis
+        # keinen Unterschied machen.
+        if diff -q <(bash scripts/normalize_html.sh "$fixture")                    <(bash scripts/normalize_html.sh "$src") &>/dev/null; then
+            pass "${name}.html  -> identisch mit Fixture"
         else
-            fail "${name}.html  → Abweichung vom Fixture"
-            diff "$fixture" "$tmp" | head -20 | sed 's/^/    /' >&2
+            fail "${name}.html  -> Abweichung vom Fixture"
+            diff <(bash scripts/normalize_html.sh "$fixture")                  <(bash scripts/normalize_html.sh "$src")                  | head -20 | sed 's/^/    /' >&2
         fi
-        rm -f "$tmp"
 
     done < <(find test -maxdepth 1 -name "*.md" -print0)
+
+    rm -rf "$run_dir"
 }
 
 # -- Zusammenfassung ------------------------------------------------------

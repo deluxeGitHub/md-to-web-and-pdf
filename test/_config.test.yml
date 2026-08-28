@@ -1,0 +1,22 @@
+# Konfigurations-Überschreibung für Testbauten (SPEC-008).
+#
+# _config.yml schliesst test/ aus, damit die Testdokumente nicht auf der
+# Website landen. Für den Fixture-Vergleich müssen sie aber gebaut werden.
+# Jekyll ersetzt bei mehreren --config-Dateien die Werte gleicher Schlüssel,
+# die Liste muss deshalb vollständig sein — bis auf test/.
+#
+# ACHTUNG: Wächst die exclude-Liste in _config.yml, muss sie hier mitwachsen.
+#
+# Verwendung:
+#   jekyll build --config _config.yml,test/_config.test.yml --destination <tmp> --baseurl ""
+exclude:
+  - harness/
+  - wordpress/
+  - scripts/
+  - temp/
+  - example/
+  - build.sh
+  - generate_pdf_local.sh
+  - README.md
+  - CLAUDE.md
+  - LICENSE

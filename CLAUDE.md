@@ -189,4 +189,13 @@ Im Menü die Option für Jekyll-Vorschau wählen. Öffne danach `http://localhos
 - **Bilder in PDFs** müssen über `--resource-path` erreichbar sein (aktuell: `.`, `./docs`, `./templates`, `./templates/<name>`). Das Trennzeichen der Liste ist plattformabhängig – unter Git Bash/MSYS `;`, sonst `:`; `scripts/generate_pdfs.sh` setzt das über `RESOURCE_SEP`. Mit dem falschen Trennzeichen findet Pandoc keine Bilddatei und ersetzt das Bild kommentarlos durch seinen Alt-Text.
 - **Bilder stehen im PDF fest an ihrer Textstelle** (`\floatplacement{figure}{H}` im Preamble von `scripts/generate_pdfs.sh`). Passt ein Bild nicht mehr auf die Seite, beginnt eine neue – der Weißraum davor ist gewollt und keine Regression.
 - **Titelschrift ohne Condensed:** Der Schnitt „TeX Gyre Heros Condensed" existiert unter diesem Namen nicht (korrekt wäre `TeX Gyre Heros Cn`). Die Fallback-Kette in `templates/*/pdf-header.tex` nutzt bewusst weiter `TeX Gyre Heros` – nicht „reparieren", sonst ändern sich alle Titelblätter.
+- **`exclude:` in `_config.yml` und `test/_config.test.yml`** müssen zusammen gepflegt
+  werden. `test/` steht in `_config.yml` unter `exclude:`, damit die Testdokumente nicht
+  auf der Website landen; `test/_config.test.yml` spiegelt dieselbe Liste **ohne** `test/`,
+  damit `scripts/test_pdfs.sh` und `scripts/generate_test_fixtures.sh` sie bauen können.
+  Wächst die eine Liste, muss die andere mitwachsen — sonst vergleicht die HTML-Suite
+  stillschweigend nichts mehr.
+- **Normalisierung der HTML-Fixtures** liegt genau einmal in `scripts/normalize_html.sh`
+  (Datum, Cache-Buster `?v=`, `buildV`, Zeilenenden). Vergleich und Fixture-Erstellung
+  benutzen dieselbe Datei; ein zweiter Satz `sed`-Aufrufe würde auseinanderlaufen.
 - **`<ol type="a">`** sollte nur für wirklich alphabetisch nummerierte Listen verwendet werden – die Konvertierung ist ein einfaches Textersetzungs-Pattern und funktioniert nicht für verschachtelte oder gemischte Listen.
