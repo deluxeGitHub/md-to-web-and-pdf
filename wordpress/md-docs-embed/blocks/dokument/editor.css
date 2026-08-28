@@ -1,0 +1,10 @@
+/* Der Editor zeigt dieselbe Ausgabe wie das Frontend; das Iframe soll dort aber
+   nicht anklickbar sein, sonst navigiert man im Editor im Dokument herum. */
+
+.wp-block-mdde-dokument .mdde-embed__frame {
+	pointer-events: none;
+}
+
+.wp-block-mdde-dokument .components-placeholder {
+	min-height: 180px;
+}

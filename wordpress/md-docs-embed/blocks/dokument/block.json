@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "mdde/dokument",
+  "title": "Verbandsdokument",
+  "category": "embed",
+  "icon": "media-document",
+  "description": "Bettet ein einzelnes Verbandsdokument oder das gesamte Dokumenten-Framework ein.",
+  "keywords": ["Satzung", "Ordnung", "Dokument", "Verband"],
+  "textdomain": "md-docs-embed",
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"],
+    "spacing": {
+      "margin": true
+    }
+  },
+  "attributes": {
+    "src": {
+      "type": "string",
+      "default": ""
+    },
+    "mode": {
+      "type": "string",
+      "default": "page"
+    },
+    "nav": {
+      "type": "string",
+      "default": ""
+    },
+    "chrome": {
+      "type": "string",
+      "default": "none"
+    },
+    "theme": {
+      "type": "string",
+      "default": "light"
+    },
+    "minHeight": {
+      "type": "number",
+      "default": 400
+    },
+    "maxHeight": {
+      "type": "number",
+      "default": 0
+    },
+    "baseUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "syncUrl": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css"
+}
