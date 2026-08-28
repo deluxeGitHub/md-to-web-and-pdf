@@ -1,60 +1,99 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <script>
+        // Embed-Modus (SPEC-007): Zustand setzen, bevor gezeichnet wird - kein Flackern
+        // der Kopfzeile und kein kurzes Aufblitzen des falschen Farbschemas.
+        (function () {
+            var p = new URLSearchParams(location.search);
+            if (p.get("embed") !== "1") return;
+            var root = document.documentElement;
+            root.classList.add("is-embed");
+            root.setAttribute("data-embed-chrome", p.get("chrome") || "none");
+            root.setAttribute("data-embed-nav", p.get("nav") === "framework" ? "framework" : "pinned");
+            var theme = p.get("theme") || "light";
+            if (theme !== "auto") {
+                root.setAttribute("data-embed-theme", theme);
+                root.setAttribute("data-theme", theme);
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Testdokument Base</title>
-    
-    
-    
-    
+
+
+
+
+
+        <meta name="theme-color" content="#f4f4f2">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="icon" type="image/png" href="/templates/base/images/favicon.png">
+        <link rel="apple-touch-icon" href="/templates/base/images/logo.png">
+        <link rel="manifest" href="/manifest.webmanifest">
         <link rel="stylesheet" href="/templates/shared/web.css">
         <link rel="stylesheet" href="/templates/base/web.css">
-    
+
 </head>
 <body class=" template-base">
-    
-        
+
+
 <header class="base-hero"></header>
 <script>
 (() => {
     const initThemeToggle = () => {
         const root = document.documentElement;
+        // SPEC-007: Im Embed-Modus ist das Farbschema fest vorgegeben - die
+        // Automatik wuerde es sonst auf "auto" zuruecksetzen.
+        if (root.hasAttribute('data-embed-theme')) return;
         const toggle = document.querySelector('[data-theme-toggle]');
         const icon = document.querySelector('[data-theme-icon]');
         if (!toggle || !icon) return;
 
+        const SUN = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/><line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/></g></svg>';
+        const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+        const AUTO = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+
+        const getOsDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
         const renderIcon = (mode) => {
-            if (mode === 'dark') {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
-            } else {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="21.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/><line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/></g></svg>';
+            icon.innerHTML = mode === 'dark' ? MOON : mode === 'auto' ? AUTO : SUN;
+        };
+
+        const updateThemeColor = () => {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) return;
+            const color = getComputedStyle(root).getPropertyValue('--color-surface-page').trim();
+            if (color) meta.setAttribute('content', color);
+        };
+
+        let osMediaQuery = null;
+        const onOsChange = () => applyMode('auto');
+
+        const applyMode = (mode) => {
+            const visual = mode === 'auto' ? (getOsDark() ? 'dark' : 'light') : mode;
+            root.setAttribute('data-theme', visual);
+            toggle.setAttribute('aria-pressed', visual === 'dark' ? 'true' : 'false');
+            renderIcon(mode);
+            updateThemeColor();
+            if (osMediaQuery) { osMediaQuery.removeEventListener('change', onOsChange); osMediaQuery = null; }
+            if (mode === 'auto') {
+                osMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                osMediaQuery.addEventListener('change', onOsChange);
             }
         };
 
-        const applyTheme = (mode) => {
-            root.setAttribute('data-theme', mode);
-            toggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
-            renderIcon(mode);
-        };
-
+        const cycleMap = { light: 'dark', dark: 'auto', auto: 'light' };
         const stored = localStorage.getItem('base-theme');
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (stored === 'light' || stored === 'dark') {
-            applyTheme(stored);
-        } else if (prefersDark) {
-            applyTheme('dark');
-        } else {
-            applyTheme('light');
-        }
+        applyMode(stored === 'light' || stored === 'dark' || stored === 'auto' ? stored : 'auto');
 
         toggle.addEventListener('click', () => {
-            const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            applyTheme(next);
+            const current = localStorage.getItem('base-theme') || 'auto';
+            const next = cycleMap[current] || 'light';
+            applyMode(next);
             localStorage.setItem('base-theme', next);
         });
     };
@@ -67,56 +106,96 @@
 })();
 </script>
 
-    
-    
+
+
+
+
+
+
+
         <div class="base-doc-heading">
             <div class="base-doc-heading__top">
-                <div class="base-doc-heading__brand">
-                    <img class="base-doc-logo" src="/templates/base/images/logo.png" alt="Logo">
-                    <div class="base-doc-titles">
-                        <div class="base-doc-title">Testdokument Base</div>
-                        
-                            <div class="base-doc-subtitle">Design-Referenz für das Base-Template</div>
-                        
-                    </div>
+
+                <a class="base-doc-brand-link" href="/">
+                    <svg class="base-doc-back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+
+                    <img class="base-doc-logo base-doc-logo--light" src="/templates/base/images/logo.png" alt="Logo">
+                    <img class="base-doc-logo base-doc-logo--dark" src="/templates/base/images/logo-dark.png" alt="Logo">
+                    <span class="base-doc-sitename">MD to PDF and Web</span>
+
+                </a>
+
+                <div class="base-doc-titles">
+                    <div class="base-doc-title">Testdokument Base</div>
+
+                        <div class="base-doc-subtitle">Design-Referenz für das Base-Template</div>
+
                 </div>
                 <div class="base-doc-actions">
                     <div class="base-hero__links">
-                        
-                            <a class="base-home-button" href="/">Home</a>
-                        
-                        
+
                             <a href="/assets/pdf/test-base.pdf" target="_blank" rel="noopener">PDF</a>
-                        
-                        
-                        <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
-                            <span class="base-theme-toggle__icon" data-theme-icon>
-                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
-                                    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                        <line x1="12" y1="2.5" x2="12" y2="5.5"/>
-                                        <line x1="12" y1="18.5" x2="12" y2="21.5"/>
-                                        <line x1="2.5" y1="12" x2="5.5" y2="12"/>
-                                        <line x1="18.5" y1="12" x2="21.5" y2="12"/>
-                                        <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
-                                        <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
-                                        <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
-                                        <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
-                                    </g>
-                                </svg>
-                            </span>
-                        </button>
+
+
                     </div>
-                    
-                    
-                    
-                    
-                        
-                    
+
+
+
+                </div>
+                <div class="base-toolbar">
+                    <button class="base-search-btn" type="button" data-search-open aria-label="Suche">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                    <div class="base-settings-wrap">
+                        <button class="base-settings-btn" type="button" data-settings-toggle aria-label="Einstellungen" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                        </button>
+                        <div class="base-settings-panel" data-settings-panel hidden>
+                            <div class="base-settings-row">
+                                <button class="base-settings-font-small" type="button" data-font-decrease aria-label="Schrift verkleinern">A</button>
+                                <input class="base-font-slider" type="range" min="0" max="4" step="1" value="2" data-font-slider aria-label="Schriftgröße">
+                                <button class="base-settings-font-large" type="button" data-font-increase aria-label="Schrift vergrößern">A</button>
+                            </div>
+                            <div class="base-settings-font-pct" data-font-pct aria-live="polite">100%</div>
+                            <div class="base-settings-row base-settings-search-row">
+                                <span class="base-settings-label">Suche</span>
+                                <button class="base-theme-toggle" type="button" data-search-open aria-label="Suche öffnen">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                </button>
+                            </div>
+                            <div class="base-settings-row">
+                                <span class="base-settings-label">Theme</span>
+                                <button class="base-theme-toggle" type="button" data-theme-toggle aria-label="Theme wechseln" aria-pressed="false">
+                                    <span class="base-theme-toggle__icon" data-theme-icon>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                                <line x1="12" y1="2.5" x2="12" y2="5.5"/>
+                                                <line x1="12" y1="18.5" x2="12" y2="21.5"/>
+                                                <line x1="2.5" y1="12" x2="5.5" y2="12"/>
+                                                <line x1="18.5" y1="12" x2="21.5" y2="12"/>
+                                                <line x1="4.5" y1="4.5" x2="6.8" y2="6.8"/>
+                                                <line x1="17.2" y1="17.2" x2="19.5" y2="19.5"/>
+                                                <line x1="17.2" y1="6.8" x2="19.5" y2="4.5"/>
+                                                <line x1="4.5" y1="19.5" x2="6.8" y2="17.2"/>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    
+
     <div class="wrapper">
         <ul id="markdown-toc">
   <li><a href="#allgemeine-bestimmungen" id="markdown-toc-allgemeine-bestimmungen">Allgemeine Bestimmungen</a>    <ul>
@@ -136,6 +215,7 @@
       <li><a href="#fußzeile-und-datum" id="markdown-toc-fußzeile-und-datum">Fußzeile und Datum</a></li>
     </ul>
   </li>
+  <li><a href="#bildplatzierung" id="markdown-toc-bildplatzierung">Bildplatzierung</a></li>
   <li><a href="#abschlussbestimmungen" id="markdown-toc-abschlussbestimmungen">Abschlussbestimmungen</a></li>
 </ul>
 
@@ -211,6 +291,28 @@ Dieser Block ist nur in der HTML-Version sichtbar, nicht im PDF.
 
 <p>Das Datum in der PDF-Fußzeile soll dem Ausstellungsdatum entsprechen.</p>
 
+<h1 id="bildplatzierung">Bildplatzierung</h1>
+
+<p>Prüft, dass ein Bild im PDF an seiner Textstelle bleibt. Ohne
+<code class="language-plaintext highlighter-rouge">\floatplacement{figure}{H}</code> im Preamble verschiebt LaTeX das Bild aus der Liste
+heraus hinter die folgenden Absätze.</p>
+
+<ol>
+  <li>Erster Schritt vor dem Bild.</li>
+  <li>
+    <p>Zweiter Schritt, zu dem das Bild gehört:</p>
+
+    <p><img src="/test/images/test-logo.png" alt="Test-Logo" /></p>
+  </li>
+  <li>Dritter Schritt nach dem Bild.</li>
+</ol>
+
+<p>Dieser Absatz steht in der Quelle <strong>nach</strong> dem Bild und muss auch im PDF danach
+stehen.</p>
+
+<p>Ein zweiter Absatz, damit LaTeX genug Text hat, um das Bild bei falscher
+Platzierung zu überholen.</p>
+
 <h1 id="abschlussbestimmungen">Abschlussbestimmungen</h1>
 
 <ol>
@@ -219,23 +321,120 @@ Dieser Block ist nur in der HTML-Version sichtbar, nicht im PDF.
 </ol>
 
     </div>
-    
+
+    <!-- Suchleiste -->
+    <div id="base-search-bar" hidden role="search">
+        <input id="base-search-input" type="search" placeholder="Auf dieser Seite suchen…" aria-label="Suche" autocomplete="off">
+        <span id="base-search-count" aria-live="polite"></span>
+        <button id="base-search-prev" type="button" aria-label="Vorheriger Treffer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button id="base-search-next" type="button" aria-label="Nächster Treffer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button id="base-search-close" type="button" aria-label="Suche schließen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <!-- Safe-area Abdeckung (nur in PWA) -->
+    <div id="safe-area-cover"></div>
+
+    <!-- Scroll-Fortschrittsbalken -->
+    <div id="scroll-progress"></div>
+
     <!-- Nach oben Button -->
     <a href="#" id="back-to-top">Nach oben</a>
+
+    <!-- Staging-Banner -->
+
+
 
     <!-- Link-kopiert-Toast -->
     <div id="base-toast" role="status" aria-live="polite">Link kopiert</div>
 
     <script>
-        // Script, um den Button bei Scrollen einzublenden
+        // Einstellungen-Panel
+        const settingsToggle = document.querySelector("[data-settings-toggle]");
+        const settingsPanel = document.querySelector("[data-settings-panel]");
+        if (settingsToggle && settingsPanel) {
+            settingsToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const open = !settingsPanel.hidden;
+                settingsPanel.hidden = open;
+                settingsToggle.setAttribute("aria-expanded", String(!open));
+            });
+            settingsPanel.addEventListener("click", (e) => { e.stopPropagation(); });
+            document.addEventListener("click", () => {
+                if (!settingsPanel.hidden) {
+                    settingsPanel.hidden = true;
+                    settingsToggle.setAttribute("aria-expanded", "false");
+                }
+            });
+        }
+
+        // Schriftgröße
+        const fontSteps = [0.70, 0.85, 1.0, 1.25, 1.50];
+        let fontIndex = parseInt(localStorage.getItem("fontIndex") ?? "2", 10);
+        const fontSlider = document.querySelector("[data-font-slider]");
+        const fontPct = document.querySelector("[data-font-pct]");
+        const fontDecrease = document.querySelector("[data-font-decrease]");
+        const fontIncrease = document.querySelector("[data-font-increase]");
+        const applyFontZoom = () => {
+            document.documentElement.style.setProperty("--font-zoom", fontSteps[fontIndex]);
+            if (fontSlider) {
+                fontSlider.value = fontIndex;
+                const pct = (fontIndex / (fontSteps.length - 1)) * 100;
+                fontSlider.style.setProperty("--slider-fill", pct + "%");
+            }
+            if (fontPct) fontPct.textContent = Math.round(fontSteps[fontIndex] * 100) + "%";
+            if (fontDecrease) fontDecrease.disabled = fontIndex === 0;
+            if (fontIncrease) fontIncrease.disabled = fontIndex === fontSteps.length - 1;
+        };
+        if (fontSlider) {
+            fontSlider.addEventListener("input", () => {
+                fontIndex = parseInt(fontSlider.value, 10);
+                localStorage.setItem("fontIndex", fontIndex);
+                applyFontZoom();
+            });
+        }
+        if (fontDecrease) {
+            fontDecrease.addEventListener("click", () => {
+                if (fontIndex > 0) { fontIndex--; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
+            });
+        }
+        if (fontIncrease) {
+            fontIncrease.addEventListener("click", () => {
+                if (fontIndex < fontSteps.length - 1) { fontIndex++; localStorage.setItem("fontIndex", fontIndex); applyFontZoom(); }
+            });
+        }
+        applyFontZoom();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buildV = 'X';
+            document.querySelectorAll('a[href]').forEach(a => {
+                const href = a.getAttribute('href');
+                if (!href || !href.match(/\.pdf(\?|$)/)) return;
+                if (!href.includes('?v=')) {
+                    a.setAttribute('href', href.replace(/\.pdf$/, '.pdf') + '?v=' + buildV);
+                }
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener');
+            });
+        });
+    </script>
+
+    <script>
         const backToTopButton = document.getElementById("back-to-top");
+        const scrollProgress = document.getElementById("scroll-progress");
 
         window.onscroll = function() {
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                backToTopButton.style.display = "block"; // Zeigt den Button nach Scrollen an
-            } else {
-                backToTopButton.style.display = "none"; // Versteckt den Button, wenn man oben ist
-            }
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrollProgress.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + "%" : "0%";
+            backToTopButton.style.display = scrollTop > 200 ? "block" : "none";
         };
     </script>
 
@@ -313,6 +512,411 @@ Dieser Block ist nur in der HTML-Version sichtbar, nicht im PDF.
             initHeadingLinks();
         }
     </script>
+
+    <script>
+        (() => {
+            // Im Embed-Modus (SPEC-007) bleibt die Suche aus: Die Leiste ist
+            // position:fixed und richtet sich am Sichtfenster aus - ein Iframe,
+            // dessen Hoehe dem Inhalt folgt, hat aber keins, die Leiste landete
+            // also irgendwo im Dokument. Ohne den Strg+F-Handler greift statt
+            // dessen die Suche des Browsers, und die funktioniert.
+            if (document.documentElement.classList.contains("is-embed")) return;
+
+            const searchBar = document.getElementById("base-search-bar");
+            const searchInput = document.getElementById("base-search-input");
+            const searchCount = document.getElementById("base-search-count");
+            const btnPrev = document.getElementById("base-search-prev");
+            const btnNext = document.getElementById("base-search-next");
+            const btnClose = document.getElementById("base-search-close");
+            const openBtns = document.querySelectorAll("[data-search-open]");
+            const wrapper = document.querySelector(".wrapper");
+
+            if (!searchBar || !openBtns.length || !wrapper) return;
+
+            let marks = [];
+            let currentIndex = -1;
+
+            const clearMarks = () => {
+                wrapper.querySelectorAll("mark.base-search-mark").forEach(m => {
+                    const parent = m.parentNode;
+                    parent.replaceChild(document.createTextNode(m.textContent), m);
+                    parent.normalize();
+                });
+                marks = [];
+                currentIndex = -1;
+            };
+
+            const highlight = (query) => {
+                clearMarks();
+                if (!query) { searchCount.textContent = ""; return; }
+                const re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+                const walker = document.createTreeWalker(wrapper, NodeFilter.SHOW_TEXT, {
+                    acceptNode: n => {
+                        const tag = n.parentElement?.tagName;
+                        return (tag === "SCRIPT" || tag === "STYLE" || n.parentElement?.closest("mark"))
+                            ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                    }
+                });
+                const textNodes = [];
+                while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+                textNodes.forEach(node => {
+                    if (!re.test(node.textContent)) return;
+                    re.lastIndex = 0;
+                    const frag = document.createDocumentFragment();
+                    let last = 0, m;
+                    while ((m = re.exec(node.textContent)) !== null) {
+                        frag.appendChild(document.createTextNode(node.textContent.slice(last, m.index)));
+                        const mark = document.createElement("mark");
+                        mark.className = "base-search-mark";
+                        mark.textContent = m[0];
+                        frag.appendChild(mark);
+                        marks.push(mark);
+                        last = m.index + m[0].length;
+                    }
+                    frag.appendChild(document.createTextNode(node.textContent.slice(last)));
+                    node.parentNode.replaceChild(frag, node);
+                });
+
+                searchCount.textContent = marks.length ? `1 / ${marks.length}` : "Kein Treffer";
+                if (marks.length) { currentIndex = 0; goTo(0); }
+            };
+
+            // Sichtbare Viewport-Höhe (berücksichtigt virtuelle Tastatur via visualViewport)
+            const getVisibleHeight = () =>
+                window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+            const goTo = (idx) => {
+                marks.forEach((m, i) => m.classList.toggle("base-search-mark--active", i === idx));
+                searchCount.textContent = `${idx + 1} / ${marks.length}`;
+                const mark = marks[idx];
+                if (!mark) return;
+                const rect = mark.getBoundingClientRect();
+                const visibleH = getVisibleHeight();
+                const barH = searchBar.offsetHeight + 16;
+                // Mitte des sichtbaren Bereichs unterhalb der Suchleiste
+                const targetCenter = barH + (visibleH - barH) / 2;
+                const scrollY = window.scrollY + rect.top - targetCenter;
+                window.scrollTo({ top: scrollY, behavior: "smooth" });
+            };
+
+            const open = () => {
+                if (settingsPanel && !settingsPanel.hidden) {
+                    settingsPanel.hidden = true;
+                    document.querySelector("[data-settings-toggle]")?.setAttribute("aria-expanded", "false");
+                }
+                searchBar.hidden = false;
+                setTimeout(() => { searchInput.focus(); searchInput.select(); }, 50);
+            };
+
+            const close = () => {
+                searchBar.hidden = true;
+                clearMarks();
+                searchInput.value = "";
+                searchCount.textContent = "";
+            };
+
+            openBtns.forEach(btn => btn.addEventListener("click", open));
+            btnClose.addEventListener("click", close);
+            btnPrev.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex - 1 + marks.length) % marks.length; goTo(currentIndex); } });
+            btnNext.addEventListener("click", () => { if (marks.length) { currentIndex = (currentIndex + 1) % marks.length; goTo(currentIndex); } });
+
+            let debounce;
+            searchInput.addEventListener("input", () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => highlight(searchInput.value.trim()), 150);
+            });
+
+            searchInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") { e.preventDefault(); if (marks.length) { currentIndex = (currentIndex + 1) % marks.length; goTo(currentIndex); } }
+                if (e.key === "Escape") close();
+            });
+
+            document.addEventListener("keydown", (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === "f") { e.preventDefault(); open(); }
+                if (e.key === "Escape" && !searchBar.hidden) close();
+            });
+        })();
+    </script>
+
+    <script>
+        // Breite Tabellen seitlich scrollbar machen (SPEC-001).
+        // kramdown liefert ein nacktes <table>; der Scroll-Container entsteht
+        // deshalb hier zur Laufzeit, damit kein Dokument Markup dafuer braucht.
+        const initTableScroll = () => {
+            const wrapper = document.querySelector(".wrapper");
+            if (!wrapper) return;
+
+            // Letzte Spalte enthaelt in jeder Zeile nur einen Link (Index-Tabellen)?
+            const isLinkColumn = (table) => {
+                const cells = [...table.rows].map(r => r.cells[r.cells.length - 1]);
+                if (cells.length < 2) return false;
+                return cells.every(cell => {
+                    if (!cell) return false;
+                    if (cell.tagName === "TH") return true;
+                    const links = cell.querySelectorAll("a");
+                    return links.length === 1 && cell.textContent.trim() === links[0].textContent.trim();
+                });
+            };
+
+            wrapper.querySelectorAll("table").forEach((table) => {
+                if (table.closest(".table-scroll")) return;
+
+                if (isLinkColumn(table)) table.classList.add("table-linkcol");
+
+                const box = document.createElement("div");
+                box.className = "table-scroll";
+                box.setAttribute("role", "region");
+                box.setAttribute("aria-label", "Tabelle, seitlich scrollbar");
+                table.parentNode.insertBefore(box, table);
+                box.appendChild(table);
+
+                const columns = table.rows.length ? table.rows[0].cells.length : 0;
+                if (columns > 2) box.classList.add("table-scroll--sticky");
+
+                const hint = document.createElement("p");
+                hint.className = "table-scroll-hint";
+                hint.textContent = "Die Tabelle lässt sich seitlich scrollen.";
+                hint.hidden = true;
+                box.after(hint);
+
+                const update = () => {
+                    const overflowing = table.scrollWidth > box.clientWidth + 1;
+                    box.classList.toggle("is-overflowing", overflowing);
+                    hint.hidden = !overflowing;
+                    // Fokus nur vergeben, wenn es auch etwas zu scrollen gibt.
+                    if (overflowing) {
+                        box.setAttribute("tabindex", "0");
+                    } else {
+                        box.removeAttribute("tabindex");
+                    }
+                };
+
+                update();
+
+                if (window.ResizeObserver) {
+                    const ro = new ResizeObserver(update);
+                    ro.observe(box);
+                    ro.observe(table);
+                }
+
+                // Die Schriftgröße hängt an --font-zoom auf <html>.
+                new MutationObserver(update).observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ["style"]
+                });
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initTableScroll);
+        } else {
+            initTableScroll();
+        }
+    </script>
+
+    <script>
+// Embed-Bruecke (SPEC-007): meldet Hoehe und Pfad an die einbettende Seite und
+// regelt, welche Links im Iframe bleiben duerfen.
+//
+// Liegt bewusst in _includes/ und nicht in assets/: die Reusable Workflow kopiert
+// scripts/, templates/, _layouts/ und _includes/ in die Kind-Repos, assets/ nicht.
+(() => {
+    const root = document.documentElement;
+    if (!root.classList.contains("is-embed")) return;
+
+    const nav = root.getAttribute("data-embed-nav") === "framework" ? "framework" : "pinned";
+    const chrome = root.getAttribute("data-embed-chrome") || "none";
+    const theme = root.getAttribute("data-embed-theme") || "";
+
+    // Zielorigin: die einbettende Seite. Gesendet werden nur Hoehe, Pfad und Titel.
+    //
+    // Der Wert kommt aus dem Parameter host, den die einbettende Seite setzt.
+    // Aus document.referrer laesst er sich nur beim ersten Laden ableiten: Nach
+    // einer Navigation im Rahmen ist der Referrer die vorige Dokumentseite, und
+    // die Nachrichten gingen an die eigene statt an die einbettende Adresse.
+    const hostParam = new URLSearchParams(location.search).get("host") || "";
+    const parentOrigin = (() => {
+        if (/^https?:\/\/[^/?#]+$/.test(hostParam)) {
+            return hostParam;
+        }
+        try {
+            return document.referrer ? new URL(document.referrer).origin : "*";
+        } catch (e) {
+            return "*";
+        }
+    })();
+
+    const send = (payload) => {
+        if (window.parent === window) return;
+        try {
+            window.parent.postMessage(payload, parentOrigin);
+        } catch (e) { /* einbettende Seite nicht erreichbar - nicht kritisch */ }
+    };
+
+    /* --- Hoehe melden ------------------------------------------------------- */
+
+    let lastHeight = 0;
+    let pending = null;
+
+    // Gemessen wird die Hoehe des Inhalts, nicht die des Dokuments: scrollHeight von
+    // <html> ist immer mindestens so gross wie das Sichtfenster - und das Sichtfenster
+    // ist hier das Iframe in seiner bisherigen Hoehe. Ein kurzes Dokument meldete so
+    // beim Zurueckgehen die Hoehe des vorigen, langen.
+    const measure = () => {
+        const body = document.body;
+        if (!body) return 0;
+
+        let height = body.getBoundingClientRect().height;
+
+        // Der untere Aussenabstand des letzten Kindes zaehlt nicht zur Box des body.
+        const children = body.children;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const style = getComputedStyle(child);
+            if (style.position === "fixed" || style.display === "none") continue;
+
+            const bottom = child.getBoundingClientRect().bottom
+                + window.scrollY
+                + (parseFloat(style.marginBottom) || 0);
+            if (bottom > height) height = bottom;
+        }
+
+        return Math.ceil(height);
+    };
+
+    const reportHeight = () => {
+        const height = measure();
+        if (height === lastHeight) return;
+        lastHeight = height;
+        send({ type: "mdde:height", height: height });
+    };
+
+    // Drosselung: waehrend Layoutaenderungen feuert der ResizeObserver haeufig.
+    const scheduleHeight = () => {
+        if (pending) return;
+        pending = setTimeout(() => { pending = null; reportHeight(); }, 100);
+    };
+
+    if (window.ResizeObserver) {
+        new ResizeObserver(scheduleHeight).observe(document.documentElement);
+    }
+    window.addEventListener("load", reportHeight);
+    window.addEventListener("resize", scheduleHeight);
+    document.addEventListener("DOMContentLoaded", scheduleHeight);
+
+    // Bilder aendern die Hoehe erst, wenn sie geladen sind.
+    document.addEventListener("load", (e) => {
+        if (e.target && e.target.tagName === "IMG") scheduleHeight();
+    }, true);
+
+    /* --- Pfad melden -------------------------------------------------------- */
+
+    const locationPayload = () => ({
+        type: "mdde:location",
+        path: location.pathname,
+        hash: location.hash,
+        title: document.title
+    });
+
+    if (nav === "framework") {
+        window.addEventListener("hashchange", () => send(locationPayload()));
+    }
+
+    /* --- Navigation --------------------------------------------------------- */
+
+    // nav="pinned": kein Weg zurueck ins Framework. Der Marken-Link wird durch ein
+    // nicht klickbares div ersetzt - dieselbe Markup-Variante, die das Layout auf
+    // der Startseite ohnehin ausgibt. Nur per CSS zu verstecken wuerde einen
+    // fokussierbaren Link stehen lassen.
+    const unlinkBrand = () => {
+        const brand = document.querySelector("a.base-doc-brand-link");
+        if (!brand) return;
+        const div = document.createElement("div");
+        div.className = brand.className;
+        div.innerHTML = brand.innerHTML;
+        brand.replaceWith(div);
+    };
+
+    const isPdf = (url) => /\.pdf(\?|#|$)/i.test(url.pathname + url.search);
+
+    const withEmbedParams = (url) => {
+        url.searchParams.set("embed", "1");
+        url.searchParams.set("chrome", chrome);
+        url.searchParams.set("nav", nav);
+        if (theme) url.searchParams.set("theme", theme);
+        // Ohne host verlieren die Folgeseiten die Adresse der einbettenden Seite.
+        if (hostParam) url.searchParams.set("host", hostParam);
+        return url;
+    };
+
+    const onClick = (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const anchor = e.target.closest && e.target.closest("a[href]");
+        if (!anchor) return;
+
+        const href = anchor.getAttribute("href");
+        if (!href || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+
+        let url;
+        try {
+            url = new URL(anchor.href, location.href);
+        } catch (err) {
+            return;
+        }
+
+        // Anker auf derselben Seite bleiben immer im Iframe.
+        const samePage = url.origin === location.origin && url.pathname === location.pathname && url.hash;
+        if (samePage) return;
+
+        const external = url.origin !== location.origin;
+        if (external || isPdf(url) || nav === "pinned") {
+            e.preventDefault();
+            window.open(url.href, "_blank", "noopener");
+            return;
+        }
+
+        // nav="framework": im Iframe navigieren, Embed-Zustand mitnehmen.
+        e.preventDefault();
+        location.href = withEmbedParams(url).href;
+    };
+
+    /* --- Nachrichten der einbettenden Seite ---------------------------------- */
+
+    window.addEventListener("message", (ev) => {
+        if (parentOrigin !== "*" && ev.origin !== parentOrigin) return;
+        if (ev.source !== window.parent) return;
+        const data = ev.data;
+        if (!data || typeof data !== "object") return;
+
+        if (data.type === "mdde:scrollTo" && typeof data.hash === "string" && data.hash) {
+            const target = document.getElementById(data.hash.replace(/^#/, ""));
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (data.type === "mdde:theme" && (data.theme === "light" || data.theme === "dark")) {
+            root.setAttribute("data-theme", data.theme);
+            root.setAttribute("data-embed-theme", data.theme);
+            scheduleHeight();
+        }
+    });
+
+    /* --- Start -------------------------------------------------------------- */
+
+    const init = () => {
+        if (nav === "pinned") unlinkBrand();
+        document.addEventListener("click", onClick);
+        send({ type: "mdde:ready", path: location.pathname, title: document.title });
+        send(locationPayload());
+        reportHeight();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+
 </body>
 </html>
 

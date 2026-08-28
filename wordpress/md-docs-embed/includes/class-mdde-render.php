@@ -238,10 +238,9 @@ class MDDE_Render {
 	/**
 	 * Pfad aus dem Abfrageparameter ?dok=, sofern unbedenklich.
 	 *
-	 * Bewusst eine Positivliste: Der Wert kommt aus einer URL, die jeder erzeugen
-	 * kann. Absolute URLs, Protokoll-relative Adressen und Verzeichniswechsel
-	 * werden verworfen, damit die Einbettung nicht auf ein fremdes Ziel umgelenkt
-	 * werden kann.
+	 * Die Prüfung selbst liegt in MDDE_URL::safe_relative_path() — dort, wo die
+	 * übrige Adressprüfung sitzt und wo der Test sie ohne WordPress erreicht.
+	 * Hier bleibt nur das Auslesen des Parameters.
 	 *
 	 * @return string Relativer Pfad oder leerer String.
 	 */
@@ -249,25 +248,7 @@ class MDDE_Render {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Leseparameter ohne Zustandsaenderung.
 		$raw = isset( $_GET['dok'] ) ? (string) wp_unslash( $_GET['dok'] ) : '';
 
-		// Vor dem Abschneiden pruefen: "//host/pfad" waere sonst nach dem ltrim nicht
-		// mehr als protokoll-relative Adresse erkennbar.
-		if ( 0 === strpos( $raw, '//' ) ) {
-			return '';
-		}
-		if ( false !== strpos( $raw, '://' ) || false !== strpos( $raw, '..' ) ) {
-			return '';
-		}
-
-		$raw = ltrim( $raw, '/' );
-
-		if ( '' === $raw ) {
-			return '';
-		}
-		if ( ! preg_match( '#^[A-Za-z0-9._/-]+$#', $raw ) ) {
-			return '';
-		}
-
-		return $raw;
+		return MDDE_URL::safe_relative_path( $raw );
 	}
 
 	/**

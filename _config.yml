@@ -15,6 +15,9 @@ defaults:
 relative_links:
   enabled: true
 
+# ACHTUNG: test/_config.test.yml spiegelt diese Liste ohne test/, damit die
+# Testdokumente für den Fixture-Vergleich gebaut werden. Änderungen hier dort
+# nachziehen.
 exclude:
   - harness/
   - wordpress/
