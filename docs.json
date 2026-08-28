@@ -8,6 +8,11 @@ um im Editor eine Auswahlliste anzubieten. Ausschluss einzelner Seiten ueber
 
 Wird per `cp -n` von der Reusable Workflow in die Kind-Repos uebernommen; die Inhalte
 entstehen dort aus den jeweils eigenen Seiten.
+
+`url` und `pdf` sind bewusst OHNE baseurl angegeben, also relativ zur Wurzel der
+jeweiligen Auslieferung. Der Konsument setzt die Adresse dieser Auslieferung davor.
+Mit `relative_url` stuende auf Staging "/staging/..." in der Datei, und zusammen mit
+einer Basis-URL, die bereits auf /staging/ zeigt, ergaebe das den Pfad doppelt.
 {%- endcomment -%}
 {%- assign listed = "" | split: "" -%}
 {%- for p in site.pages -%}
@@ -24,7 +29,7 @@ entstehen dort aus den jeweils eigenen Seiten.
       "slug": "{% assign s = p.url | split: '/' | last | replace: '.html', '' | replace: '.md', '' %}{{ s | default: 'index' }}",
       "title": {{ p.title | jsonify }},
       "subtitle": {{ p.subtitle | default: "" | jsonify }},
-      "url": "{{ p.url | relative_url }}",
+      "url": "{{ p.url }}",
       "pdf": {{ p.pdf | default: "" | jsonify }},
       "source": {{ p.source | default: "" | jsonify }},
       "template": "{{ p.template | default: site.template | default: 'base' }}",

@@ -117,10 +117,40 @@ class MDDE_URL {
 		$document = MDDE_Manifest::find( $src, $base_url );
 		if ( $document ) {
 			// Die Startseite hat die URL "/" und damit einen leeren Pfad.
-			return ltrim( (string) ( isset( $document['url'] ) ? $document['url'] : '' ), '/' );
+			$path = ltrim( (string) ( isset( $document['url'] ) ? $document['url'] : '' ), '/' );
+			return self::strip_base_path( $path, $base_url );
 		}
 
 		return 'docs/' . $src . '.html';
+	}
+
+	/**
+	 * Einen im Pfad bereits enthaltenen Basis-Abschnitt entfernen.
+	 *
+	 * Liegt die Auslieferung in einem Unterverzeichnis (z. B. /staging/), enthalten
+	 * die Pfade eines aelteren Manifests dieses Verzeichnis mit. Zusammen mit einer
+	 * Basis-URL, die ohnehin dorthin zeigt, ergaebe das den Abschnitt doppelt.
+	 * Neuere Manifeste liefern die Pfade ohne — dann tut diese Methode nichts.
+	 *
+	 * @param string $path     Pfad ohne führenden Schrägstrich.
+	 * @param string $base_url Basis-URL.
+	 * @return string
+	 */
+	private static function strip_base_path( $path, $base_url ) {
+		$base_path = (string) wp_parse_url( $base_url, PHP_URL_PATH );
+		$base_path = trim( $base_path, '/' );
+
+		if ( '' === $base_path ) {
+			return $path;
+		}
+		if ( $path === $base_path ) {
+			return '';
+		}
+		if ( 0 === strpos( $path, $base_path . '/' ) ) {
+			return ltrim( substr( $path, strlen( $base_path ) ), '/' );
+		}
+
+		return $path;
 	}
 
 	/**
