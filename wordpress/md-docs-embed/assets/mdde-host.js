@@ -2,7 +2,9 @@
  * Host-Skript der Einbettung (SPEC-007).
  *
  * Führt die Iframe-Höhe nach, schreibt bei Framework-Navigation den Pfad in die
- * Adresszeile und blendet bei Ladefehler einen Direktlink ein.
+ * Adresszeile, scrollt bei Ankersprüngen im Dokument die Seite (A18), kopiert für den
+ * Link an einer Überschrift die eigene Adresse (A19) und blendet bei Ladefehler einen
+ * Direktlink ein.
  *
  * Sicherheitsmodell nach Vorbild von wp-embed.js im WordPress-Core: eine Nachricht
  * wird nur akzeptiert, wenn Origin UND Absenderfenster stimmen.
@@ -37,6 +39,7 @@
 				min: parseInt( container.getAttribute( "data-min-height" ), 10 ) || 400,
 				max: parseInt( container.getAttribute( "data-max-height" ), 10 ) || 0,
 				sync: container.getAttribute( "data-sync-url" ) === "yes",
+				scrollOffset: parseInt( container.getAttribute( "data-scroll-offset" ), 10 ) || 0,
 				ready: false,
 				sized: false
 			};
@@ -108,6 +111,117 @@
 		embed.frame.style.height = height + "px";
 	}
 
+	/**
+	 * Zusätzlicher Abstand über dem Ziel: die Adminleiste, falls sie mitscrollt, dazu
+	 * der eingestellte Wert für eine fixe Kopfzeile des Themes.
+	 */
+	function stickyOffset( embed ) {
+		var offset = 8 + embed.scrollOffset;
+		var bar = document.getElementById( "wpadminbar" );
+		if ( bar ) {
+			var position = window.getComputedStyle( bar ).position;
+			if ( "fixed" === position || "sticky" === position ) {
+				offset += bar.offsetHeight;
+			}
+		}
+		return offset;
+	}
+
+	/**
+	 * Ankersprung im Dokument. Das Iframe ist so hoch wie sein Inhalt und hat keinen
+	 * eigenen Scrollweg - gescrollt wird hier. Nur bei erreichter Höhendeckelung gibt
+	 * es im Iframe etwas zu scrollen; dann geht der Abstand zurück (A18).
+	 */
+	function scrollToAnchor( embed, data ) {
+		var offset = Number( data.offset );
+		if ( ! isFinite( offset ) || offset < 0 ) {
+			return;
+		}
+
+		if ( "1" === embed.frame.getAttribute( "data-clamped" ) ) {
+			post( embed, { type: "mdde:scrollSelf", offset: offset, smooth: !! data.smooth } );
+			return;
+		}
+
+		var top = embed.frame.getBoundingClientRect().top + window.pageYOffset + offset - stickyOffset( embed );
+		try {
+			window.scrollTo( { top: Math.max( 0, top ), behavior: data.smooth ? "smooth" : "auto" } );
+		} catch ( e ) {
+			window.scrollTo( 0, Math.max( 0, top ) );
+		}
+
+		writeHash( data.hash );
+	}
+
+	/**
+	 * Anker in die eigene Adresszeile schreiben, damit ein geteilter Link denselben
+	 * Punkt trifft. Nur unverdächtige Werte - der Text kommt aus dem Iframe.
+	 */
+	function writeHash( hash ) {
+		if ( typeof hash !== "string" || ! /^#[A-Za-z0-9\-._~%!$&'()*+,;=:@\/]+$/.test( hash ) ) {
+			return "";
+		}
+		var href = "";
+		try {
+			var url = new URL( window.location.href );
+			url.hash = hash;
+			href = url.toString();
+		} catch ( e ) {
+			return "";
+		}
+		if ( window.history && window.history.replaceState ) {
+			try {
+				window.history.replaceState( null, "", href );
+			} catch ( e ) { /* Adresse bleibt stehen */ }
+		}
+		return href;
+	}
+
+	/**
+	 * Kopieren in die Zwischenablage. Im Iframe scheitert das an der
+	 * Berechtigungsrichtlinie, hier nicht - die Aktivierung durch den Klick im Iframe
+	 * gilt auch für dieses Fenster.
+	 */
+	function copyText( text ) {
+		if ( window.navigator && navigator.clipboard && navigator.clipboard.writeText ) {
+			return navigator.clipboard.writeText( text ).then(
+				function () { return true; },
+				function () { return legacyCopy( text ); }
+			);
+		}
+		return Promise.resolve( legacyCopy( text ) );
+	}
+
+	function legacyCopy( text ) {
+		var field = document.createElement( "textarea" );
+		field.value = text;
+		field.setAttribute( "readonly", "" );
+		field.style.position = "absolute";
+		field.style.left = "-9999px";
+		document.body.appendChild( field );
+		field.select();
+		var ok = false;
+		try {
+			ok = document.execCommand( "copy" );
+		} catch ( e ) { /* ohne Zwischenablage bleibt ok false */ }
+		document.body.removeChild( field );
+		return ok;
+	}
+
+	/**
+	 * Link an einer Überschrift: kopiert wird die Adresse dieser Seite mit Anker,
+	 * nicht die der Docs-Instanz (A19).
+	 */
+	function copyLink( embed, data ) {
+		var href = writeHash( data.hash );
+		if ( ! href ) {
+			return;
+		}
+		copyText( href ).then( function ( ok ) {
+			post( embed, { type: "mdde:copied", ok: !! ok, url: href } );
+		} );
+	}
+
 	function post( embed, payload ) {
 		if ( ! embed.frame.contentWindow || ! embed.origin ) {
 			return;
@@ -177,6 +291,12 @@
 				break;
 			case "mdde:location":
 				syncLocation( embed, data );
+				break;
+			case "mdde:anchor":
+				scrollToAnchor( embed, data );
+				break;
+			case "mdde:copyLink":
+				copyLink( embed, data );
 				break;
 			default:
 				break;

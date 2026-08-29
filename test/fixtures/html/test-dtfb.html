@@ -453,6 +453,11 @@ Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.<
             toastTimer = setTimeout(() => toast.classList.remove("base-toast--visible"), 2000);
         };
 
+        // Die Embed-Bruecke (SPEC-007) kopiert im Namen der einbettenden Seite und
+        // braucht dafuer beides: die Bestaetigung und die Rueckfallebene von hier.
+        window.baseCopyText = baseCopyText;
+        window.baseShowCopyToast = showCopyToast;
+
         const initHeadingLinks = () => {
             const wrapper = document.querySelector(".wrapper");
             if (!wrapper) return;
@@ -479,6 +484,9 @@ Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.<
 
                 link.addEventListener("click", async (event) => {
                     event.preventDefault();
+                    // Eingebettet gehoert der Link der einbettenden Seite: eine Adresse
+                    // dieser Instanz fuehrte aus der Verbandsseite heraus (SPEC-007 A19).
+                    if (typeof window.baseEmbedCopyLink === "function" && window.baseEmbedCopyLink(id)) return;
                     const url = `${window.location.origin}${window.location.pathname}#${id}`;
                     await baseCopyText(url);
                     history.replaceState(null, "", `#${id}`);
@@ -737,6 +745,48 @@ Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.<
         } catch (e) { /* einbettende Seite nicht erreichbar - nicht kritisch */ }
     };
 
+    /* --- Anker: scrollen muss die einbettende Seite -------------------------- */
+
+    // Das Iframe ist so hoch wie sein Inhalt und traegt scrolling="no" - es hat also
+    // keinen eigenen Scrollweg. Ein Ankersprung im Iframe bewegt darum nichts sichtbar.
+    // Gemeldet wird der Abstand des Ziels vom Dokumentanfang; die einbettende Seite
+    // rechnet ihn in ihre Koordinaten um und scrollt (SPEC-007 A18).
+    const anchorTarget = (hash) => {
+        const raw = String(hash || "").replace(/^#/, "");
+        if (!raw) return null;
+        let id = raw;
+        try { id = decodeURIComponent(raw); } catch (e) { /* Rohwert verwenden */ }
+        return document.getElementById(id)
+            || document.getElementById(raw)
+            || document.getElementsByName(id)[0]
+            || null;
+    };
+
+    const requestScroll = (hash, smooth) => {
+        const target = anchorTarget(hash);
+        if (!target) return false;
+        const offset = Math.max(0, Math.round(target.getBoundingClientRect().top + window.scrollY));
+        send({
+            type: "mdde:anchor",
+            hash: "#" + String(hash).replace(/^#/, ""),
+            offset: offset,
+            smooth: !!smooth
+        });
+        return true;
+    };
+
+    /* --- Kopier-Link an Ueberschriften --------------------------------------- */
+
+    // Kopiert wird in der einbettenden Seite: nur sie kennt ihre eigene Adresse, und
+    // navigator.clipboard scheitert im fremden Iframe an der Berechtigungsrichtlinie.
+    // Das Layout ruft diesen Haken, statt selbst zu kopieren (SPEC-007 A19).
+    window.baseEmbedCopyLink = (id) => {
+        if (window.parent === window || !id) return false;
+        send({ type: "mdde:copyLink", hash: "#" + id });
+        try { history.replaceState(null, "", "#" + id); } catch (e) { /* Adresse bleibt stehen */ }
+        return true;
+    };
+
     /* --- Hoehe melden ------------------------------------------------------- */
 
     let lastHeight = 0;
@@ -848,9 +898,17 @@ Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.<
             return;
         }
 
-        // Anker auf derselben Seite bleiben immer im Iframe.
+        // Anker auf derselben Seite: Der Sprung des Browsers ginge ins Leere, weil das
+        // Iframe keinen Scrollweg hat - scrollen muss die einbettende Seite (A18).
         const samePage = url.origin === location.origin && url.pathname === location.pathname && url.hash;
-        if (samePage) return;
+        if (samePage) {
+            e.preventDefault();
+            if (requestScroll(url.hash, true)) {
+                try { history.replaceState(null, "", url.hash); } catch (err) { /* Adresse bleibt stehen */ }
+                if (nav === "framework") send(locationPayload());
+            }
+            return;
+        }
 
         const external = url.origin !== location.origin;
         if (external || isPdf(url) || nav === "pinned") {
@@ -873,8 +931,19 @@ Die Seitenzahl erscheint rechts in der Fußzeile im Format „Seite X von Y”.<
         if (!data || typeof data !== "object") return;
 
         if (data.type === "mdde:scrollTo" && typeof data.hash === "string" && data.hash) {
-            const target = document.getElementById(data.hash.replace(/^#/, ""));
-            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+            requestScroll(data.hash, false);
+        } else if (data.type === "mdde:scrollSelf" && typeof data.offset === "number" && isFinite(data.offset)) {
+            // Nur bei gedeckelter Hoehe: dann gibt es hier ueberhaupt einen Scrollweg.
+            window.scrollTo({ top: Math.max(0, data.offset), behavior: data.smooth ? "smooth" : "auto" });
+        } else if (data.type === "mdde:copied") {
+            if (data.ok) {
+                if (typeof window.baseShowCopyToast === "function") window.baseShowCopyToast();
+            } else if (typeof data.url === "string" && data.url && typeof window.baseCopyText === "function") {
+                // Rueckfallebene im Dokument - greift nur mit allow="clipboard-write".
+                Promise.resolve(window.baseCopyText(data.url)).then(() => {
+                    if (typeof window.baseShowCopyToast === "function") window.baseShowCopyToast();
+                }, () => { /* ohne Zwischenablage keine Bestaetigung */ });
+            }
         } else if (data.type === "mdde:theme" && (data.theme === "light" || data.theme === "dark")) {
             root.setAttribute("data-theme", data.theme);
             root.setAttribute("data-embed-theme", data.theme);

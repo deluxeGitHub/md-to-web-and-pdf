@@ -301,6 +301,11 @@
             toastTimer = setTimeout(() => toast.classList.remove("base-toast--visible"), 2000);
         };
 
+        // Die Embed-Bruecke (SPEC-007) kopiert im Namen der einbettenden Seite und
+        // braucht dafuer beides: die Bestaetigung und die Rueckfallebene von hier.
+        window.baseCopyText = baseCopyText;
+        window.baseShowCopyToast = showCopyToast;
+
         const initHeadingLinks = () => {
             const wrapper = document.querySelector(".wrapper");
             if (!wrapper) return;
@@ -327,6 +332,9 @@
 
                 link.addEventListener("click", async (event) => {
                     event.preventDefault();
+                    // Eingebettet gehoert der Link der einbettenden Seite: eine Adresse
+                    // dieser Instanz fuehrte aus der Verbandsseite heraus (SPEC-007 A19).
+                    if (typeof window.baseEmbedCopyLink === "function" && window.baseEmbedCopyLink(id)) return;
                     const url = `${window.location.origin}${window.location.pathname}#${id}`;
                     await baseCopyText(url);
                     history.replaceState(null, "", `#${id}`);

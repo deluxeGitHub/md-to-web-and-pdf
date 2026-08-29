@@ -3,7 +3,7 @@
  * Plugin Name:       Verbandsdokumente einbetten
  * Plugin URI:        https://github.com/deluxeGitHub/md-to-web-and-pdf
  * Description:       Bettet einzelne Dokumente oder das gesamte Dokumenten-Framework (docs.btfv.de) als Iframe in WordPress-Seiten ein. Höhe folgt dem Inhalt, keine zweite Scrollleiste.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            BTFV
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MDDE_VERSION', '1.0.0' );
+define( 'MDDE_VERSION', '1.1.0' );
 define( 'MDDE_FILE', __FILE__ );
 define( 'MDDE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MDDE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -45,6 +45,7 @@ function mdde_default_options() {
 		'theme'            => 'light',
 		'min_height'       => 400,
 		'max_height'       => 0,
+		'scroll_offset'    => 0,
 		'error_text'       => __( 'Das Dokument konnte nicht geladen werden.', 'md-docs-embed' ),
 	);
 }
