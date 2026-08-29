@@ -111,6 +111,9 @@ class MDDE_Settings {
 		}
 		$clean['max_height'] = $max;
 
+		$offset = isset( $input['scroll_offset'] ) ? absint( $input['scroll_offset'] ) : 0;
+		$clean['scroll_offset'] = $offset > 400 ? 400 : $offset;
+
 		$text = isset( $input['error_text'] ) ? sanitize_text_field( (string) $input['error_text'] ) : '';
 		$clean['error_text'] = '' === $text ? $defaults['error_text'] : $text;
 
@@ -219,6 +222,15 @@ class MDDE_Settings {
 								name="<?php echo esc_attr( MDDE_OPTION ); ?>[max_height]"
 								value="<?php echo esc_attr( (string) $options['max_height'] ); ?>"> px
 							<p class="description"><?php esc_html_e( 'Maximalhöhe 0 bedeutet: unbegrenzt, das Dokument wird vollständig ausgeklappt.', 'md-docs-embed' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="mdde-scroll-offset"><?php esc_html_e( 'Abstand beim Ankersprung', 'md-docs-embed' ); ?></label></th>
+						<td>
+							<input type="number" id="mdde-scroll-offset" min="0" max="400" step="5" class="small-text"
+								name="<?php echo esc_attr( MDDE_OPTION ); ?>[scroll_offset]"
+								value="<?php echo esc_attr( (string) $options['scroll_offset'] ); ?>"> px
+							<p class="description"><?php esc_html_e( 'Klick auf einen Eintrag im Inhaltsverzeichnis scrollt die Seite. Hat das Theme eine mitlaufende Kopfzeile, verdeckt sie sonst die Überschrift — hier ihre Höhe eintragen. Die Adminleiste wird automatisch berücksichtigt.', 'md-docs-embed' ); ?></p>
 						</td>
 					</tr>
 					<tr>

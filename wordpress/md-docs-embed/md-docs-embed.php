@@ -45,6 +45,7 @@ function mdde_default_options() {
 		'theme'            => 'light',
 		'min_height'       => 400,
 		'max_height'       => 0,
+		'scroll_offset'    => 0,
 		'error_text'       => __( 'Das Dokument konnte nicht geladen werden.', 'md-docs-embed' ),
 	);
 }

@@ -179,6 +179,7 @@ class MDDE_Render {
 			data-origin="<?php echo esc_attr( MDDE_URL::origin( $url ) ); ?>"
 			data-min-height="<?php echo esc_attr( (string) $args['min_height'] ); ?>"
 			data-max-height="<?php echo esc_attr( (string) $args['max_height'] ); ?>"
+			data-scroll-offset="<?php echo esc_attr( (string) (int) mdde_option( 'scroll_offset' ) ); ?>"
 			data-sync-url="<?php echo esc_attr( $args['sync_url'] ); ?>">
 			<iframe
 				class="mdde-embed__frame"
@@ -186,6 +187,8 @@ class MDDE_Render {
 				title="<?php echo esc_attr( $title ); ?>"
 				loading="lazy"
 				referrerpolicy="strict-origin-when-cross-origin"
+				<?php // Rueckfallebene fuer den Kopier-Link im Dokument (A19); regulaer kopiert das Host-Skript. ?>
+				allow="clipboard-write"
 				<?php
 				// Ohne Deckelung folgt die Hoehe dem Inhalt, im Iframe gibt es also nie
 				// etwas zu scrollen. Das Attribut ist zwar veraltet, aber das einzige
