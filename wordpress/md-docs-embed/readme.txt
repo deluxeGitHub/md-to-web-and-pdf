@@ -4,7 +4,7 @@ Tags: embed, dokumente, satzung, iframe
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,15 @@ sich das auf "dunkel" oder "dem Gerät folgen" umstellen.
 Nein. Nur die eingestellte Basis-URL und ausdrücklich freigegebene Adressen.
 
 == Changelog ==
+
+= 1.1.0 =
+* Sprungmarken im Inhaltsverzeichnis funktionieren: Da das eingebettete Dokument
+  so hoch ist wie sein Inhalt, hat es keinen eigenen Scrollweg — jetzt scrollt die
+  WordPress-Seite zur Überschrift. Bei gesetzter Maximalhöhe scrollt weiterhin das
+  Dokument selbst.
+* Der Link an einer Überschrift kopiert die Adresse der WordPress-Seite statt der
+  des Dokumentenservers.
+* Neue Einstellung "Abstand beim Ankersprung" für Themes mit mitlaufender Kopfzeile.
 
 = 1.0.0 =
 * Erste Fassung: Block, Shortcode, Einstellungsseite, Höhen-Nachführung,
